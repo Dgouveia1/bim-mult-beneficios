@@ -1,0 +1,444 @@
+import { _supabase } from './supabase.js';
+import { validateCPF, validateEmail, validatePhone } from './utils.js';
+
+// --- ELEMENTOS DO DOM ---
+const clientsTableBody = document.getElementById('clientsTableBody');
+const newClientModal = document.getElementById('newClientModal');
+const detailsClientModal = document.getElementById('detailsClientModal');
+const dependentesContainer = document.getElementById('dependentesContainer');
+const detailsDependentesContainer = document.getElementById('detailsDependentesContainer');
+let dependenteCount = 0;
+let dependenteDetailsCount = 0;
+
+// --- VARIÁVEL GLOBAL PARA ARMAZENAR TODAS AS PESSOAS (TITULARES E DEPENDENTES) ---
+let allPeople = [];
+
+function formatDateForSupabase(dateString) {
+    if (!dateString || !dateString.includes('/')) return null;
+    const parts = dateString.split('/');
+    if (parts.length !== 3) return null;
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
+
+// --- FUNÇÕES DE CRIAÇÃO ---
+
+function addDependenteField(container, counterVar) {
+    if (window[counterVar] >= 6) {
+        alert("É permitido no máximo 6 dependentes.");
+        return;
+    }
+    window[counterVar]++;
+    const id = window[counterVar];
+
+    const html = `
+        <div class="dependente-form-group" data-dependente-new-id="${id}">
+            <hr><h4>Novo Dependente ${id}</h4>
+            <div class="form-row">
+                <input type="hidden" name="dependente_novo_${id}" value="true">
+                <div class="form-group"><label>Nome</label><input type="text" name="dependente_nome_${id}" required></div>
+                <div class="form-group"><label>Sobrenome</label><input type="text" name="dependente_sobrenome_${id}" required></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${id}" maxlength="14"></div>
+                <div class="form-group"><label>Telefone</label><input type="text" name="dependente_telefone_${id}" maxlength="15"></div>
+            </div>
+        </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+// --- FUNÇÕES DE LEITURA, RENDERIZAÇÃO E FILTRO ---
+
+async function loadClientsData() {
+    if (!clientsTableBody) return;
+    clientsTableBody.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
+    try {
+        // 1. Busca todos os titulares e seus dependentes de uma vez
+        const { data: clients, error } = await _supabase
+            .from('clients')
+            .select(`
+                *,
+                dependents ( * )
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // 2. Transforma os dados em uma lista única de pessoas
+        const peopleList = [];
+        clients.forEach(client => {
+            // Adiciona o titular à lista
+            peopleList.push({
+                titular_id: client.id,
+                nome: client.nome,
+                cpf: client.cpf,
+                telefone: client.telefone,
+                plano: client.plano,
+                status: client.status,
+                tipo: 'Titular'
+            });
+
+            // Adiciona os dependentes do titular à lista
+            if (client.dependents) {
+                client.dependents.forEach(dep => {
+                    peopleList.push({
+                        titular_id: client.id, // Importante: o ID de referência é sempre o do titular
+                        nome: dep.nome,
+                        cpf: dep.cpf,
+                        telefone: dep.telefone,
+                        plano: client.plano, // Dependente herda o plano e status
+                        status: client.status,
+                        tipo: 'Dependente'
+                    });
+                });
+            }
+        });
+
+        allPeople = peopleList; // Salva na variável global
+        renderClientsTable(allPeople);
+
+    } catch (error) {
+        clientsTableBody.innerHTML = `<tr><td colspan="6" style="color:red;">Erro ao carregar os dados: ${error.message}</td></tr>`;
+        allPeople = [];
+    }
+}
+
+function renderClientsTable(people) {
+    if (!clientsTableBody) return;
+    clientsTableBody.innerHTML = '';
+    
+    // Atualiza contadores
+    document.getElementById('resultsCount').textContent = people.length;
+    document.getElementById('totalResults').textContent = allPeople.length;
+
+    if (people.length === 0) {
+        clientsTableBody.innerHTML = '<tr><td colspan="6">Nenhuma pessoa encontrada.</td></tr>';
+        return;
+    }
+
+    people.forEach(person => {
+        const row = document.createElement('tr');
+        // O botão agora usa 'data-titular-id' para sempre abrir o cadastro do titular
+        row.innerHTML = `
+            <td>${person.nome || 'N/A'} (${person.tipo})</td>
+            <td>${person.cpf || 'N/A'}</td>
+            <td>${person.telefone || 'N/A'}</td>
+            <td>${person.plano || 'N/A'}</td>
+            <td><span class="status status-${person.status === 'ATIVO' ? 'active' : 'inactive'}">${person.status}</span></td>
+            <td class="actions">
+                <button class="btn btn-secondary btn-small" data-titular-id="${person.titular_id}">Ver Detalhes</button>
+            </td>
+        `;
+        clientsTableBody.appendChild(row);
+    });
+}
+
+function filterAndRenderClients() {
+    const searchTerm = document.getElementById('clientsSearchInput').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderClientsTable(allPeople);
+        return;
+    }
+
+    const filteredPeople = allPeople.filter(person => {
+        const nome = person.nome ? person.nome.toLowerCase() : '';
+        const cpf = person.cpf ? person.cpf.toString().replace(/\D/g, '') : '';
+        const telefone = person.telefone ? person.telefone.toString().replace(/\D/g, '') : '';
+
+        return nome.includes(searchTerm) ||
+               cpf.includes(searchTerm) ||
+               telefone.includes(searchTerm);
+    });
+
+    renderClientsTable(filteredPeople);
+}
+
+// --- FUNÇÕES DE SUBMISSÃO (CREATE/UPDATE) ---
+
+async function handleNewClientSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const formData = new FormData(form);
+    const formProps = Object.fromEntries(formData);
+    
+    // Validações do Titular
+    if (!validateCPF(formProps.cpf)) {
+        alert('O CPF do titular é inválido!');
+        return;
+    }
+    if (!validateEmail(formProps.email)) {
+        alert('O Email do titular é inválido!');
+        return;
+    }
+     if (!validatePhone(formProps.telefone)) {
+        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        return;
+    }
+
+    const titularData = {};
+    const dependentesData = [];
+    const dependentesFields = {};
+
+    for (const key in formProps) {
+        if (key.startsWith('dependente_')) {
+            const [, field, index] = key.split('_');
+            if (!dependentesFields[index]) dependentesFields[index] = {};
+            dependentesFields[index][field] = formProps[key];
+        } else {
+            titularData[key] = formProps[key];
+        }
+    }
+    
+    for (const index in dependentesFields) {
+        // Validação do CPF do dependente
+        if (!validateCPF(dependentesFields[index].cpf)) {
+            alert(`O CPF do dependente ${dependentesFields[index].nome} é inválido!`);
+            return;
+        }
+        if (!validatePhone(dependentesFields[index].telefone)) {
+            alert(`O Telefone do dependente ${dependentesFields[index].nome} parece inválido!`);
+            return;
+        }
+        dependentesData.push(dependentesFields[index]);
+    }
+    
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    
+    titularData.data_nascimento = formatDateForSupabase(titularData.data_nascimento);
+
+    try {
+        const { data: newTitular, error: titularError } = await _supabase
+            .from('clients')
+            .insert(titularData)
+            .select()
+            .single();
+
+        if (titularError) throw titularError;
+
+        const titularId = newTitular.id;
+
+        if (dependentesData.length > 0) {
+            const dependentesParaSalvar = dependentesData.map(dep => {
+                delete dep.novo;
+                dep.data_nascimento = formatDateForSupabase(dep.data_nascimento);
+                return { ...dep, titular_id: titularId };
+            });
+
+            const { error: dependentesError } = await _supabase
+                .from('dependents')
+                .insert(dependentesParaSalvar);
+
+            if (dependentesError) throw dependentesError;
+        }
+
+        alert('Cliente e dependentes cadastrados com sucesso!');
+        closeModal(newClientModal);
+        form.reset();
+        document.getElementById('dependentesContainer').innerHTML = '';
+        dependenteCount = 0;
+        loadClientsData();
+
+    } catch (error) {
+        alert('Erro ao salvar cliente: ' + error.message);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Salvar';
+    }
+}
+
+// --- FUNÇÕES DE DETALHES E ATUALIZAÇÃO ---
+
+async function openDetailsModal(clientId) {
+    const form = document.getElementById('detailsClientForm');
+    form.reset();
+    detailsDependentesContainer.innerHTML = '';
+    dependenteDetailsCount = 0;
+
+    try {
+        const { data: client, error: clientError } = await _supabase.from('clients').select('*').eq('id', clientId).single();
+        if (clientError) throw clientError;
+
+        const { data: dependents, error: dependentsError } = await _supabase.from('dependents').select('*').eq('titular_id', clientId);
+        if (dependentsError) throw dependentsError;
+
+        populateDetailsForm(client, dependents);
+        openModal(detailsClientModal);
+    } catch (error) {
+        alert('Não foi possível carregar os detalhes do cliente.');
+    }
+}
+
+function populateDetailsForm(client, dependents) {
+    document.getElementById('detailsClientId').value = client.id;
+    document.getElementById('details_nome').value = client.nome || '';
+    document.getElementById('details_sobrenome').value = client.sobrenome || '';
+    document.getElementById('details_telefone').value = client.telefone || '';
+    document.getElementById('details_cpf').value = client.cpf || '';
+    document.getElementById('details_email').value = client.email || '';
+    if (client.data_nascimento) {
+        const [year, month, day] = client.data_nascimento.split('-');
+        document.getElementById('details_data_nascimento').value = `${day}/${month}/${year}`;
+    }
+    document.getElementById('details_plano').value = client.plano || '';
+    document.getElementById('details_status').value = client.status || 'ATIVO';
+    document.getElementById('details_cep').value = client.cep || '';
+    document.getElementById('details_endereco').value = client.endereco || '';
+    document.getElementById('details_municipio').value = client.municipio || '';
+    
+    if (dependents && dependents.length > 0) {
+        dependents.forEach(dep => {
+            const depHTML = `
+                <div class="dependente-form-group" data-dependente-id="${dep.id}">
+                     <hr>
+                    <div class="form-row">
+                        <input type="hidden" name="dependente_id_${dep.id}" value="${dep.id}">
+                        <div class="form-group"><label>Nome</label><input type="text" name="dependente_nome_${dep.id}" value="${dep.nome || ''}"></div>
+                        <div class="form-group"><label>Sobrenome</label><input type="text" name="dependente_sobrenome_${dep.id}" value="${dep.sobrenome || ''}"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${dep.id}" value="${dep.cpf || ''}" maxlength="14"></div>
+                        <div class="form-group"><label>Telefone</label><input type="text" name="dependente_telefone_${dep.id}" value="${dep.telefone || ''}" maxlength="15"></div>
+                    </div>
+                </div>`;
+            detailsDependentesContainer.insertAdjacentHTML('beforeend', depHTML);
+        });
+        dependenteDetailsCount = dependents.length;
+    }
+}
+
+async function handleUpdateClient(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const formData = new FormData(form);
+    const formProps = Object.fromEntries(formData);
+    
+    // Validação do Titular
+    if (!validateCPF(formProps.cpf)) {
+        alert('O CPF do titular é inválido!');
+        return;
+    }
+    if (!validateEmail(formProps.email)) {
+        alert('O Email do titular é inválido!');
+        return;
+    }
+     if (!validatePhone(formProps.telefone)) {
+        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        return;
+    }
+    
+    const titularId = formProps.id;
+    const titularData = {
+        nome: formProps.details_nome,
+        sobrenome: formProps.details_sobrenome,
+        telefone: formProps.details_telefone,
+        cpf: formProps.details_cpf,
+        email: formProps.details_email,
+        data_nascimento: formatDateForSupabase(formProps.details_data_nascimento),
+        plano: formProps.details_plano,
+        status: formProps.details_status,
+        cep: formProps.details_cep,
+        endereco: formProps.details_endereco,
+        municipio: formProps.details_municipio,
+    };
+    
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        const { error: titularError } = await _supabase.from('clients').update(titularData).eq('id', titularId);
+        if (titularError) throw titularError;
+
+        // Lógica para Dependentes
+        const dependentesUpsert = [];
+        const novosDependentes = [];
+        const allDependenteGroups = form.querySelectorAll('.dependente-form-group');
+
+        for (const group of allDependenteGroups) {
+            const id = group.dataset.dependenteId;
+            const newId = group.dataset.dependenteNewId;
+            
+            let dependente = {};
+            if (id) {
+                dependente = {
+                    id: id,
+                    titular_id: titularId,
+                    nome: group.querySelector(`[name="dependente_nome_${id}"]`).value,
+                    sobrenome: group.querySelector(`[name="dependente_sobrenome_${id}"]`).value,
+                    cpf: group.querySelector(`[name="dependente_cpf_${id}"]`).value,
+                    telefone: group.querySelector(`[name="dependente_telefone_${id}"]`).value,
+                };
+                 if (!validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
+                 if (!validatePhone(dependente.telefone)) { throw new Error(`Telefone do dependente ${dependente.nome} é inválido.`); }
+                dependentesUpsert.push(dependente);
+            } else if (newId) {
+                dependente = {
+                    titular_id: titularId,
+                    nome: group.querySelector(`[name="dependente_nome_${newId}"]`).value,
+                    sobrenome: group.querySelector(`[name="dependente_sobrenome_${newId}"]`).value,
+                    cpf: group.querySelector(`[name="dependente_cpf_${newId}"]`).value,
+                    telefone: group.querySelector(`[name="dependente_telefone_${newId}"]`).value,
+                };
+                 if (!validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
+                 if (!validatePhone(dependente.telefone)) { throw new Error(`Telefone do dependente ${dependente.nome} é inválido.`); }
+                novosDependentes.push(dependente);
+            }
+        }
+
+        if (dependentesUpsert.length > 0) {
+            const { error: upsertError } = await _supabase.from('dependents').upsert(dependentesUpsert);
+            if (upsertError) throw upsertError;
+        }
+
+        if (novosDependentes.length > 0) {
+            const { error: insertError } = await _supabase.from('dependents').insert(novosDependentes);
+            if (insertError) throw insertError;
+        }
+
+        alert('Cliente atualizado com sucesso!');
+        closeModal(detailsClientModal);
+        loadClientsData();
+
+    } catch (error) {
+        alert('Erro ao atualizar cliente: ' + error.message);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Salvar Alterações';
+    }
+}
+
+// --- FUNÇÕES AUXILIARES ---
+function openModal(modalElement) {
+    if (modalElement) modalElement.style.display = 'flex';
+}
+
+function closeModal(modalElement) {
+    if (modalElement) modalElement.style.display = 'none';
+}
+
+// --- FUNÇÃO DE EXPORTAÇÃO ---
+function exportToExcel() {
+    if (allPeople.length === 0) {
+        alert("Não há dados para exportar.");
+        return;
+    }
+    const dataToExport = allPeople.map(person => ({
+        "Nome": person.nome,
+        "Tipo": person.tipo,
+        "CPF": person.cpf,
+        "Telefone": person.telefone,
+        "Plano": person.plano,
+        "Status": person.status
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes_e_Dependentes");
+    XLSX.writeFile(workbook, "Todos_Beneficiarios.xlsx");
+}
+
+// --- EXPORTAÇÕES ---
+export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople };

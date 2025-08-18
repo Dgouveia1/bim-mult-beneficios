@@ -1,0 +1,14 @@
+/* =================================================================
+   PÁGINA: DISPAROS
+   ================================================================= */
+
+/* Estilos específicos para a página de disparos */
+.form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.form-actions .btn {
+    min-width: 150px;
+} 

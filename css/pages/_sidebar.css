@@ -1,0 +1,87 @@
+/* =================================================================
+   PÁGINA: SIDEBAR
+   ================================================================= */
+
+.sidebar { 
+    width: var(--sidebar-width); 
+    background: var(--sidebar-bg); 
+    color: var(--white); 
+    display: flex; 
+    flex-direction: column; 
+    z-index: 1000; 
+    height: 100vh; 
+    overflow-y: auto; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.logo-container { 
+    padding: 30px 20px; 
+    text-align: center; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+}
+
+.logo-text { 
+    font-size: 24px; 
+    font-weight: 600; 
+}
+
+.logo-subtitle { 
+    font-size: 11px; 
+    opacity: 0.8; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+}
+
+.menu-item, 
+.submenu-item { 
+    padding: 18px 25px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    border-left: 4px solid transparent; 
+    color: var(--gray-light); 
+    text-decoration: none; 
+    display: block; 
+}
+
+.menu-item:hover, 
+.menu-item.active { 
+    background: var(--sidebar-hover); 
+    border-left-color: var(--primary-color); 
+    color: var(--white); 
+}
+
+.submenu { 
+    display: none; 
+    background: rgba(0,0,0,0.1); 
+}
+
+.submenu.active { 
+    display: block; 
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.submenu-item { 
+    padding-left: 45px; 
+    font-size: 14px; 
+}
+
+.submenu-item:hover, 
+.submenu-item.active { 
+    border-left-color: var(--primary-light); 
+}
+
+.sidebar-footer { 
+    margin-top: auto; 
+    padding: 20px; 
+} 

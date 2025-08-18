@@ -1,0 +1,39 @@
+/* =================================================================
+   CSS PRINCIPAL - BIM BENEFÍCIOS
+   ================================================================= */
+
+/* Importa estilos base (variáveis, resets, body) */
+@import url('base.css');
+
+/* Importa estilos de componentes reutilizáveis */
+@import url('components/_buttons.css');
+@import url('components/_cards.css');
+@import url('components/_tables.css');
+@import url('components/_search.css');
+@import url('components/_modals.css');
+
+/* Importa estilos específicos de cada página */
+@import url('pages/_login.css');
+@import url('pages/_sidebar.css');
+@import url('pages/_pacientes.css');
+@import url('pages/_status.css');
+@import url('pages/_recepcao.css');
+@import url('pages/_agenda.css');
+@import url('pages/_disparos.css'); 
+@import url('pages/_clientes.css');
+
+/* Estilos específicos para a impressão */
+@media print {
+   body * {
+       visibility: hidden; /* Esconde tudo */
+   }
+   #print-area, #print-area * {
+       visibility: visible; /* Mostra apenas a área de impressão */
+   }
+   #print-area {
+       position: absolute;
+       left: 0;
+       top: 0;
+       width: 100%;
+   }
+}

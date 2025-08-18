@@ -1,0 +1,33 @@
+/* =================================================================
+   COMPONENTE: BARRA DE PESQUISA
+   ================================================================= */
+
+   .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 20px;
+}
+
+.search-container i {
+    position: absolute;
+    left: 15px;
+    color: var(--gray-medium);
+}
+
+.search-container input[type="search"] {
+    width: 100%;
+    padding: 12px 15px 12px 40px; /* Espaço para o ícone */
+    border: 1px solid #ddd;
+    border-radius: 25px; /* Bordas arredondadas */
+    font-size: 22px;
+    transition: all 0.2s ease-in-out;
+}
+
+.search-container input[type="search"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
+}

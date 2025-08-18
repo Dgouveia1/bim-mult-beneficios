@@ -1,0 +1,94 @@
+/* =================================================================
+   PÁGINA: CLIENTES (Layout Melhorado)
+   ================================================================= */
+
+   .clients-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.clients-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.clients-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: #f0f4f8;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 21px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    background: #e2e8f0;
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.clients-table-container {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.table-header, .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8fafc;
+    color: #555;
+    font-size: 21px;
+}
+.table-header { border-bottom: 1px solid #e2e8f0; }
+.table-footer { border-top: 1px solid #e2e8f0; }
+
+.pagination { display: flex; gap: 5px; }
+.pagination-btn {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pagination-btn:hover { background: #f0f4f8; }
+.pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pagination-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 19px;
+    font-weight: 600;
+}
+.badge-danger { background-color: var(--cancelled-color); color: white; }
+.badge-success { background-color: var(--confirmed-color); color: white; }

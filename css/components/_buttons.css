@@ -1,0 +1,97 @@
+/* =================================================================
+   COMPONENTE: BOTÕES
+   ================================================================= */
+
+.btn { 
+    padding: 12px 24px; 
+    background: var(--primary-color); 
+    color: var(--white); 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 14px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    transition: all 0.3s ease;
+}
+
+.btn:hover { 
+    background: var(--primary-dark); 
+    transform: translateY(-1px);
+    box-shadow: var(--hover-shadow);
+}
+
+.btn-secondary { 
+    background: var(--secondary-color); 
+}
+
+.btn-secondary:hover { 
+    background: var(--secondary-dark); 
+}
+
+.btn-success { 
+    background: var(--confirmed-color); 
+}
+
+.btn-success:hover {
+    background: #45a049;
+}
+
+.btn-logout { 
+    background: #f44336; 
+    width: 100%; 
+}
+
+.btn-logout:hover { 
+    background: #d32f2f; 
+}
+
+/* Botões de Ação */
+.action-btn { 
+    width: 36px; 
+    height: 36px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    border: none; 
+    transition: all 0.3s ease;
+}
+
+.action-edit { 
+    background: rgba(70, 130, 180, 0.1); 
+    color: var(--secondary-color); 
+}
+
+.action-edit:hover { 
+    background: var(--secondary-color); 
+    color: white; 
+    transform: scale(1.1);
+}
+
+.action-delete { 
+    background: rgba(244, 67, 54, 0.1); 
+    color: var(--cancelled-color); 
+}
+
+.action-delete:hover { 
+    background: var(--cancelled-color); 
+    color: white; 
+    transform: scale(1.1);
+}
+
+/* Botões de Atendimento */
+.atendimento-botoes .btn { 
+    flex: 1; 
+    background: transparent; 
+    color: var(--secondary-color); 
+    border: 1px solid var(--secondary-color); 
+}
+
+.atendimento-botoes .btn.active, 
+.atendimento-botoes .btn:hover { 
+    background: var(--secondary-color); 
+    color: var(--white); 
+} 

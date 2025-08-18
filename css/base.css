@@ -1,0 +1,119 @@
+/* =================================================================
+   BASE CSS - Variáveis, Resets e Estilos Base
+   ================================================================= */
+
+:root {
+    /* Paleta de Cores Médica: Laranja e Azul */
+    --primary-color: #FF8C00; /* Laranja escuro - Cor Principal */
+    --primary-dark: #D2691E; /* Laranja queimado */
+    --primary-light: #FFA500; /* Laranja padrão */
+    --secondary-color: #4682B4; /* Azul aço */
+    --secondary-dark: #1E4D6B; /* Azul marinho mais escuro */
+    --secondary-light: #87CEEB; /* Azul céu */
+    --white: #FFFFFF;
+    --gray-light: #F5F5F5;
+    --gray-medium: #808080;
+    --black: #1A1A1A;
+    --blue-light: #e3f2fd;
+    
+    
+    /* Cores de Status */
+    --confirmed-color: #4CAF50;
+    --pending-color: #FF9800;
+    --cancelled-color: #F44336;
+    --info-color: #2196F3;
+    
+    
+    /* Sombras e Efeitos */
+    --card-shadow: 0 8px 32px rgba(210, 105, 30, 0.15);
+    --hover-shadow: 0 12px 40px rgba(210, 105, 30, 0.25);
+    --sidebar-bg: #1E4D6B;
+    --sidebar-hover: #2C5D7A;
+    --sidebar-width: 280px;
+}
+
+/* Reset e Estilos Base */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body { 
+    background: #F5F5F5; 
+    color: var(--black); 
+    font-family: 'Poppins', sans-serif; 
+    overflow-x: hidden; 
+    height: 100vh; 
+}
+
+.container { 
+    display: flex; 
+    height: 100vh; 
+    width: 100vw; 
+}
+
+/* Dashboard */
+.dashboard { 
+    display: none; 
+    width: 100%; 
+    height: 100vh; 
+    overflow: hidden; 
+}
+
+/* Main Content */
+.main-content { 
+    flex: 1; 
+    padding: 30px; 
+    overflow-y: auto; 
+    background: var(--gray-light); 
+    height: 100vh; 
+}
+
+.page-content { 
+    display: none; 
+    animation: fadeIn 0.3s ease-in-out; 
+}
+
+.page-content.active { 
+    display: block; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+.content-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 30px; 
+}
+
+.page-title { 
+    font-size: 28px; 
+    color: var(--secondary-dark); 
+}
+
+/* Formulários Base */
+.form-group { 
+    margin-bottom: 20px; 
+}
+
+.form-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    color: var(--gray-medium); 
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea { 
+    width: 100%; 
+    padding: 12px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    font-size: 15px; 
+}
+

@@ -1,0 +1,73 @@
+/* =================================================================
+   COMPONENTE: TABELAS
+   ================================================================= */
+
+.table-container { 
+    overflow-x: auto; 
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 22px; 
+}
+
+th { 
+    background-color: var(--secondary-color); 
+    color: var(--white); 
+    text-align: left; 
+    padding: 16px; 
+}
+
+td { 
+    padding: 14px 16px; 
+    border-bottom: 1px solid #eee; 
+}
+
+tr:nth-child(even) { 
+    background-color: var(--gray-light); 
+}
+
+tr:hover {
+    background-color: rgba(70, 130, 180, 0.05);
+}
+
+/* Status Tags */
+.status { 
+    padding: 6px 12px; 
+    border-radius: 20px; 
+    font-size: 12px; 
+    font-weight: 500;
+}
+
+.status-active { 
+    background: #e8f5e9; 
+    color: var(--confirmed-color); 
+}
+
+.status-inactive { 
+    background: #ffebee; 
+    color: var(--cancelled-color); 
+}
+
+.status-pending { 
+    background: #fffde7; 
+    color: var(--pending-color); 
+}
+
+/* Ações da Tabela */
+.actions { 
+    display: flex; 
+    gap: 10px; 
+} 
+/* ADICIONE ESTE BLOCO */
+.status-info { 
+    background: #e3f2fd; 
+    color: var(--info-color); 
+}
+/* FIM DO BLOCO */
+
+.status-pending { 
+    background: #fffde7; 
+    color: var(--pending-color); 
+}

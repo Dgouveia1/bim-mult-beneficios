@@ -1,0 +1,82 @@
+/* =================================================================
+   COMPONENTE: CARDS
+   ================================================================= */
+
+.card { 
+    background: var(--white); 
+    border-radius: 12px; 
+    box-shadow: var(--card-shadow); 
+    padding: 25px; 
+    margin-bottom: 30px; 
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-2px);
+}
+
+/* Cards de Pacientes */
+.patient-card { 
+    background: var(--white); 
+    border-radius: 8px; 
+    box-shadow: var(--card-shadow); 
+    padding: 20px; 
+    transition: all 0.3s ease;
+}
+
+.patient-card:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-1px);
+}
+
+.patient-card-header { 
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 15px; 
+    margin-bottom: 15px; 
+}
+
+.patient-card-header h4 { 
+    font-size: 18px; 
+    color: var(--secondary-dark); 
+}
+
+.patient-card-header span { 
+    font-size: 14px; 
+    color: var(--primary-color); 
+}
+
+.patient-card-body p { 
+    font-size: 14px; 
+    color: var(--gray-medium); 
+    margin-bottom: 8px; 
+}
+
+.patient-card-actions { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 20px; 
+}
+
+/* Cards de Informação do Paciente */
+.paciente-info-header { 
+    padding: 20px; 
+}
+
+.paciente-info-header h4 { 
+    margin-bottom: 15px; 
+}
+
+.paciente-info-header p { 
+    font-size: 14px; 
+    margin-bottom: 5px; 
+}
+
+.historico-item { 
+    padding: 15px; 
+}
+
+.historico-item p { 
+    font-size: 13px; 
+    margin-bottom: 5px; 
+} 

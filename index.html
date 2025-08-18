@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bim Benefícios - Sistema Interno</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo"><i class="fas fa-heartbeat"></i></div>
+            <h1 class="login-title">Bim Benefícios</h1>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="login-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="dashboard" id="dashboard" style="display:none;">
+        <div class="container">
+            <div class="sidebar" id="sidebar">
+                <div class="logo-container">
+                    <div class="logo-text">Bim Benefícios</div>
+                    <div class="logo-subtitle">Sistema Interno</div>
+                </div>
+                
+                <a href="#" class="menu-item active" data-page="home" id="menu-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                
+                <div class="menu-item" id="menu-cartao"><i class="fas fa-id-card"></i> Cartão Bim</div>
+                <div class="submenu" id="submenu-cartao">
+                    <a href="#" class="submenu-item" data-page="clientes">Clientes</a>
+                </div>
+                
+                <div class="menu-item" id="menu-clinica"><i class="fas fa-clinic-medical"></i> Clínica Bim</div>
+                <div class="submenu" id="submenu-clinica">
+                    <a href="#" class="submenu-item" data-page="recepcao">Recepção</a>
+                    <a href="#" class="submenu-item" data-page="agenda">Agenda</a>
+                    <a href="#" class="submenu-item" data-page="pacientes">Pacientes</a>
+                    <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
+                    <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
+                </div>
+            
+                <div class="admin-only">
+                    <div class="menu-item" id="menu-admin"><i class="fas fa-cogs"></i> Marketing & Admin</div>
+                    <div class="submenu" id="submenu-admin">
+                        <a href="#" class="submenu-item" data-page="produtos">Produtos</a>
+                        <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
+                        <a href="#" class="submenu-item" data-page="disparos">Disparos</a>
+                        <a href="#" class="submenu-item" data-page="status">Status Conexão</a>
+                        <a href="#" class="submenu-item" data-page="usuarios">Usuários</a>
+                    </div>
+                </div>
+            
+                <div class="sidebar-footer">
+                    <button class="btn btn-logout" id="logoutBtn">Sair</button>
+                </div>
+            </div>
+
+            <div class="main-content" id="mainContent">
+                <div class="page-content active" id="homePage">
+                    <h2 class="page-title">Dashboard</h2>
+                </div>
+
+                <div class="page-content" id="clientesPage">
+                    <div class="clients-page">
+                        <div class="clients-header">
+                            <h2 class="page-title">Clientes</h2>
+                            
+                            <div class="search-container" style="flex-grow: 1; max-width: 400px;">
+                                <i class="fas fa-search"></i>
+                                <input type="search" id="clientsSearchInput" placeholder="Buscar por nome, CPF ou telefone...">
+                            </div>
+                            
+                            <button class="btn" id="addClientBtn"><i class="fas fa-plus"></i> Novo Cliente</button>
+                            <button class="btn btn-secondary" id="exportClientsBtn"><i class="fas fa-download"></i> Exportar</button>
+                        </div>
+                        
+                        <div class="clients-table-container">
+                            <div class="table-header">
+                                <div class="results-info">Mostrando <span id="resultsCount">0</span> de <span id="totalResults">0</span> clientes</div>
+                            </div>
+                            
+                            <div class="card" style="box-shadow: none; border-radius: 0; margin-bottom: 0;">
+                                <div class="table-container">
+                                    <table id="clientsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome do Beneficiário</th>
+                                                <th>CPF</th>
+                                                <th>Telefone</th>
+                                                <th>Plano</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="clientsTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="table-footer">
+                                <div>Itens por página: 
+                                    <select id="itemsPerPage" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+                                        <option>10</option>
+                                        <option selected>25</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div class="pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page-content" id="recepcaoPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Recepção - Fila de Espera</h2>
+                    </div>
+                    <div class="reception-queue" id="receptionQueue"></div>
+                </div>
+
+                <div class="page-content" id="agendaPage">
+                    <div class="content-header" style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
+                        <h2 class="page-title">Agenda</h2>
+                        <div class="date-navigation">
+                            <button class="btn btn-secondary btn-small" id="prevDayBtn"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="currentDateDisplay" style="color: var(--secondary-dark);"></h3>
+                            <button class="btn btn-secondary btn-small" id="nextDayBtn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        
+                        <div class="professional-legend" id="professionalLegend">
+                            </div>
+
+                        <div style="margin-left: auto;">
+                            <button class="btn" id="newAppointmentBtn"><i class="fas fa-plus"></i> Novo Agendamento</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        
+                        <div class="schedule-container" id="scheduleContainer">
+                            </div>
+
+                        <div class="table-section" style="margin-top: 30px;">
+                            <h3 style="margin-bottom: 15px; color: var(--secondary-dark);">Próximos Agendamentos</h3>
+                            <div class="table-container">
+                                <table id="proximosAgendamentosTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Paciente</th>
+                                            <th>Horário</th>
+                                            <th>Profissional</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proximosAgendamentosBody">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+
+                <div class="page-content" id="pacientesPage">
+                    <div class="pacientes-container">
+                        <div class="consulta-coluna" id="filaAtendimento">
+                            <div class="coluna-header"><h3>Aguardando Atendimento</h3></div>
+                            <div class="lista-pacientes-espera" id="patientQueueList"></div>
+                        </div>
+
+                        <div class="consulta-coluna" id="infoPaciente">
+                            <div class="paciente-info-header card">
+                                <h4>Informações do Paciente</h4>
+                                <p><strong>Nome:</strong> <span id="currentPatientName">Selecione um paciente</span></p>
+                                <p><strong>Idade:</strong> <span id="currentPatientAge">-</span></p>
+                                <p><strong>Plano:</strong> <span id="currentPatientPlan">-</span></p>
+                            </div>
+                            <div class="coluna-header"><h3>Histórico de Consultas</h3></div>
+                            <div class="historico-consultas" id="patientHistoryContainer">
+                                <p>Selecione um paciente para ver o histórico.</p>
+                            </div>
+                        </div>
+
+                        <div class="consulta-coluna" id="areaAtendimento">
+                            <div class="card" id="consultationWorkspace" style="display: none;">
+                                <input type="hidden" id="currentAppointmentId">
+                                <div class="atendimento-botoes">
+                                    <button class="btn btn-secondary active" data-aba="conduta">Conduta</button>
+                                    <button class="btn btn-secondary" data-aba="receita">Receita</button>
+                                    <button class="btn btn-secondary" data-aba="exames">Exames</button>
+                                </div>
+                                <div class="atendimento-conteudo">
+                                    <div class="aba-conteudo active" id="abaConduta">
+                                        <div class="form-group"><label>Queixa Principal / Anamnese</label><textarea id="queixaPrincipal" rows="4"></textarea></div>
+                                        <div class="form-group"><label>Exame Físico</label><textarea id="exameFisico" rows="4"></textarea></div>
+                                        <div class="form-group"><label>Diagnóstico</label><textarea id="diagnostico" rows="4"></textarea></div>
+                                        <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaConduta">Imprimir Conduta</button>
+                                    </div>
+                                    <div class="aba-conteudo" id="abaReceita">
+                                        <div class="form-group"><label>Receituário</label><textarea id="receituario" rows="12"></textarea></div>
+                                        <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaReceita">Imprimir Receita</button>
+                                    </div>
+                                    <div class="aba-conteudo" id="abaExames">
+                                        <div class="form-group">
+                                            <label for="examSearchInput">Buscar Exame</label>
+                                            <div class="autocomplete-container">
+                                                <input type="text" id="examSearchInput" placeholder="Digite para buscar um exame..." autocomplete="off">
+                                                <div class="autocomplete-results" id="examSearchResults"></div>
+                                            </div>
+                                        </div>
+                                        <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5>
+                                        <div class="selected-items-list" id="selectedExamsList">
+                                            <p>Nenhum exame adicionado.</p>
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-small" id="printExamsBtn">
+                                            <i class="fas fa-print"></i> Imprimir Pedido e Orçamento
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="atendimento-actions">
+                                    <button class="btn btn-success" id="finalizeConsultationBtn">Finalizar Consulta</button>
+                                </div>
+                            </div>
+                            <div class="card" id="noPatientSelected">
+                                <p style="text-align: center; padding: 20px;">Selecione um paciente da fila para iniciar o atendimento.</p>
+                            </div>
+                        </div>
+                    </div> </div>
+
+                <div class="page-content" id="laboratorioPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Laboratório - Tabela de Exames</h2>
+                        <button class="btn" id="addExamBtn"><i class="fas fa-plus"></i> Adicionar Exame</button>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="examsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome do Exame</th>
+                                        <th>Descrição</th>
+                                        <th>Valor (R$)</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="examsTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content" id="profissionaisPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Gestão de Profissionais</h2>
+                        </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="professionalsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome do Profissional</th>
+                                        <th>Especialidade</th>
+                                        <th>CRM</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="professionalsTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content" id="produtosPage">
+                    <div class="content-header"><h2 class="page-title">Produtos</h2></div>
+                </div>
+
+                <div class="page-content" id="financeiroPage">
+                    <div class="content-header"><h2 class="page-title">Financeiro</h2></div>
+                </div>
+
+                <div class="page-content" id="disparosPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Disparos</h2>
+                    </div>
+                    <div class="card">
+                        <form id="disparoForm">
+                            <div class="form-group">
+                                <label for="mensagem">Mensagem</label>
+                                <textarea id="mensagem" rows="4" placeholder="Digite sua mensagem..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="imagem">Imagem (Opcional)</label>
+                                <input type="file" id="imagem" accept="image/*">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn">Enviar Mensagem</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="page-content" id="statusPage">
+                    <div class="content-header"><h2 class="page-title">Status de Conexão WhatsApp</h2></div>
+                    <div class="status-wrapper card">
+                        <div class="status-card-info">
+                            <h3>Status da Instância</h3>
+                            <p>Verifique o status da sua conexão com a API.</p>
+                            <div class="status-display" id="connectionStatus"><span class="status-text">INICIANDO...</span><div class="spinner-small"></div></div>
+                            <button id="disconnectBtn" class="btn btn-danger" style="display: none; margin-top: 20px;"><i class="fas fa-power-off"></i> Desconectar</button>
+                        </div>
+                        <div class="qrcode-container" id="qrcodeContainer" style="display: none;">
+                            <div class="qrcode-output" id="qrcodeOutput"></div>
+                            <p>Escaneie o QR Code com seu WhatsApp.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="page-content" id="usuariosPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Gestão de Usuários</h2>
+                        <button class="btn" id="addUserBtn"><i class="fas fa-plus"></i> Adicionar Usuário</button>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome Completo</th>
+                                        <th>Email</th>
+                                        <th>Função (Role)</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+    
+   <div class="modal" id="appointmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Agendamento</h2>
+                <button class="close-btn" id="closeAppointmentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentPatientSearch">Paciente</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="appointmentPatientSearch" placeholder="Digite para buscar..." autocomplete="off" required>
+                                <div class="autocomplete-results" id="patientSearchResults"></div>
+                            </div>
+                            <input type="hidden" id="appointmentPatientName" name="patient">
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentPatientCPF">CPF do Paciente</label>
+                            <input type="text" id="appointmentPatientCPF" name="patient_cpf" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentProcedure">Procedimento</label>
+                            <input type="text" id="appointmentProcedure" name="procedure">
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentProfessional">Profissional</label>
+                            <select id="appointmentProfessional" name="professionalId" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentDate">Data</label>
+                            <input type="date" id="appointmentDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentTime">Hora</label>
+                            <input type="time" id="appointmentTime" name="time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentRoom">Consultório</label>
+                            <select id="appointmentRoom" name="room" required>
+                                <option value="">Selecione</option>
+                                <option value="Consultório 1">Consultório 1</option>
+                                <option value="Consultório 2">Consultório 2</option>
+                                <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelAppointmentBtn">Cancelar</button>
+                        <button type="submit" class="btn">Agendar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="appointmentDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Agendamento</h2>
+                <button class="close-btn" data-close-modal="appointmentDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="appointmentDetailsForm">
+                    <input type="hidden" id="detailsAppointmentId">
+                    <h4>Dados do Paciente</h4>
+                    <div class="details-grid">
+                        <div><strong>Paciente:</strong> <span id="detailsPatientName"></span></div>
+                        <div><strong>CPF:</strong> <span id="detailsPatientCPF"></span></div>
+                        <div><strong>Telefone:</strong> <span id="detailsPatientPhone"></span></div>
+                        <div><strong>Plano:</strong> <span id="detailsPatientPlan"></span></div>
+                        <div><strong>Status:</strong> <span id="detailsPatientStatus"></span></div>
+                    </div>
+                    <hr style="margin: 20px 0;">
+                    <h4>Dados do Agendamento (Editável)</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="detailsAppointmentDate">Data</label>
+                            <input type="date" id="detailsAppointmentDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="detailsAppointmentTime">Hora</label>
+                            <input type="time" id="detailsAppointmentTime" name="time" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="detailsAppointmentProfessional">Profissional</label>
+                            <select id="detailsAppointmentProfessional" name="professionalId" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="detailsAppointmentRoom">Consultório</label>
+                            <select id="detailsAppointmentRoom" name="room" required>
+                                <option value="">Selecione</option>
+                                <option value="Consultório 1">Consultório 1</option>
+                                <option value="Consultório 2">Consultório 2</option>
+                                <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="justify-content: space-between;">
+                        <button type="button" class="btn btn-danger" id="deleteAppointmentBtn">Excluir</button>
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-close-modal="appointmentDetailsModal">Cancelar</button>
+                            <button type="submit" class="btn">Salvar Alterações</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="paymentModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Registrar Pagamento</h2>
+                <button class="close-btn" data-close-modal="paymentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm">
+                    <input type="hidden" id="paymentAppointmentId">
+                    <h4>Dados do Paciente</h4>
+                    <div class="details-grid">
+                        <div><strong>Paciente:</strong> <span id="paymentPatientName"></span></div>
+                        <div><strong>CPF:</strong> <span id="paymentPatientCPF"></span></div>
+                        <div><strong>Plano:</strong> <span id="paymentPatientPlan"></span></div>
+                    </div>
+                    <hr style="margin: 20px 0;">
+                    <h4>Dados do Pagamento</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentAmount">Valor (R$)</label>
+                            <input type="number" id="paymentAmount" name="amount" step="0.01" placeholder="Ex: 150.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Método de Pagamento</label>
+                            <select id="paymentMethod" name="method" required>
+                                <option value="">Selecione o método</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Crédito">Cartão de Crédito</option>
+                                <option value="Débito">Cartão de Débito</option>
+                                <option value="Pix">Pix</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-close-modal="paymentModal">Cancelar</button>
+                        <button type="submit" class="btn">Salvar Pagamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="newClientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Cliente</h2>
+                <button class="close-btn" data-close-modal="newClientModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newClientForm">
+                    <h4>Dados do Titular</h4>
+                    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" name="nome" required></div><div class="form-group"><label>Sobrenome</label><input type="text" name="sobrenome" required></div></div>
+                    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" name="telefone" maxlength="15"></div><div class="form-group"><label>CPF</label><input type="text" name="cpf" maxlength="14" required></div></div>
+                    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" name="email"></div><div class="form-group"><label>Data de Nascimento</label><input type="text" name="data_nascimento" placeholder="dd/mm/aaaa"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Plano</label><input type="text" name="plano"></div><div class="form-group"><label>Status</label><select name="status"><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option></select></div></div>
+                    <h4>Endereço</h4>
+                    <div class="form-row"><div class="form-group"><label>CEP</label><input type="text" name="cep"></div><div class="form-group"><label>Endereço</label><input type="text" name="endereco"></div><div class="form-group"><label>Município</label><input type="text" name="municipio"></div></div>
+                    <hr>
+                    <h4>Dependentes</h4>
+                    <div id="dependentesContainer"></div>
+                    <button type="button" class="btn btn-secondary" id="addDependenteBtn">Adicionar Dependente</button>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="newClientModal">Cancelar</button><button type="submit" class="btn">Salvar</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailsClientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Cliente</h2>
+                <button class="close-btn" data-close-modal="detailsClientModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="detailsClientForm">
+                    <input type="hidden" id="detailsClientId" name="id">
+                    <h4>Dados do Titular</h4>
+                    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="details_nome" name="details_nome" required></div><div class="form-group"><label>Sobrenome</label><input type="text" id="details_sobrenome" name="details_sobrenome" required></div></div>
+                    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="details_telefone" name="telefone" maxlength="15"></div><div class="form-group"><label>CPF</label><input type="text" id="details_cpf" name="cpf" maxlength="14" required></div></div>
+                    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="details_email" name="email"></div><div class="form-group"><label>Data de Nascimento</label><input type="text" id="details_data_nascimento" name="details_data_nascimento" placeholder="dd/mm/aaaa"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Plano</label><input type="text" id="details_plano" name="plano"></div><div class="form-group"><label>Status</label><select id="details_status" name="status"><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option></select></div></div>
+                    <h4>Endereço</h4>
+                    <div class="form-row"><div class="form-group"><label>CEP</label><input type="text" id="details_cep" name="cep"></div><div class="form-group"><label>Endereço</label><input type="text" id="details_endereco" name="endereco"></div><div class="form-group"><label>Município</label><input type="text" id="details_municipio" name="municipio"></div></div>
+                    <hr>
+                    <h4>Dependentes</h4>
+                    <div id="detailsDependentesContainer"></div>
+                    <button type="button" class="btn btn-secondary" id="addDependenteDetailsBtn">Adicionar Dependente</button>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="detailsClientModal">Cancelar</button><button type="submit" class="btn">Salvar Alterações</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="examModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="examModalTitle">Adicionar Novo Exame</h2>
+                <button class="close-btn" data-close-modal="examModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="examForm">
+                    <input type="hidden" id="examId">
+                    <div class="form-group">
+                        <label for="examName">Nome do Exame</label>
+                        <input type="text" id="examName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="examDescription">Descrição</label>
+                        <textarea id="examDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="examValue">Valor (R$)</label>
+                        <input type="number" id="examValue" name="value" step="0.01" placeholder="Ex: 80.00">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-close-modal="examModal">Cancelar</button>
+                        <button type="submit" class="btn">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="userModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Adicionar Novo Usuário</h2>
+                <button class="close-btn" data-close-modal="userModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="userName">Nome Completo</label>
+                        <input type="text" id="userName" name="full_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email</label>
+                        <input type="email" id="userEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword">Senha (mínimo 6 caracteres)</label>
+                        <input type="password" id="userPassword" name="password">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Função (Role)</label>
+                        <select id="userRole" name="role" required>
+                            </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-close-modal="userModal">Cancelar</button>
+                        <button type="submit" class="btn">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="professionalModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="professionalModalTitle">Editar Perfil Profissional</h2>
+                <button class="close-btn" data-close-modal="professionalModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="professionalForm">
+                    <input type="hidden" id="professionalId">
+                    <div class="form-group">
+                        <label for="professionalName">Nome do Profissional</label>
+                        <input type="text" id="professionalName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="professionalSpecialty">Especialidade</label>
+                        <input type="text" id="professionalSpecialty" name="specialty">
+                    </div>
+                    <div class="form-group">
+                        <label for="professionalCRM">CRM</label>
+                        <input type="text" id="professionalCRM" name="CRM">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-close-modal="professionalModal">Cancelar</button>
+                        <button type="submit" class="btn">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Adicione os módulos JS necessários -->
+    <script src="js/auth.js" type="module"></script>
+    <script src="js/usuarios.js" type="module"></script>
+    <script src="js/recepcao.js" type="module"></script>
+    <script src="js/agenda.js" type="module"></script>
+    <script src="js/pacientes.js" type="module"></script>
+    <script src="js/clientes.js" type="module"></script>
+    <script src="js/laboratorio.js" type="module"></script>
+    <script src="js/produtos.js" type="module"></script>
+    <script src="js/financeiro.js" type="module"></script>
+    <script src="js/disparos.js" type="module"></script>
+    <script src="js/whatsapp.js" type="module"></script>
+    
+    <script src="js/navigation.js" type="module"></script>
+    <script src="js/events.js" type="module"></script>
+    <script src="js/main.js" type="module"></script>
+</body>
+</html>
