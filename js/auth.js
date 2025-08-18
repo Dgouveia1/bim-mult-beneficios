@@ -1,6 +1,6 @@
 import { _supabase } from './supabase.js';
 import { initializeDashboard } from './main.js';
-import { showLoginScreen } from './ui.js'; // ALTERADO: Importa de ui.js
+import { showLoginScreen } from './ui.js'; // Importa do novo arquivo ui.js
 
 let currentUserProfile = null;
 
@@ -46,10 +46,12 @@ function setupPermissions(role) {
     };
     const userPerms = rolesPermissions[role] || {};
     for (const menuId in allMenuItems) {
-        document.getElementById(menuId).style.display = 'none';
+        if (document.getElementById(menuId)) {
+            document.getElementById(menuId).style.display = 'none';
+        }
     }
     for (const menuId in userPerms) {
-        if (userPerms[menuId]) {
+        if (userPerms[menuId] && document.getElementById(menuId)) {
             document.getElementById(menuId).style.display = 'block';
         }
     }

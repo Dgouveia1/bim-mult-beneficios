@@ -1,6 +1,5 @@
 // Arquivo: js/ui.js
 
-// Pega os elementos principais da UI uma única vez
 const loginScreen = document.getElementById('loginScreen');
 const dashboard = document.getElementById('dashboard');
 
@@ -13,7 +12,7 @@ function showDashboard() {
 }
 
 /**
- * Mostra a tela de login e esconde a do dashboard.
+ * Mostra a tela de login, esconde o dashboard e limpa o localStorage.
  */
 function showLoginScreen() {
     if (loginScreen) loginScreen.style.display = 'flex';
@@ -21,5 +20,4 @@ function showLoginScreen() {
     localStorage.clear();
 }
 
-// Exporta as funções para que outros módulos possam usá-las
 export { showDashboard, showLoginScreen };
