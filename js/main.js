@@ -68,6 +68,18 @@ function setupEventListeners() {
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
 
+    // Listener para a barra de pesquisa de clientes
+    const clientsSearchInput = document.getElementById('clientsSearchInput');
+    if (clientsSearchInput) {
+        clientsSearchInput.addEventListener('input', () => {
+            // Adiciona um pequeno delay para evitar buscas a cada tecla
+            clearTimeout(clientsSearchInput.searchTimeout);
+            clientsSearchInput.searchTimeout = setTimeout(() => {
+                filterAndRenderClients();
+            }, 300); // 300ms de delay
+        });
+    }
+
     document.body.addEventListener('click', function(event) {
         const target = event.target;
         if (target.closest('.close-btn') || target.closest('[data-close-modal]')) {

@@ -167,7 +167,7 @@ function setupFormEvents() {
             // Adiciona um pequeno delay para evitar buscas a cada tecla
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
-                filterAndRender();
+                filterAndRenderClients();
             }, 300); // 300ms de delay
         });
     }
