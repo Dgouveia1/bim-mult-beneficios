@@ -115,7 +115,7 @@ async function loadScheduleView() {
         });
         
         let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
-        for(let h = 7; h < 19; h++) {
+        for(let h = 7; h <22; h++) {
             html += `<div class="time-slot">${String(h).padStart(2, '0')}:00</div>`;
             html += `<div class="time-slot">${String(h).padStart(2, '0')}:30</div>`;
         }

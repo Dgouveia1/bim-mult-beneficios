@@ -4,6 +4,10 @@ import { showLoginScreen } from './ui.js'; // Importa do novo arquivo ui.js
 
 let currentUserProfile = null;
 
+function setCurrentUserProfile(profile) {
+    currentUserProfile = profile;
+}
+
 async function handleLogin(event) {
     event.preventDefault();
     const email = document.getElementById('username').value;
@@ -57,4 +61,4 @@ function setupPermissions(role) {
     }
 }
 
-export { handleLogin, handleLogout, setupPermissions, getCurrentUserProfile };
+export { handleLogin, handleLogout, setupPermissions, getCurrentUserProfile, setCurrentUserProfile };

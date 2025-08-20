@@ -120,11 +120,110 @@ async function loadPatientHistory(patientCpf) {
 }
 
 // Lógica da Aba de Exames (sem alterações)
-function setupExamSearch() { /* ... */ }
-function renderSelectedExams() { /* ... */ }
-function removeExam(examId) { /* ... */ }
+function setupExamSearch() {
+    const searchInput = document.getElementById('examSearchInput');
+    const resultsContainer = document.getElementById('examSearchResults');
 
-// --- LÓGICA DE FINALIZAÇÃO E IMPRESSÃO ---
+    if (!searchInput || !resultsContainer) return;
+
+    // Evento de digitação no campo de busca
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        resultsContainer.innerHTML = '';
+
+        if (query.length < 2) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        const filteredExams = allExams.filter(exam =>
+            exam.name.toLowerCase().includes(query)
+        );
+
+        if (filteredExams.length === 0) {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        filteredExams.forEach(exam => {
+            const div = document.createElement('div');
+            // Armazena o ID do exame no elemento para fácil acesso
+            div.dataset.examId = exam.id;
+            div.textContent = `${exam.name} - R$ ${exam.value ? exam.value.toFixed(2).replace('.', ',') : '0,00'}`;
+            resultsContainer.appendChild(div);
+        });
+
+        resultsContainer.style.display = 'block';
+    });
+
+    // Evento de clique nos resultados da busca
+    resultsContainer.addEventListener('click', (event) => {
+        const examId = parseInt(event.target.dataset.examId);
+        if (examId) {
+            handleExamSelection(examId);
+            searchInput.value = ''; // Limpa o campo de busca
+            resultsContainer.style.display = 'none'; // Esconde os resultados
+        }
+    });
+
+    // Esconde os resultados se clicar fora
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.autocomplete-container')) {
+            resultsContainer.style.display = 'none';
+        }
+    });
+}
+
+
+// ADICIONE ESTA NOVA FUNÇÃO ABAIXO DE setupExamSearch
+function handleExamSelection(examId) {
+    // Verifica se o exame já foi adicionado
+    if (selectedExams.some(exam => exam.id === examId)) {
+        alert('Este exame já foi adicionado.');
+        return;
+    }
+
+    // Encontra o exame completo na lista de todos os exames
+    const examToAdd = allExams.find(exam => exam.id === examId);
+    if (examToAdd) {
+        selectedExams.push(examToAdd);
+        renderSelectedExams(); // Atualiza a lista de exames selecionados na tela
+    }
+}
+
+
+// Verifique se a função renderSelectedExams já existe e se está correta
+function renderSelectedExams() {
+    const listContainer = document.getElementById('selectedExamsList');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = '';
+
+    if (selectedExams.length === 0) {
+        listContainer.innerHTML = '<p>Nenhum exame adicionado.</p>';
+        return;
+    }
+
+    selectedExams.forEach(exam => {
+        const item = document.createElement('div');
+        item.className = 'selected-item'; // Use uma classe para estilização se necessário
+        item.innerHTML = `
+            <span>${exam.name}</span>
+            <span>R$ ${exam.value ? exam.value.toFixed(2).replace('.', ',') : '0,00'}</span>
+            <button type="button" class="btn btn-danger btn-small remove-item-btn" data-exam-id="${exam.id}">
+                &times;
+            </button>
+        `;
+        listContainer.appendChild(item);
+    });
+}
+
+
+function removeExam(examId) {
+    selectedExams = selectedExams.filter(exam => exam.id !== examId);
+    renderSelectedExams();
+}
+
 
 async function finalizeConsultation() {
     const appointmentId = document.getElementById('currentAppointmentId').value;

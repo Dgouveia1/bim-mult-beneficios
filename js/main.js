@@ -1,5 +1,5 @@
 import { _supabase } from './supabase.js';
-import { handleLogin, handleLogout, setupPermissions } from './auth.js';
+import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile  } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
 import { fetchAddressByCEP } from './utils.js';
@@ -162,9 +162,10 @@ async function initializeDashboard(user) {
         alert('Erro crítico: Perfil do usuário não encontrado.');
         return handleLogout();
     }
+    setCurrentUserProfile(profile);
     setupPermissions(profile.role);
     showDashboard();
-    loadClientsData();
+    await loadClientsData();
     navigateToPage('home');
 }
 
