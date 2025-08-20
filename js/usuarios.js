@@ -69,7 +69,6 @@ async function openUserModal(id = null) {
 
 // Preenche o <select> de roles com base na permissão do usuário logado
 function populateRoleOptions() {
-    const userProfile = getCurrentUserProfile();
     const roleSelect = document.getElementById('userRole');
     roleSelect.innerHTML = '';
 
@@ -80,30 +79,17 @@ function populateRoleOptions() {
         financeiro: 'Usuário Financeiro'
     };
 
-    let allowedRoles = [];
-    if (userProfile?.role === 'superadmin') {
-        allowedRoles = ['admin', 'recepcao', 'medicos', 'financeiro'];
-    } else if (userProfile?.role === 'admin') {
-        allowedRoles = ['recepcao', 'medicos', 'financeiro'];
-    }
-
-    if (allowedRoles.length === 0) {
+    // Habilita o select e preenche com todas as roles disponíveis
+    roleSelect.disabled = false;
+    for (const roleKey in allRoles) {
         const option = document.createElement('option');
-        option.textContent = 'Sem permissão para criar usuários';
+        option.value = roleKey;
+        option.textContent = allRoles[roleKey];
         roleSelect.appendChild(option);
-        roleSelect.disabled = true;
-    } else {
-        roleSelect.disabled = false;
-        allowedRoles.forEach(roleKey => {
-            const option = document.createElement('option');
-            option.value = roleKey;
-            option.textContent = allRoles[roleKey];
-            roleSelect.appendChild(option);
-        });
     }
 }
-
 // Salva o usuário (cria um novo ou atualiza um existente) - VERSÃO SIMPLIFICADA E CORRIGIDA
+// Salva o usuário (cria um novo ou atualiza um existente) - VERSÃO CORRIGIDA
 async function saveUser(event) {
     event.preventDefault();
     const submitButton = userForm.querySelector('button[type="submit"]');
@@ -112,16 +98,19 @@ async function saveUser(event) {
 
     const id = userIdInput.value;
     
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Usando FormData para ler os valores do formulário de forma mais confiável
+    const formData = new FormData(userForm);
     const userData = {
-        full_name: document.getElementById('userName').value,
-        email: document.getElementById('userEmail').value,
-        password: document.getElementById('userPassword').value,
-        role: document.getElementById('userRole').value,
+        full_name: formData.get('full_name'), // Lê o campo com name="full_name"
+        email: formData.get('email'),         // Lê o campo com name="email"
+        password: formData.get('password'),   // Lê o campo com name="password"
+        role: formData.get('role')            // Lê o campo com name="role"
     };
 
     try {
         if (id) {
-            // Lógica de ATUALIZAÇÃO (não muda)
+            // Lógica de atualização (não muda)
             const { error } = await _supabase
                 .from('profiles')
                 .update({ full_name: userData.full_name, role: userData.role })
@@ -130,17 +119,16 @@ async function saveUser(event) {
             alert('Usuário atualizado com sucesso!');
 
         } else {
-            // Lógica de CRIAÇÃO - SIMPLIFICADA
-            // Agora, enviamos os dados extras dentro da chamada signUp
-            const { error } = await _supabase.auth.signUp({
-                email: userData.email,
-                password: userData.password,
-                options: {
-                    data: {
-                        full_name: userData.full_name,
-                        role: userData.role
-                    }
-                }
+            // Lógica de criação (não muda)
+            if (!userData.password || userData.password.length < 6) {
+                throw new Error('A senha é obrigatória e deve ter no mínimo 6 caracteres.');
+            }
+
+            const { error } = await _supabase.rpc('create_new_user', {
+                p_email: userData.email,
+                p_password: userData.password,
+                p_full_name: userData.full_name,
+                p_role: userData.role
             });
                 
             if (error) throw error;
@@ -149,7 +137,7 @@ async function saveUser(event) {
         }
 
         userModal.style.display = 'none';
-        await loadUsersData(); // Recarrega a lista
+        await loadUsersData();
 
     } catch (error) {
         alert('Erro ao salvar usuário: ' + error.message);

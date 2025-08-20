@@ -67,6 +67,17 @@ function setupEventListeners() {
     document.getElementById('examForm')?.addEventListener('submit', saveExam);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
+        // Listener para o botão "Adicionar Dependente" no modal de NOVO cliente
+    document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
+            const container = document.getElementById('dependentesContainer');
+            addDependenteField(container, 'dependenteCount');
+        });
+    
+        // Listener para o botão "Adicionar Dependente" no modal de DETALHES (edição)
+     document.getElementById('addDependenteDetailsBtn')?.addEventListener('click', () => {
+            const container = document.getElementById('detailsDependentesContainer');
+            addDependenteField(container, 'dependenteDetailsCount');
+        });
 
     // Listener para a barra de pesquisa de clientes
     const clientsSearchInput = document.getElementById('clientsSearchInput');
@@ -116,7 +127,29 @@ function setupEventListeners() {
         }
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
+        const removeDependenteButton = target.closest('.remove-dependente-btn');
+        if (removeDependenteButton) {
+            const dependentGroup = removeDependenteButton.closest('.dependente-form-group');
+            const dependentId = dependentGroup.dataset.dependenteId;
+    
+            if (dependentId) {
+                // Se o dependente já existe no banco, pede confirmação
+                if (confirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.')) {
+                    // Esconde o grupo do formulário e o marca para exclusão
+                    dependentGroup.style.display = 'none';
+                    const deleteInput = document.createElement('input');
+                    deleteInput.type = 'hidden';
+                    deleteInput.name = `dependente_delete_${dependentId}`;
+                    deleteInput.value = 'true';
+                    dependentGroup.appendChild(deleteInput);
+                }
+            } else {
+                // Se for um dependente novo (que ainda não foi salvo), apenas remove do formulário
+                dependentGroup.remove();
+            }
+        }
     });
+
 
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
     document.getElementById('nextDayBtn')?.addEventListener('click', () => changeDay(1));
