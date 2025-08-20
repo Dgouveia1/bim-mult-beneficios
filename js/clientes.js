@@ -69,7 +69,7 @@ async function loadClientsData() {
             // Adiciona o titular à lista
             peopleList.push({
                 titular_id: client.id,
-                nome: client.nome,
+                nome:  `${client.nome || ''} ${client.sobrenome || ''}`.trim(),
                 cpf: client.cpf,
                 telefone: client.telefone,
                 plano: client.plano,
@@ -82,7 +82,7 @@ async function loadClientsData() {
                 client.dependents.forEach(dep => {
                     peopleList.push({
                         titular_id: client.id, // Importante: o ID de referência é sempre o do titular
-                        nome: dep.nome,
+                        nome: `${dep.nome || ''} ${dep.sobrenome || ''}`.trim(),
                         cpf: dep.cpf,
                         telefone: dep.telefone,
                         plano: client.plano, // Dependente herda o plano e status
