@@ -106,10 +106,7 @@ function downloadCSV(data) {
     csvRows.push(headers.join(','));
 
     for (const row of data) {
-        const values = headers.map(header => {
-            const escaped = ('' + row[header.toLowerCase()]).replace(/"/g, '\\"');
-            return `"${escaped}"`;
-        });
+        const values = headers.map(header => row[header.toLowerCase()]);
         csvRows.push(values.join(','));
     }
 
