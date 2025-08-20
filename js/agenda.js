@@ -171,7 +171,7 @@ async function loadAppointments(professionals) {
             const roomColumn = document.querySelector(`.professional-column[data-room-name="${appointment.room}"]`);
             if(roomColumn) {
                 const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
-                const top = ((startHour - 7) * 120) + (startMinute / 30 * 60);
+                const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + 50;
                 const height = 58;
 
                 const card = document.createElement('div');
@@ -313,41 +313,58 @@ async function saveAppointment(event) {
         alert('Por favor, selecione um paciente da lista ou cadastre um novo.');
         return;
     }
-    
+
+    // Calcula o end_time (assumindo 30 minutos de duração)
     const [hour, minute] = appointmentData.start_time.split(':').map(Number);
-    const endTime = new Date();
-    endTime.setHours(hour, minute + 30, 0, 0);
-    appointmentData.end_time = endTime.toTimeString().split(' ')[0];
-    
+    const endTimeObject = new Date();
+    endTimeObject.setHours(hour, minute + 30, 0, 0);
+    appointmentData.end_time = endTimeObject.toTimeString().split(' ')[0];
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
     try {
-        const { data: existingAppointment, error: checkError } = await _supabase
-            .from('appointments')
-            .select('id')
-            .eq('appointment_date', appointmentData.appointment_date)
-            .eq('start_time', appointmentData.start_time)
-            .eq('room', appointmentData.room)
-            .single();
+        // =================================================================
+        //  LÓGICA DE VERIFICAÇÃO MODIFICADA - INÍCIO
+        // =================================================================
 
-        if (checkError && checkError.code !== 'PGRST116') throw checkError;
-        if (existingAppointment) {
-            alert(`Conflito de agendamento! O ${appointmentData.room} já está reservado neste horário.`);
-            return;
+        // A consulta agora verifica se existe algum agendamento que se sobrepõe
+        // ao novo intervalo de tempo.
+        // Condição de sobreposição: O início do novo é antes do fim do existente
+        // E o fim do novo é depois do início do existente.
+        const { data: conflictingAppointments, error: checkError } = await _supabase
+            .from('appointments')
+            .select('id, patient_name, start_time, end_time')
+            .eq('appointment_date', appointmentData.appointment_date)
+            .eq('room', appointmentData.room)
+            .lt('start_time', appointmentData.end_time) // O início do agendamento existente é MENOR que o FIM do novo
+            .gt('end_time', appointmentData.start_time);  // O fim do agendamento existente é MAIOR que o INÍCIO do novo
+
+        if (checkError) throw checkError;
+
+        // Se a consulta retornar qualquer resultado, significa que há um conflito.
+        if (conflictingAppointments && conflictingAppointments.length > 0) {
+            const conflict = conflictingAppointments[0];
+            const errorMessage = `Conflito de agendamento! O ${appointmentData.room} já está reservado para "${conflict.patient_name}" das ${conflict.start_time.substring(0, 5)} às ${conflict.end_time.substring(0, 5)}.`;
+            throw new Error(errorMessage);
         }
-        
+
+        // =================================================================
+        //  LÓGICA DE VERIFICAÇÃO MODIFICADA - FIM
+        // =================================================================
+
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-        
+
         const { error: insertError } = await _supabase.from('appointments').insert(appointmentData);
         if (insertError) throw insertError;
-        
+
         alert('Agendamento salvo com sucesso!');
         closeAppointmentModal();
         loadScheduleView();
 
     } catch (error) {
-        alert('Erro ao salvar agendamento: ' + error.message);
+        // O alerta agora mostrará a mensagem de erro específica e amigável
+        alert(error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Agendar';
