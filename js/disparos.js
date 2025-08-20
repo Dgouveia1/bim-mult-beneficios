@@ -1,91 +1,130 @@
-// =================================================================
-// MÓDULO DE DISPAROS
-// Função: Lógica para a página de envio de mensagens.
-// =================================================================
+import { _supabase } from './supabase.js';
 
 /**
- * Lida com o envio do formulário de disparos.
- * Coleta todos os dados, incluindo a imagem, e prepara para o envio.
+ * Lida com o envio do formulário de exportação.
+ * Coleta os filtros, busca os dados no Supabase e gera um arquivo CSV.
  * @param {Event} event - O evento de submit do formulário.
  */
-async function handleDisparoSubmit(event) {
-    console.log('📢 [DISPAROS] Iniciando envio de disparo...');
-    
-    // 1. Previne o recarregamento da página
+async function handleGenerateCSV(event) {
     event.preventDefault();
-    console.log('🛡️ [DISPAROS] Prevenção de recarregamento aplicada');
-
-    const form = event.target;
-    const submitButton = form.querySelector('button[type="submit"]');
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const resultDiv = document.getElementById('exportResult');
     
-    if (!submitButton) {
-        console.error('❌ [DISPAROS] Botão de submit não encontrado');
-        return;
-    }
-    
-    console.log('⏳ [DISPAROS] Desabilitando botão e mostrando loading...');
     submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+    resultDiv.textContent = '';
 
-    // 2. Coleta os dados do formulário
-    console.log('📋 [DISPAROS] Coletando dados do formulário...');
-    const mensagem = form.querySelector('#mensagem')?.value || '';
-    const imagemInput = form.querySelector('#imagem');
-    const imagemFile = imagemInput?.files[0]; // Pega o arquivo de imagem
-
-    console.log('📊 [DISPAROS] Dados coletados:', {
-        mensagemLength: mensagem.length,
-        hasImagem: !!imagemFile,
-        imagemSize: imagemFile ? `${(imagemFile.size / 1024).toFixed(2)} KB` : 'N/A'
-    });
-
-    // 3. Validação simples
-    if (!mensagem || mensagem.trim().length === 0) {
-        console.error('❌ [DISPAROS] Mensagem não preenchida');
-        alert('Por favor, preencha a mensagem.');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Enviar Mensagem';
-        return;
-    }
-
-    // 4. Monta o payload usando FormData para suportar o arquivo de imagem
-    console.log('📦 [DISPAROS] Montando FormData...');
-    const formData = new FormData();
-    formData.append('mensagem', mensagem);
-
-    if (imagemFile) {
-        console.log('🖼️ [DISPAROS] Adicionando imagem ao FormData:', imagemFile.name);
-        formData.append('imagem', imagemFile);
-    }
-    
-    console.log('🌐 [DISPAROS] Enviando para webhook...');
-    // Futuramente, aqui entrará a chamada real para o n8n:
     try {
-        const response = await fetch('https://webhook.ia-tess.com.br/webhook/mult-disparos', {
-            method: 'POST',
-            body: formData 
-            // Note: Não definimos o Content-Type, o browser faz isso automaticamente para FormData
+        // 1. Coletar valores dos filtros
+        const plano = document.getElementById('filterPlano').value;
+        const status = document.getElementById('filterStatus').value;
+        const sexo = document.getElementById('filterSexo').value;
+        const idadeMin = parseInt(document.getElementById('filterIdadeMin').value, 10);
+        const idadeMax = parseInt(document.getElementById('filterIdadeMax').value, 10);
+        const apenasTitular = document.getElementById('filterApenasTitular').checked;
+
+        // 2. Construir a query no Supabase
+        let query = _supabase.from('clients').select('*, dependents(*)');
+        
+        // CORREÇÃO: Usa 'eq' para correspondência exata do dropdown
+        if (plano) query = query.eq('plano', plano);
+        if (status) query = query.eq('status', status);
+        if (sexo) query = query.eq('sexo', sexo);
+
+        // =================================================================
+        //  DEBUG: Mostra a query que será executada no console do navegador
+        // =================================================================
+        console.log("Query Supabase sendo executada:", query);
+        // =================================================================
+
+        const { data: clients, error } = await query;
+        if (error) throw error;
+
+        // 3. Processar e filtrar os dados (lógica de idade e dependentes)
+        const finalContacts = [];
+        const currentYear = new Date().getFullYear();
+
+        const processPerson = (person, clientData) => {
+            if (person.data_nascimento) {
+                const birthYearParts = person.data_nascimento.split(/[\/-]/);
+                const birthYear = parseInt(birthYearParts[birthYearParts.length - 1], 10);
+                if (birthYear > 1000) { // Validação simples do ano
+                    const age = currentYear - birthYear;
+                    if ((!isNaN(idadeMin) && age < idadeMin) || (!isNaN(idadeMax) && age > idadeMax)) {
+                        return; 
+                    }
+                }
+            } else if (!isNaN(idadeMin) || !isNaN(idadeMax)) {
+                 return;
+            }
+
+            if (person.telefone) {
+                finalContacts.push({
+                    nome: `${person.nome || ''} ${person.sobrenome || ''}`.trim(),
+                    telefone: person.telefone.replace(/\D/g, '')
+                });
+            }
+        };
+
+        clients.forEach(client => {
+            processPerson(client);
+            if (!apenasTitular && client.dependents) {
+                client.dependents.forEach(dependent => {
+                    let dependentMatches = true;
+                    if (sexo && dependent.sexo !== sexo) dependentMatches = false;
+                    
+                    if(dependentMatches) processPerson(dependent);
+                });
+            }
         });
         
-        console.log('📥 [DISPAROS] Resposta recebida:', {
-            status: response.status,
-            ok: response.ok
-        });
-        
-        if (response.ok) {
-            console.log('✅ [DISPAROS] Disparo enviado com sucesso!');
-            alert('Disparo enviado com sucesso!');
-            form.reset();
-        } else {
-            console.error('❌ [DISPAROS] Erro ao enviar disparo - Status:', response.status);
-            alert('Houve um erro ao enviar o disparo.');
+        if (finalContacts.length === 0) {
+            resultDiv.textContent = 'Nenhum contato encontrado com os filtros selecionados.';
+            return;
         }
-    } catch(error) {
-        console.error('💥 [DISPAROS] Erro de conexão:', error);
-        alert('Erro de conexão ao tentar enviar o disparo.');
+
+        // 4. Gerar e baixar o arquivo CSV
+        downloadCSV(finalContacts);
+        resultDiv.textContent = `${finalContacts.length} contatos exportados com sucesso!`;
+
+    } catch (error) {
+        resultDiv.textContent = `Erro ao gerar arquivo: ${error.message}`;
+        console.error(error);
     } finally {
-        console.log('🔄 [DISPAROS] Restaurando botão...');
         submitButton.disabled = false;
-        submitButton.textContent = 'Enviar Mensagem';
+        submitButton.innerHTML = '<i class="fas fa-file-csv"></i> Gerar Arquivo CSV';
     }
 }
+
+/**
+ * Converte um array de objetos em um arquivo CSV e inicia o download.
+ * @param {Array<Object>} data - Os dados a serem convertidos.
+ */
+function downloadCSV(data) {
+    const csvRows = [];
+    const headers = ['Nome', 'Telefone'];
+    csvRows.push(headers.join(','));
+
+    for (const row of data) {
+        const values = headers.map(header => {
+            const escaped = ('' + row[header.toLowerCase()]).replace(/"/g, '\\"');
+            return `"${escaped}"`;
+        });
+        csvRows.push(values.join(','));
+    }
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'contatos_exportados.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+
+export { handleGenerateCSV };

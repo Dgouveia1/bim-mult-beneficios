@@ -9,6 +9,8 @@ import { loadPatientsData, selectPatient, finalizeConsultation, printContent, pr
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
+import { handleGenerateCSV } from './disparos.js';
+
 
 const newClientModalEl = document.getElementById('newClientModal');
 
@@ -57,7 +59,6 @@ function setupEventListeners() {
     document.getElementById('newAppointmentBtn')?.addEventListener('click', openNewAppointmentModal);
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
-
     document.getElementById('newClientForm')?.addEventListener('submit', handleNewClientSubmit);
     document.getElementById('detailsClientForm')?.addEventListener('submit', handleUpdateClient);
     document.getElementById('appointmentForm')?.addEventListener('submit', saveAppointment);
@@ -67,17 +68,15 @@ function setupEventListeners() {
     document.getElementById('examForm')?.addEventListener('submit', saveExam);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
-        // Listener para o botão "Adicionar Dependente" no modal de NOVO cliente
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
             const container = document.getElementById('dependentesContainer');
             addDependenteField(container, 'dependenteCount');
         });
-    
-        // Listener para o botão "Adicionar Dependente" no modal de DETALHES (edição)
-     document.getElementById('addDependenteDetailsBtn')?.addEventListener('click', () => {
+    document.getElementById('addDependenteDetailsBtn')?.addEventListener('click', () => {
             const container = document.getElementById('detailsDependentesContainer');
             addDependenteField(container, 'dependenteDetailsCount');
         });
+    document.getElementById('exportForm')?.addEventListener('submit', handleGenerateCSV);
 
     // Listener para a barra de pesquisa de clientes
     const clientsSearchInput = document.getElementById('clientsSearchInput');
