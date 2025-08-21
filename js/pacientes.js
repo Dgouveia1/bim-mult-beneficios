@@ -1,9 +1,19 @@
 import { _supabase } from './supabase.js';
 import { allPeople } from './clientes.js';
-import { getCurrentUserProfile } from './auth.js'; // Importa a função que pega o usuário logado
+import { getCurrentUserProfile } from './auth.js';
 
 let allExams = [];
 let selectedExams = [];
+let patientsSubscription = null; // Variável para a inscrição em tempo real
+
+// Função para remover a inscrição
+function unsubscribePatients() {
+    if (patientsSubscription) {
+        _supabase.removeChannel(patientsSubscription);
+        patientsSubscription = null;
+        console.log('👨‍⚕️ [PACIENTES] Inscrição de tempo real removida.');
+    }
+}
 
 async function initializeExamsCache() {
     try {
@@ -32,50 +42,76 @@ async function loadPatientsData() {
     const today = new Date().toISOString().split('T')[0];
 
     try {
-        // --- CORREÇÃO AQUI ---
-        // 1. Primeiro, buscamos o ID numérico do profissional usando o UUID do usuário logado.
+        // Primeiro, remove qualquer inscrição anterior
+        unsubscribePatients();
+        
+        // Busca o ID do profissional
         const { data: professional, error: profError } = await _supabase
             .from('professionals')
             .select('id')
-            .eq('user_id', currentUser.id) // Busca pelo UUID do usuário
+            .eq('user_id', currentUser.id)
             .single();
 
         if (profError || !professional) {
             throw new Error('Perfil profissional não encontrado para este usuário.');
         }
         
-        const professionalId = professional.id; // Este é o ID numérico (bigint)
+        const professionalId = professional.id;
 
-        // 2. Agora, usamos o ID numérico correto para filtrar os agendamentos.
+        // Busca os agendamentos
         const { data, error } = await _supabase
             .from('appointments')
             .select('*')
             .eq('appointment_date', today)
-            .eq('professional_id', professionalId) // Usa o ID correto
+            .eq('professional_id', professionalId)
             .in('status', ['chegou', 'em_atendimento'])
             .order('start_time');
 
         if (error) throw error;
         
-        patientListContainer.innerHTML = '';
-        if (data.length === 0) {
-            patientListContainer.innerHTML = '<p>Nenhum paciente na fila de espera.</p>';
-            return;
-        }
-
-        data.forEach(appt => {
-            const item = document.createElement('div');
-            item.className = 'paciente-espera-item';
-            if (appt.status === 'em_atendimento') item.classList.add('active');
-            item.dataset.appointmentId = appt.id;
-            item.innerHTML = `<span class="nome">${appt.patient_name}</span><span class="horario">${appt.start_time.substring(0, 5)}</span>`;
-            patientListContainer.appendChild(item);
-        });
+        renderPatientsList(data);
+        
+        // Cria a inscrição para mudanças futuras
+        patientsSubscription = _supabase.channel('public:appointments_medico')
+            .on('postgres_changes', { 
+                event: '*', 
+                schema: 'public', 
+                table: 'appointments',
+                filter: `professional_id=eq.${professionalId}` // Filtra apenas para este médico
+            }, (payload) => {
+                console.log('👨‍⚕️ [PACIENTES] Mudança detectada nos agendamentos!', payload);
+                // Recarrega a lista quando houver mudanças
+                loadPatientsData();
+            })
+            .subscribe();
+        
+        console.log('👨‍⚕️ [PACIENTES] Inscrição de tempo real ativada.');
 
     } catch (error) {
         patientListContainer.innerHTML = `<p style="color:red">${error.message}</p>`;
         console.error(error);
     }
+}
+
+// Função separada para renderizar a lista de pacientes
+function renderPatientsList(data) {
+    const patientListContainer = document.getElementById('patientQueueList');
+    if (!patientListContainer) return;
+    
+    patientListContainer.innerHTML = '';
+    if (data.length === 0) {
+        patientListContainer.innerHTML = '<p>Nenhum paciente na fila de espera.</p>';
+        return;
+    }
+
+    data.forEach(appt => {
+        const item = document.createElement('div');
+        item.className = 'paciente-espera-item';
+        if (appt.status === 'em_atendimento') item.classList.add('active');
+        item.dataset.appointmentId = appt.id;
+        item.innerHTML = `<span class="nome">${appt.patient_name}</span><span class="horario">${appt.start_time.substring(0, 5)}</span>`;
+        patientListContainer.appendChild(item);
+    });
 }
 
 // Lida com a seleção de um paciente na fila
@@ -354,4 +390,4 @@ function printExamDocuments() {
     document.body.removeChild(printArea);
 }
 
-export { loadPatientsData, selectPatient, finalizeConsultation, printContent, printExamDocuments, removeExam };
+export { loadPatientsData, selectPatient, finalizeConsultation, printContent, printExamDocuments, removeExam, unsubscribePatients };

@@ -1,24 +1,62 @@
 import { _supabase } from './supabase.js';
 import { allPeople } from './clientes.js'; // Importamos a lista de pessoas para pegar os detalhes
 
-// Carrega a fila de pacientes agendados para o dia de hoje
+// Variável para guardar a inscrição e poder removê-la depois
+let receptionSubscription = null;
+
+// Função para remover a inscrição anterior e evitar duplicatas
+function unsubscribeReception() {
+    if (receptionSubscription) {
+        _supabase.removeChannel(receptionSubscription);
+        receptionSubscription = null;
+        console.log('🏥 [RECEPTION] Inscrição de tempo real removida.');
+    }
+}
+
+// Função principal que agora também ouve as mudanças
 async function loadReceptionQueue() {
     console.log('🏥 [RECEPTION] Iniciando carregamento da fila de recepção...');
     const queueContainer = document.getElementById('receptionQueue');
     if (!queueContainer) return;
+
+    // Primeiro, remove qualquer inscrição anterior para evitar múltiplas execuções
+    unsubscribeReception();
     
+    // Carrega os dados iniciais
+    await renderReceptionQueue(); 
+
+    // Agora, cria a inscrição para futuras mudanças na tabela 'appointments'
+    receptionSubscription = _supabase.channel('public:appointments')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, (payload) => {
+            console.log('🏥 [RECEPTION] Mudança detectada nos agendamentos!', payload);
+            // Ao detectar qualquer mudança, simplesmente renderiza a fila novamente
+            renderReceptionQueue();
+        })
+        .subscribe();
+    
+    console.log('🏥 [RECEPTION] Inscrição de tempo real ativada.');
+}
+
+// Criamos uma função separada para a lógica de renderização
+async function renderReceptionQueue() {
+    const queueContainer = document.getElementById('receptionQueue');
+    if (!queueContainer) return;
+
     queueContainer.innerHTML = '<p>Carregando agendamentos do dia...</p>';
     const today = new Date().toISOString().split('T')[0];
 
     try {
+        console.log("🏥 [RECEPTION] Buscando dados do Supabase..."); // LOG DE DEBUG
         const { data: appointments, error } = await _supabase
             .from('appointments')
             .select(`*, professionals ( name )`)
             .eq('appointment_date', today)
             .order('start_time');
 
-        if (error) throw error;
+        // Se houver um erro na busca, ele será capturado pelo 'catch' abaixo
+        if (error) throw error; 
 
+        console.log("🏥 [RECEPTION] Dados recebidos com sucesso. Renderizando..."); // LOG DE DEBUG
         queueContainer.innerHTML = '';
         if (appointments.length === 0) {
             queueContainer.innerHTML = '<p>Nenhum paciente agendado para hoje.</p>';
@@ -57,10 +95,11 @@ async function loadReceptionQueue() {
         });
 
     } catch (error) {
-        console.error('❌ [RECEPTION] Erro ao carregar fila:', error);
-        queueContainer.innerHTML = `<p style="color:red;">Erro ao carregar a fila de agendamentos.</p>`;
+        console.error('❌ [RECEPTION] ERRO CRÍTICO AO BUSCAR DADOS:', error); 
+        queueContainer.innerHTML = `<p style="color:red;">Erro ao carregar a fila de agendamentos. Verifique o console (F12).</p>`;
     }
 }
+
 
 // Marca a chegada do paciente (check-in)
 async function markArrival(appointmentId) {
@@ -73,7 +112,14 @@ async function markArrival(appointmentId) {
     try {
         const { error } = await _supabase.from('appointments').update({ status: 'chegou' }).eq('id', appointmentId);
         if (error) throw error;
-        await loadReceptionQueue();
+        
+        // Atualiza visualmente o botão imediatamente enquanto espera o realtime
+        if(checkinButton) {
+            checkinButton.innerHTML = '<i class="fas fa-check"></i> Chegou';
+            checkinButton.classList.remove('btn-secondary');
+            checkinButton.classList.add('btn-success');
+        }   
+        // Não precisamos mais chamar loadReceptionQueue() aqui, a inscrição em tempo real fará isso.
 
     } catch (error) {
         alert('Não foi possível realizar o check-in.');
@@ -131,7 +177,7 @@ async function savePayment(event) {
         alert('Pagamento registrado com sucesso!');
         document.getElementById('paymentModal').style.display = 'none';
         form.reset();
-        await loadReceptionQueue(); // Recarrega a fila para atualizar o botão
+        // Não precisa recarregar a fila aqui, o realtime fará isso.
 
     } catch (error) {
         alert('Erro ao salvar pagamento: ' + error.message);
@@ -141,4 +187,4 @@ async function savePayment(event) {
     }
 }
 
-export { loadReceptionQueue, markArrival, openPaymentModal, savePayment };
+export { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception };

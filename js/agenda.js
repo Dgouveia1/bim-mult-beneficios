@@ -1,25 +1,37 @@
 // =================================================================
-// FUNÇÕES DE AGENDA
+// FUNÇÕES DE AGENDA (COM SUPABASE REALTIME)
 // =================================================================
 import { _supabase } from './supabase.js';
 import { allPeople, openModal } from './clientes.js';
 
 let currentScheduleDate = new Date(); // Inicia com a data de hoje
+let scheduleSubscription = null; // Variável para guardar a inscrição de tempo real
 
-// Paleta de cores para os profissionais. Adicione mais cores se necessário.
+// Paleta de cores para os profissionais.
 const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c', '#e67e22'];
 
+// --- FUNÇÕES DE CONTROLE DE TEMPO REAL ---
+
+// Função para remover a inscrição anterior e evitar duplicatas
+function unsubscribeSchedule() {
+    if (scheduleSubscription) {
+        _supabase.removeChannel(scheduleSubscription);
+        scheduleSubscription = null;
+        console.log('📅 [AGENDA] Inscrição de tempo real removida.');
+    }
+}
+
 // --- FUNÇÕES DE NAVEGAÇÃO DE DATA ---
+
 function changeDay(offset) {
     currentScheduleDate.setDate(currentScheduleDate.getDate() + offset);
-    loadScheduleView(); // Recarrega toda a visualização para o novo dia
+    loadScheduleView(); // Recarrega toda a visualização, incluindo a inscrição de tempo real
 }
 
 function updateDateDisplay() {
     const display = document.getElementById('currentDateDisplay');
     if (display) {
-        // Formata a data para "dd de [Mês] de yyyy"
-        display.textContent = currentScheduleDate.toLocaleDateString('pt-BR', {
+        display.textContent = currentScheduleDate.toLocaleString('pt-BR', {
             day: '2-digit',
             month: 'long',
             year: 'numeric'
@@ -28,6 +40,7 @@ function updateDateDisplay() {
 }
 
 // --- BUSCA DE PACIENTES (AUTOCOMPLETE) ---
+
 function setupPatientSearch() {
     const searchInput = document.getElementById('appointmentPatientSearch');
     const resultsContainer = document.getElementById('patientSearchResults');
@@ -90,16 +103,40 @@ function setupPatientSearch() {
 
 // --- CARREGAMENTO DA AGENDA E AGENDAMENTOS ---
 
-// Função principal que agora desenha a agenda por CONSULTÓRIO
+// Função principal que agora desenha a agenda e se inscreve para mudanças
 async function loadScheduleView() {
+    const container = document.getElementById('scheduleContainer');
+    if (!container) return;
+
+    unsubscribeSchedule(); // Garante que não há inscrições duplicadas
+    
+    container.innerHTML = 'Carregando agenda...';
+    
+    // Carrega a visualização inicial
+    await renderSchedule();
+
+    // Cria a nova inscrição para a tabela de agendamentos
+    scheduleSubscription = _supabase.channel('public:appointments_agenda')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async payload => {
+            console.log('📅 [AGENDA] Mudança detectada!', payload);
+            const { data: professionals } = await _supabase.from('professionals').select('*');
+            // Recarrega apenas os agendamentos, não a grade inteira
+            loadAppointments(professionals || []);
+        })
+        .subscribe();
+    
+    console.log('📅 [AGENDA] Inscrição de tempo real ativada.');
+}
+
+// Separa a lógica de renderização da estrutura da agenda
+async function renderSchedule() {
     const container = document.getElementById('scheduleContainer');
     const legendContainer = document.getElementById('professionalLegend');
     if (!container || !legendContainer) return;
 
-    container.innerHTML = 'Carregando agenda...';
     legendContainer.innerHTML = '';
 
-    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)'];
+    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4', 'Consultório 5'];
 
     try {
         const { data: professionals, error } = await _supabase.from('professionals').select('*').order('name');
@@ -115,7 +152,7 @@ async function loadScheduleView() {
         });
         
         let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
-        for(let h = 7; h <22; h++) {
+        for(let h = 7; h < 22; h++) {
             html += `<div class="time-slot">${String(h).padStart(2, '0')}:00</div>`;
             html += `<div class="time-slot">${String(h).padStart(2, '0')}:30</div>`;
         }
@@ -125,7 +162,7 @@ async function loadScheduleView() {
         rooms.forEach(room => {
             html += `<div class="professional-column" data-room-name="${room}">`;
             html += `<div class="schedule-header">${room}</div>`;
-            for(let h = 7; h < 19; h++) {
+            for(let h = 7; h < 22; h++) {
                 html += `<div class="time-slot" data-time="${h}:00"></div>`;
                 html += `<div class="time-slot" data-time="${h}:30"></div>`;
             }
@@ -142,7 +179,8 @@ async function loadScheduleView() {
     }
 }
 
-// Carrega e posiciona os agendamentos, agora com as cores
+
+// Carrega e posiciona os agendamentos
 async function loadAppointments(professionals) {
     const selectedDate = currentScheduleDate.toISOString().split('T')[0];
     const tableBody = document.getElementById('proximosAgendamentosBody');
@@ -215,9 +253,7 @@ async function loadAppointments(professionals) {
 async function openNewAppointmentModal() {
     const modal = document.getElementById('appointmentModal');
     if (!modal) return;
-
-    // --- CORREÇÃO ADICIONADA AQUI ---
-    // Busca e preenche a lista de profissionais sempre que o modal é aberto
+    
     const professionalSelect = document.getElementById('appointmentProfessional');
     if (professionalSelect) {
         professionalSelect.innerHTML = '<option>Carregando...</option>';
@@ -314,7 +350,6 @@ async function saveAppointment(event) {
         return;
     }
 
-    // Calcula o end_time (assumindo 30 minutos de duração)
     const [hour, minute] = appointmentData.start_time.split(':').map(Number);
     const endTimeObject = new Date();
     endTimeObject.setHours(hour, minute + 30, 0, 0);
@@ -324,34 +359,21 @@ async function saveAppointment(event) {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
     try {
-        // =================================================================
-        //  LÓGICA DE VERIFICAÇÃO MODIFICADA - INÍCIO
-        // =================================================================
-
-        // A consulta agora verifica se existe algum agendamento que se sobrepõe
-        // ao novo intervalo de tempo.
-        // Condição de sobreposição: O início do novo é antes do fim do existente
-        // E o fim do novo é depois do início do existente.
         const { data: conflictingAppointments, error: checkError } = await _supabase
             .from('appointments')
             .select('id, patient_name, start_time, end_time')
             .eq('appointment_date', appointmentData.appointment_date)
             .eq('room', appointmentData.room)
-            .lt('start_time', appointmentData.end_time) // O início do agendamento existente é MENOR que o FIM do novo
-            .gt('end_time', appointmentData.start_time);  // O fim do agendamento existente é MAIOR que o INÍCIO do novo
+            .lt('start_time', appointmentData.end_time)
+            .gt('end_time', appointmentData.start_time);
 
         if (checkError) throw checkError;
 
-        // Se a consulta retornar qualquer resultado, significa que há um conflito.
         if (conflictingAppointments && conflictingAppointments.length > 0) {
             const conflict = conflictingAppointments[0];
             const errorMessage = `Conflito de agendamento! O ${appointmentData.room} já está reservado para "${conflict.patient_name}" das ${conflict.start_time.substring(0, 5)} às ${conflict.end_time.substring(0, 5)}.`;
             throw new Error(errorMessage);
         }
-
-        // =================================================================
-        //  LÓGICA DE VERIFICAÇÃO MODIFICADA - FIM
-        // =================================================================
 
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
@@ -360,10 +382,9 @@ async function saveAppointment(event) {
 
         alert('Agendamento salvo com sucesso!');
         closeAppointmentModal();
-        loadScheduleView();
+        // Não precisa recarregar a view aqui, o realtime fará isso.
 
     } catch (error) {
-        // O alerta agora mostrará a mensagem de erro específica e amigável
         alert(error.message);
     } finally {
         submitButton.disabled = false;
@@ -398,7 +419,6 @@ async function updateAppointment(event) {
 
         alert('Agendamento atualizado com sucesso!');
         closeAppointmentDetailsModal();
-        loadAppointments((await _supabase.from('professionals').select('*')).data);
 
     } catch (error) {
         alert('Erro ao atualizar o agendamento: ' + error.message);
@@ -418,7 +438,6 @@ async function deleteAppointment() {
         
         alert('Agendamento excluído com sucesso!');
         closeAppointmentDetailsModal();
-        loadAppointments((await _supabase.from('professionals').select('*')).data);
 
     } catch (error) {
         alert('Erro ao excluir agendamento: ' + error.message);
@@ -434,5 +453,6 @@ export {
     updateAppointment,
     deleteAppointment,
     closeAppointmentDetailsModal,
-    changeDay
+    changeDay,
+    unsubscribeSchedule
 };

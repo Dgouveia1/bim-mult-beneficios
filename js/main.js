@@ -3,18 +3,30 @@ import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile  } f
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
 import { fetchAddressByCEP } from './utils.js';
-import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay } from './agenda.js'; 
-import { loadReceptionQueue, markArrival, openPaymentModal, savePayment } from './recepcao.js';
-import { loadPatientsData, selectPatient, finalizeConsultation, printContent, printExamDocuments, removeExam } from './pacientes.js';
+import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
+import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
+import { loadPatientsData, selectPatient, finalizeConsultation, printContent, printExamDocuments, removeExam, unsubscribePatients  } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
 import { handleGenerateCSV } from './disparos.js';
 
-
 const newClientModalEl = document.getElementById('newClientModal');
 
+// Função para limpar as inscrições de tempo real da página atual
+function cleanupRealtimeSubscriptions() {
+    console.log('🧹 [NAV] Limpando inscrições de tempo real...');
+    unsubscribeReception();
+    unsubscribeSchedule();
+    unsubscribePatients(); // Adiciona a limpeza da inscrição de pacientes
+    // Chame aqui outras funções de unsubscribe que você criar no futuro
+}
+
 function navigateToPage(pageName) {
+    // 1. Limpa as inscrições da página anterior ANTES de navegar
+    cleanupRealtimeSubscriptions();
+
+    // 2. O resto do seu código de navegação
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     const targetPage = document.getElementById(`${pageName}Page`);
     if (targetPage) {
@@ -29,6 +41,8 @@ function navigateToPage(pageName) {
         const parentMenu = activeMenuItem.closest('.submenu')?.previousElementSibling;
         if (parentMenu) parentMenu.classList.add('active');
     }
+
+    // 3. Carrega os dados da nova página (que vai criar sua própria inscrição)
     loadPageData(pageName);
 }
 
@@ -78,15 +92,13 @@ function setupEventListeners() {
         });
     document.getElementById('exportForm')?.addEventListener('submit', handleGenerateCSV);
 
-    // Listener para a barra de pesquisa de clientes
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
         clientsSearchInput.addEventListener('input', () => {
-            // Adiciona um pequeno delay para evitar buscas a cada tecla
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
                 filterAndRenderClients();
-            }, 300); // 300ms de delay
+            }, 300);
         });
     }
 
@@ -132,9 +144,7 @@ function setupEventListeners() {
             const dependentId = dependentGroup.dataset.dependenteId;
     
             if (dependentId) {
-                // Se o dependente já existe no banco, pede confirmação
                 if (confirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.')) {
-                    // Esconde o grupo do formulário e o marca para exclusão
                     dependentGroup.style.display = 'none';
                     const deleteInput = document.createElement('input');
                     deleteInput.type = 'hidden';
@@ -143,12 +153,10 @@ function setupEventListeners() {
                     dependentGroup.appendChild(deleteInput);
                 }
             } else {
-                // Se for um dependente novo (que ainda não foi salvo), apenas remove do formulário
                 dependentGroup.remove();
             }
         }
     });
-
 
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
     document.getElementById('nextDayBtn')?.addEventListener('click', () => changeDay(1));
