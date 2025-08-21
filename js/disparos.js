@@ -61,7 +61,7 @@ async function handleGenerateCSV(event) {
             if (person.telefone) {
                 finalContacts.push({
                     nome: `${person.nome || ''} ${person.sobrenome || ''}`.trim(),
-                    telefone: person.telefone.replace(/\D/g, '')
+                    telefone: '55' + person.telefone.replace(/\D/g, '')
                 });
             }
         };
