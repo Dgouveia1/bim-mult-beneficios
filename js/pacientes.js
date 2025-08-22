@@ -150,10 +150,94 @@ async function selectPatient(appointmentId) {
 }
 
 // Carrega o histórico de consultas passadas do paciente
+// Carrega o histórico de consultas passadas do paciente
+// Carrega o histórico de consultas passadas do paciente
 async function loadPatientHistory(patientCpf) {
     const historyContainer = document.getElementById('patientHistoryContainer');
-    historyContainer.innerHTML = '<p>Nenhuma consulta anterior registrada.</p>';
+    historyContainer.innerHTML = '<p>Carregando histórico...</p>';
+    
+    // Obter o nome do paciente da interface, que já deve estar preenchido por selectPatient
+    const patientName = document.getElementById('currentPatientName').textContent;
+
+    if (!patientName || patientName === 'Selecione um paciente') {
+        historyContainer.innerHTML = '<p>Selecione um paciente para ver o histórico.</p>';
+        return;
+    }
+
+    try {
+        // 1. Buscar todos os appointments (agendamentos) para este paciente
+        const { data: patientAppointments, error: apptError } = await _supabase
+            .from('appointments')
+            .select('id, appointment_date, start_time, professional_id, professionals(name)') // Inclui professional(name) para exibir o nome
+            .eq('patient_name', patientName)
+            .order('appointment_date', { ascending: false })
+            .order('start_time', { ascending: false });
+
+        if (apptError) throw apptError;
+
+        if (patientAppointments.length === 0) {
+            historyContainer.innerHTML = '<p>Nenhuma consulta anterior registrada para este paciente.</p>';
+            return;
+        }
+
+        // Extrair os IDs dos agendamentos
+        const appointmentIds = patientAppointments.map(appt => appt.id);
+
+        // 2. Usar os IDs dos agendamentos para buscar as consultations (consultas)
+        const { data: history, error: consultError } = await _supabase
+            .from('consultations')
+            .select('*') // Seleciona todas as colunas da consulta
+            .in('appointment_id', appointmentIds)
+            .order('created_at', { ascending: false });
+
+        if (consultError) throw consultError;
+        
+        historyContainer.innerHTML = ''; // Limpa o container antes de renderizar
+        
+        if (history.length === 0) {
+            historyContainer.innerHTML = '<p>Nenhuma consulta anterior registrada para este paciente.</p>';
+            return;
+        }
+
+        history.forEach(consultation => {
+            // Encontrar o agendamento correspondente para obter a data e o nome do profissional
+            const correspondingAppointment = patientAppointments.find(appt => appt.id === consultation.appointment_id);
+            const professionalName = correspondingAppointment?.professionals?.name || 'N/A';
+            const consultationDate = correspondingAppointment?.appointment_date ? new Date(correspondingAppointment.appointment_date).toLocaleDateString('pt-BR') : 'N/A';
+
+
+            const item = document.createElement('div');
+            item.className = 'historico-item card';
+            item.innerHTML = `
+                <p><strong>Data:</strong> ${consultationDate}</p>
+                <p><strong>Profissional:</strong> ${professionalName}</p>
+                <p><strong>Queixa Principal:</strong> ${consultation.queixa_principal || 'N/A'}</p>
+                <p><strong>Diagnóstico:</strong> ${consultation.diagnostico || 'N/A'}</p>
+                <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
+                <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
+                    <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
+                    <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
+                    <p><strong>Pedidos de Exames:</strong> ${consultation.pedido_exames ? JSON.parse(consultation.pedido_exames).join(', ') : 'N/A'}</p>
+                </div>
+            `;
+            // Adicionar listener para expandir/recolher detalhes
+            item.querySelector('.details-link').addEventListener('click', (e) => {
+                const fullDetails = e.target.nextElementSibling;
+                if (fullDetails) {
+                    fullDetails.style.display = fullDetails.style.display === 'none' ? 'block' : 'none';
+                    e.target.textContent = fullDetails.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
+                }
+            });
+
+            historyContainer.appendChild(item);
+        });
+        
+    } catch (error) {
+        historyContainer.innerHTML = `<p style="color:red;">Erro ao carregar o histórico: ${error.message}</p>`;
+        console.error('Erro ao carregar o histórico de consultas:', error);
+    }
 }
+
 
 // Lógica da Aba de Exames (sem alterações)
 function setupExamSearch() {
@@ -271,16 +355,28 @@ async function finalizeConsultation() {
     const submitButton = document.getElementById('finalizeConsultationBtn');
     const currentUser = getCurrentUserProfile();
     
+    // CORREÇÃO: Busca o ID do profissional com base no ID do usuário logado
+    const { data: professional, error: profError } = await _supabase
+        .from('professionals')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .single();
+    
+    if (profError || !professional) {
+        alert('Erro: Perfil profissional não encontrado.');
+        return;
+    }
+    
     const consultationData = {
         appointment_id: appointmentId,
-        professional_id: professional.id, // Usa o ID do médico logado
+        professional_id: professional.id, // <-- USANDO O ID CORRETO
         queixa_principal: document.getElementById('queixaPrincipal').value,
         exame_fisico: document.getElementById('exameFisico').value,
         diagnostico: document.getElementById('diagnostico').value,
         receituario: document.getElementById('receituario').value,
         pedido_exames: JSON.stringify(selectedExams.map(e => e.name))
     };
-
+    
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
 
@@ -302,7 +398,7 @@ async function finalizeConsultation() {
         loadPatientsData();
 
     } catch (error) {
-        alert('Erro ao salvar a consulta.');
+        alert('Erro ao salvar a consulta: ' + error.message);
         console.error(error);
     } finally {
         submitButton.disabled = false;

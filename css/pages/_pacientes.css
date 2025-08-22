@@ -113,3 +113,27 @@
     display: flex; 
     justify-content: flex-end; 
 }
+.atendimento-botoes {
+    display: flex; /* Adiciona flexbox para alinhar os itens em uma linha */
+    gap: 10px; /* Adiciona um espaço entre os botões */
+    margin-bottom: 20px; /* Adiciona um espaço abaixo dos botões */
+    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+}
+
+.atendimento-botoes .btn { 
+    flex: 1; 
+    background: transparent; 
+    color: var(--secondary-color); 
+    border: 1px solid var(--secondary-color); 
+    /* Garante que o texto dentro do botão não quebre */
+    white-space: nowrap; 
+    /* Adiciona padding para botões menores, se necessário */
+    padding: 10px 15px;
+    justify-content: center; /* Centraliza o conteúdo do botão */
+}
+
+.atendimento-botoes .btn.active, 
+.atendimento-botoes .btn:hover { 
+    background: var(--secondary-color); 
+    color: var(--white); 
+} 
