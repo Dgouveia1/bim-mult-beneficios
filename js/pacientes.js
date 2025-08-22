@@ -228,7 +228,7 @@ function handleExamSelection(examId) {
 }
 
 
-// Verifique se a função renderSelectedExams já existe e se está correta
+// CÓDIGO CORRIGIDO
 function renderSelectedExams() {
     const listContainer = document.getElementById('selectedExamsList');
     if (!listContainer) return;
@@ -242,10 +242,15 @@ function renderSelectedExams() {
 
     selectedExams.forEach(exam => {
         const item = document.createElement('div');
-        item.className = 'selected-item'; // Use uma classe para estilização se necessário
+        item.className = 'selected-item';
+        
+        // CORREÇÃO: Converte o valor para número e formata com segurança.
+        const examValue = parseFloat(exam.value);
+        const formattedValue = isNaN(examValue) ? '0,00' : examValue.toFixed(2).replace('.', ',');
+
         item.innerHTML = `
             <span>${exam.name}</span>
-            <span>R$ ${exam.value ? exam.value.toFixed(2).replace('.', ',') : '0,00'}</span>
+            <span>R$ ${formattedValue}</span>
             <button type="button" class="btn btn-danger btn-small remove-item-btn" data-exam-id="${exam.id}">
                 &times;
             </button>
@@ -268,7 +273,7 @@ async function finalizeConsultation() {
     
     const consultationData = {
         appointment_id: appointmentId,
-        professional_id: currentUser.id, // Usa o ID do médico logado
+        professional_id: professional.id, // Usa o ID do médico logado
         queixa_principal: document.getElementById('queixaPrincipal').value,
         exame_fisico: document.getElementById('exameFisico').value,
         diagnostico: document.getElementById('diagnostico').value,

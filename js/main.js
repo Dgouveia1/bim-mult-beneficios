@@ -9,7 +9,7 @@ import { loadPatientsData, selectPatient, finalizeConsultation, printContent, pr
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
-import { handleGenerateCSV } from './disparos.js';
+import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 
 const newClientModalEl = document.getElementById('newClientModal');
 
@@ -54,6 +54,10 @@ function loadPageData(pageName) {
     else if (pageName === 'laboratorio') loadLaboratoryData();
     else if (pageName === 'usuarios') loadUsersData();
     else if (pageName === 'profissionais') loadProfessionalsData();
+    else if (pageName === 'disparos') {
+        loadMunicipios();
+        setupExportFormListener(); // Adicione esta linha
+    };
 }
 
 function setupEventListeners() {
@@ -90,7 +94,12 @@ function setupEventListeners() {
             const container = document.getElementById('detailsDependentesContainer');
             addDependenteField(container, 'dependenteDetailsCount');
         });
-    document.getElementById('exportForm')?.addEventListener('submit', handleGenerateCSV);
+        document.body.addEventListener('submit', function(event) {
+            if (event.target.id === 'exportForm') {
+                event.preventDefault();
+                handleGenerateCSV(event);
+            }
+        });
 
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
