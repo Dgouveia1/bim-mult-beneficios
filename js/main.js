@@ -18,15 +18,12 @@ function cleanupRealtimeSubscriptions() {
     console.log('🧹 [NAV] Limpando inscrições de tempo real...');
     unsubscribeReception();
     unsubscribeSchedule();
-    unsubscribePatients(); // Adiciona a limpeza da inscrição de pacientes
-    // Chame aqui outras funções de unsubscribe que você criar no futuro
+    unsubscribePatients();
 }
 
 function navigateToPage(pageName) {
-    // 1. Limpa as inscrições da página anterior ANTES de navegar
     cleanupRealtimeSubscriptions();
 
-    // 2. O resto do seu código de navegação
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     const targetPage = document.getElementById(`${pageName}Page`);
     if (targetPage) {
@@ -42,7 +39,15 @@ function navigateToPage(pageName) {
         if (parentMenu) parentMenu.classList.add('active');
     }
 
-    // 3. Carrega os dados da nova página (que vai criar sua própria inscrição)
+    // Fecha a sidebar em QUALQUER tela ao navegar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mainContentOverlay');
+    const dashboard = document.getElementById('dashboard');
+    sidebar.classList.remove('visible');
+    overlay.classList.remove('visible');
+    dashboard.classList.remove('sidebar-is-open');
+
+
     loadPageData(pageName);
 }
 
@@ -56,11 +61,29 @@ function loadPageData(pageName) {
     else if (pageName === 'profissionais') loadProfessionalsData();
     else if (pageName === 'disparos') {
         loadMunicipios();
-        setupExportFormListener(); // Adicione esta linha
     };
 }
 
 function setupEventListeners() {
+    // EVENTOS PARA O MENU (FUNCIONA EM TODAS AS TELAS)
+    const dashboard = document.getElementById('dashboard');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mainContentOverlay');
+
+    if (sidebarToggle && sidebar && overlay && dashboard) {
+        const toggleSidebar = () => {
+            sidebar.classList.toggle('visible');
+            overlay.classList.toggle('visible');
+            // Adiciona/remove classe para o layout do desktop
+            dashboard.classList.toggle('sidebar-is-open');
+        };
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+    }
+
+
     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     document.getElementById('sidebar')?.addEventListener('click', (e) => {
@@ -173,6 +196,17 @@ function setupEventListeners() {
 }
 
 async function initializeDashboard(user) {
+    document.querySelectorAll('table').forEach(table => {
+        const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
+        table.querySelectorAll('tbody tr').forEach(row => {
+            row.querySelectorAll('td').forEach((td, index) => {
+                if (headers[index]) {
+                    td.setAttribute('data-label', headers[index]);
+                }
+            });
+        });
+    });
+
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
         alert('Erro crítico: Perfil do usuário não encontrado.');

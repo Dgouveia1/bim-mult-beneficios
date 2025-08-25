@@ -1,27 +1,26 @@
 /* =================================================================
-   COMPONENTE: TABELAS
+   COMPONENTE: TABELAS (COM RESPONSIVIDADE)
    ================================================================= */
 
-.table-container { 
+   .table-container { 
     overflow-x: auto; 
 }
 
 table { 
     width: 100%; 
     border-collapse: collapse; 
-    font-size: 22px; 
+    font-size: 14px; /* Tamanho da fonte ajustado */
+}
+
+th, td { 
+    padding: 12px 15px; /* Padding ajustado */
+    border-bottom: 1px solid #eee; 
+    text-align: left;
 }
 
 th { 
     background-color: var(--secondary-color); 
     color: var(--white); 
-    text-align: left; 
-    padding: 16px; 
-}
-
-td { 
-    padding: 14px 16px; 
-    border-bottom: 1px solid #eee; 
 }
 
 tr:nth-child(even) { 
@@ -32,12 +31,74 @@ tr:hover {
     background-color: rgba(70, 130, 180, 0.05);
 }
 
+/* -- RESPONSIVIDADE PARA TABELAS EM CELULARES -- */
+@media (max-width: 767px) {
+    table, thead, tbody, th, td, tr { 
+        display: block; 
+    }
+    
+    thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    tr { 
+        border: 1px solid #ddd; 
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background-color: #fff; /* Fundo branco para cada "card" */
+    }
+    
+    td { 
+        border: none;
+        border-bottom: 1px solid #eee; 
+        position: relative;
+        padding-left: 50%; 
+        text-align: right; /* Alinha o conteúdo à direita */
+        display: flex; /* Para melhor alinhamento */
+        align-items: center;
+        justify-content: flex-end;
+    }
+    
+    td:last-child {
+        border-bottom: none;
+    }
+
+    td:before { 
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 15px;
+        width: 45%; 
+        padding-right: 10px; 
+        white-space: nowrap;
+        text-align: left; /* Alinha o rótulo à esquerda */
+        font-weight: bold;
+        color: var(--secondary-dark);
+        content: attr(data-label); /* Pega o rótulo do atributo data-label */
+    }
+
+    .actions { 
+        display: flex; 
+        gap: 10px; 
+        justify-content: flex-end; /* Alinha os botões à direita */
+        padding-left: 15px !important;
+    }
+
+    td.actions:before {
+        content: "" !important; /* Remove o label "Ações" */
+    }
+}
+
+
 /* Status Tags */
 .status { 
     padding: 6px 12px; 
     border-radius: 20px; 
     font-size: 12px; 
     font-weight: 500;
+    display: inline-block;
 }
 
 .status-active { 
@@ -55,19 +116,8 @@ tr:hover {
     color: var(--pending-color); 
 }
 
-/* Ações da Tabela */
-.actions { 
-    display: flex; 
-    gap: 10px; 
-} 
-/* ADICIONE ESTE BLOCO */
+
 .status-info { 
     background: #e3f2fd; 
     color: var(--info-color); 
-}
-/* FIM DO BLOCO */
-
-.status-pending { 
-    background: #fffde7; 
-    color: var(--pending-color); 
 }

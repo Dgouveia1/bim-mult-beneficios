@@ -28,6 +28,11 @@
     
     <div class="dashboard" id="dashboard" style="display:none;">
         <div class="container">
+            <div class="main-content-overlay" id="mainContentOverlay"></div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
             <div class="sidebar" id="sidebar">
                 <div class="logo-container">
                     <div class="logo-text">Bim Benefícios</div>
@@ -46,13 +51,13 @@
                     <a href="#" class="submenu-item" data-page="recepcao">Recepção</a>
                     <a href="#" class="submenu-item" data-page="agenda">Agenda</a>
                     <a href="#" class="submenu-item" data-page="pacientes">Pacientes</a>
-                    <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
-                    <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
                 </div>
             
                 <div class="admin-only">
                     <div class="menu-item" id="menu-admin"><i class="fas fa-cogs"></i> Marketing & Admin</div>
                     <div class="submenu" id="submenu-admin">
+                        <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
+                        <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
                         <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
                         <a href="#" class="submenu-item" data-page="disparos">Disparos</a>
                         <a href="#" class="submenu-item" data-page="usuarios">Usuários</a>
@@ -201,7 +206,19 @@
                                     <div class="aba-conteudo active" id="abaConduta">
                                         <div class="form-group"><label>Queixa Principal / Anamnese</label><textarea id="queixaPrincipal" rows="4"></textarea></div>
                                         <div class="form-group"><label>Exame Físico</label><textarea id="exameFisico" rows="4"></textarea></div>
-                                        <div class="form-group"><label>Diagnóstico</label><textarea id="diagnostico" rows="4"></textarea></div>
+                                        <div class="form-group"><label>Conduta</label><textarea id="diagnostico" rows="4"></textarea></div>
+                                        <div class="form-group">
+                                            <label>Anexar Exame</label>
+                                            <div class="laudo-container" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
+                                                <textarea id="laudoTexto" rows="4" placeholder="Digite o laudo do exame aqui..."></textarea>
+                                                <label for="fileUploadInput" class="btn btn-secondary" style="margin-top: 10px; width: fit-content;">
+                                                    <i class="fas fa-paperclip"></i> Anexar Arquivo
+                                                </label>
+                                                <input type="file" id="fileUploadInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                                                <div id="uploadStatus" style="font-size: 12px; margin-top: 5px;"></div>
+                                                <ul id="attachmentsList" style="list-style: none; padding: 0; margin-top: 10px;"></ul>
+                                            </div>
+                                        </div>
                                         <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaConduta">Imprimir Conduta</button>
                                     </div>
                                     <div class="aba-conteudo" id="abaReceita">
@@ -209,18 +226,36 @@
                                         <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaReceita">Imprimir Receita</button>
                                     </div>
                                     <div class="aba-conteudo" id="abaExames">
+                                        <div class="protocol-controls">
+                                            <div class="form-group">
+                                                <label for="protocolSelect">Carregar Protocolo</label>
+                                                <select id="protocolSelect">
+                                                    <option value="">Selecione um protocolo</option>
+                                                </select>
+                                            </div>
+                                            <button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar Protocolo</button>
+                                        </div>
+                                        <hr>
                                         <div class="form-group">
-                                            <label for="examSearchInput">Buscar Exame</label>
+                                            <label for="examSearchInput">Buscar Exame na Lista</label>
                                             <div class="autocomplete-container">
-                                                <input type="text" id="examSearchInput" placeholder="Digite para buscar um exame..." autocomplete="off">
+                                                <input type="text" id="examSearchInput" placeholder="Digite para buscar..." autocomplete="off">
                                                 <div class="autocomplete-results" id="examSearchResults"></div>
                                             </div>
                                         </div>
-                                        <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5>
-                                        <div class="selected-items-list" id="selectedExamsList">
-                                            <p>Nenhum exame adicionado.</p>
+                                        <div class="form-group">
+                                            <label for="manualExamInput">Adicionar Exame Manualmente</label>
+                                            <div class="manual-add-container">
+                                                <input type="text" id="manualExamInput" placeholder="Ex: Raio-X de Tórax">
+                                                <button type="button" class="btn btn-small" id="addManualExamBtn">Adicionar</button>
+                                            </div>
                                         </div>
-                                        <button type="button" class="btn btn-secondary btn-small" id="printExamsBtn">
+                                        <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5>
+                                        <div class="selected-exams-container">
+                                            <select id="selectedExamsList" multiple></select>
+                                            <button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtn">Remover Selecionado</button>
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-small" id="printExamsBtn" style="margin-top: 20px;">
                                             <i class="fas fa-print"></i> Imprimir Pedido e Orçamento
                                         </button>
                                     </div>
@@ -233,7 +268,8 @@
                                 <p style="text-align: center; padding: 20px;">Selecione um paciente da fila para iniciar o atendimento.</p>
                             </div>
                         </div>
-                    </div> </div>
+                    </div> 
+                </div>
 
                 <div class="page-content" id="laboratorioPage">
                     <div class="content-header">
@@ -324,10 +360,9 @@
                                 <label for="filterMunicipio">Município</label>
                                 <select id="filterMunicipio">
                                     <option value="">Todos os municípios</option>
-                                    <!-- As opções serão preenchidas dinamicamente pelo JavaScript -->
                                 </select>
                             </div>
-                        </div>
+                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="filterIdadeMin">Idade (mínima)</label>
                                     <input type="number" id="filterIdadeMin" placeholder="Ex: 18">
@@ -336,10 +371,10 @@
                                     <label for="filterIdadeMax">Idade (máxima)</label>
                                     <input type="number" id="filterIdadeMax" placeholder="Ex: 65">
                                 </div>
-                                <div class="form-group" style="display: flex; align-items: center; padding-top: 20px;">
-                                     <input type="checkbox" id="filterApenasTitular" style="width: auto; margin-right: 10px;">
-                                    <label for="filterApenasTitular" style="margin-bottom: 0;">Incluir apenas titulares</label>
-                                </div>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; padding-top: 20px;">
+                                 <input type="checkbox" id="filterApenasTitular" style="width: auto; margin-right: 10px;">
+                                <label for="filterApenasTitular" style="margin-bottom: 0;">Incluir apenas titulares</label>
                             </div>
                             <div class="form-actions" style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 10px;">
                                 <button type="submit" class="btn btn-success">
@@ -423,10 +458,8 @@
                                 <option value="Consultório 1">Consultório 1</option>
                                 <option value="Consultório 2">Consultório 2</option>
                                 <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
-                                <option value="Consultório 4">Consultório 4(segundo andar)</option>
-                                <option value="Consultório 5">Consultório 5(segundo andar)</option>
-
-                                
+                                <option value="Consultório 4">Consultório 4 (segundo andar)</option>
+                                <option value="Consultório 5">Consultório 5 (segundo andar)</option>
                             </select>
                         </div>
                     </div>
@@ -480,6 +513,8 @@
                                 <option value="Consultório 1">Consultório 1</option>
                                 <option value="Consultório 2">Consultório 2</option>
                                 <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
+                                <option value="Consultório 4">Consultório 4 (segundo andar)</option>
+                                <option value="Consultório 5">Consultório 5 (segundo andar)</option>
                             </select>
                         </div>
                     </div>
@@ -690,11 +725,9 @@
 
     
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
-    <!-- Adicione os módulos JS necessários -->
     <script src="js/main.js" type="module"></script>
     <script src="js/ui.js" type="module"></script>
     <script src="js/auth.js" type="module"></script>

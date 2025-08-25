@@ -1,18 +1,33 @@
 /* =================================================================
-   PÁGINA: SIDEBAR
+   PÁGINA: SIDEBAR (COM RESPONSIVIDADE)
    ================================================================= */
 
-.sidebar { 
+   .sidebar { 
     width: var(--sidebar-width); 
+    max-width: 90%;
     background: var(--sidebar-bg); 
     color: var(--white); 
     display: flex; 
     flex-direction: column; 
-    z-index: 1000; 
     height: 100vh; 
     overflow-y: auto; 
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    
+    /* CONFIGURAÇÃO INICIAL (OCULTO) PARA TODOS OS TAMANHOS */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
 }
+
+/* QUANDO A SIDEBAR ESTIVER VISÍVEL */
+.sidebar.visible {
+    transform: translateX(0);
+}
+
+/* A MEDIA QUERY QUE FIXAVA A SIDEBAR NO DESKTOP FOI REMOVIDA */
 
 .logo-container { 
     padding: 30px 20px; 
@@ -84,4 +99,4 @@
 .sidebar-footer { 
     margin-top: auto; 
     padding: 20px; 
-} 
+}

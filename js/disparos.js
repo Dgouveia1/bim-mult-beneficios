@@ -120,6 +120,7 @@ async function handleGenerateCSV(event) {
     }
 }
 
+
 /**
  * Converte um array de objetos em um arquivo CSV e inicia o download.
  * @param {Array<Object>} data - Os dados a serem convertidos.
@@ -185,5 +186,6 @@ async function loadMunicipios() {
         console.error('Erro ao carregar municípios:', error);
     }
 }
+
 
 export { handleGenerateCSV, loadMunicipios };
