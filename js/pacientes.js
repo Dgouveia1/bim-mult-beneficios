@@ -465,13 +465,13 @@ async function finalizeConsultation() {
         .select('id').eq('user_id', currentUser.id).single();
     if (profError || !professional) { alert('Erro: Perfil profissional não encontrado.'); return; }
     
-    // FUNÇÃO ATUALIZADA AQUI
+    // LÓGICA CORRIGIDA AQUI
     const consultationData = {
         appointment_id: appointmentId,
         professional_id: professional.id,
         queixa_principal: document.getElementById('queixaPrincipal').value,
         exame_fisico: document.getElementById('exameFisico').value,
-        conduta: document.getElementById('conduta').value, // Alterado de 'diagnostico' para 'conduta'
+        conduta: document.getElementById('conduta').value, // Corrigido
         laudo_texto: document.getElementById('laudoTexto').value,
         receituario: document.getElementById('receituario').value,
         pedido_exames: JSON.stringify(selectedExams),
