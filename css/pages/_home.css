@@ -1,0 +1,67 @@
+/* =================================================================
+   PÁGINA: HOME (Dashboard Principal)
+   ================================================================= */
+
+   .home-header {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.home-greeting {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.home-date {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.home-widgets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.widget-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.widget-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.widget-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--secondary-dark);
+    margin-bottom: 10px;
+}
+
+.widget-content {
+    font-size: 15px;
+    color: var(--gray-medium);
+    line-height: 1.6;
+}
+
+/* Cores específicas para os widgets */
+#weatherWidget .widget-icon {
+    color: #f1c40f; /* Amarelo/Laranja para Sol */
+}
+
+#quoteWidget .widget-icon {
+    color: #9b59b6; /* Roxo para Citação */
+}

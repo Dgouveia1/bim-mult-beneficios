@@ -1,5 +1,5 @@
 import { _supabase } from './supabase.js';
-import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile  } from './auth.js';
+import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
 import { fetchAddressByCEP } from './utils.js';
@@ -18,7 +18,6 @@ const newClientModalEl = document.getElementById('newClientModal');
 
 // Função para limpar as inscrições de tempo real da página atual
 function cleanupRealtimeSubscriptions() {
-    console.log('🧹 [NAV] Limpando inscrições de tempo real...');
     unsubscribeReception();
     unsubscribeSchedule();
     unsubscribePatients();
@@ -27,13 +26,16 @@ function cleanupRealtimeSubscriptions() {
 function navigateToPage(pageName) {
     cleanupRealtimeSubscriptions();
 
+    // Esconde todas as páginas
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
+    
+    // Mostra a página alvo
     const targetPage = document.getElementById(`${pageName}Page`);
     if (targetPage) {
         targetPage.classList.add('active');
-    } else {
-        document.getElementById('homePage').classList.add('active');
     }
+
+    // Atualiza o menu
     document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
     const activeMenuItem = document.querySelector(`[data-page="${pageName}"]`);
     if (activeMenuItem) {
@@ -42,7 +44,7 @@ function navigateToPage(pageName) {
         if (parentMenu) parentMenu.classList.add('active');
     }
 
-    // Fecha a sidebar em QUALQUER tela ao navegar
+    // Fecha a sidebar (em telas menores)
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mainContentOverlay');
     const dashboard = document.getElementById('dashboard');
@@ -50,31 +52,65 @@ function navigateToPage(pageName) {
     overlay.classList.remove('visible');
     dashboard.classList.remove('sidebar-is-open');
 
-
+    // Carrega os dados da página que acabou de ser aberta
     loadPageData(pageName);
 }
 
-async function loadPageData(pageName) { // Adicionado 'async'
-    if (pageName === 'clientes') await loadClientsData(); // Adicionado 'await' para consistência
+async function loadHomePageData() {
+    const userProfile = getCurrentUserProfile();
+    if (!userProfile) return;
+
+    const greetingElement = document.getElementById('homeGreeting');
+    if (greetingElement) {
+        greetingElement.textContent = `Olá, ${userProfile.full_name || 'Usuário'}!`;
+    }
+
+    const dateElement = document.getElementById('homeDate');
+    if (dateElement) {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = today.toLocaleDateString('pt-BR', options);
+    }
+
+    const weatherElement = document.getElementById('weatherInfo');
+    if (weatherElement) {
+        weatherElement.textContent = 'Hoje o dia está com sol e algumas nuvens. A temperatura varia entre 22°C e 33°C.';
+    }
+
+    const quoteElement = document.getElementById('motivationalQuote');
+    if (quoteElement) {
+        const quotes = [
+            "Suba o primeiro degrau com fé. Não é necessário que você veja toda a escada. Apenas dê o primeiro passo.",
+            "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
+            "A persistência realiza o impossível.",
+            "Não espere por uma crise para descobrir o que é importante em sua vida.",
+            "Comece onde você está. Use o que você tem. Faça o que você pode."
+        ];
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        quoteElement.textContent = `"${quotes[randomIndex]}"`;
+    }
+}
+
+async function loadPageData(pageName) {
+    if (pageName === 'home') await loadHomePageData();
+    else if (pageName === 'clientes') await loadClientsData();
     else if (pageName === 'agenda') await loadScheduleView();
     else if (pageName === 'recepcao') await loadReceptionQueue();
     else if (pageName === 'pacientes') await loadPatientsData();
     else if (pageName === 'laboratorio') await loadLaboratoryData();
     else if (pageName === 'usuarios') await loadUsersData();
     else if (pageName === 'profissionais') await loadProfessionalsData();
-    else if (pageName === 'disparos') {
-        await loadMunicipios();
-    } else if (pageName === 'prontuario') {
-        await loadClientsData(); // <-- GARANTE QUE OS CLIENTES SÃO CARREGADOS PRIMEIRO
-        setupProntuarioPage();   // <-- SÓ DEPOIS CONFIGURA A PÁGINA
+    else if (pageName === 'disparos') await loadMunicipios();
+    else if (pageName === 'prontuario') {
+        await loadClientsData();
+        setupProntuarioPage();
     } else if (pageName === 'carteirinha') {
         setupCarteirinhaPage();
     }
 }                                     
 
-
 function setupEventListeners() {
-    // EVENTOS PARA O MENU (FUNCIONA EM TODAS AS TELAS)
+    // ... (O restante desta função permanece exatamente o mesmo)
     const dashboard = document.getElementById('dashboard');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
@@ -84,14 +120,12 @@ function setupEventListeners() {
         const toggleSidebar = () => {
             sidebar.classList.toggle('visible');
             overlay.classList.toggle('visible');
-            // Adiciona/remove classe para o layout do desktop
             dashboard.classList.toggle('sidebar-is-open');
         };
 
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
     }
-
 
     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
@@ -126,12 +160,12 @@ function setupEventListeners() {
             const container = document.getElementById('detailsDependentesContainer');
             addDependenteField(container, 'dependenteDetailsCount');
         });
-        document.body.addEventListener('submit', function(event) {
-            if (event.target.id === 'exportForm') {
-                event.preventDefault();
-                handleGenerateCSV(event);
-            }
-        });
+    document.body.addEventListener('submit', function(event) {
+        if (event.target.id === 'exportForm') {
+            event.preventDefault();
+            handleGenerateCSV(event);
+        }
+    });
 
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
@@ -205,6 +239,7 @@ function setupEventListeners() {
 }
 
 async function initializeDashboard(user) {
+    // Adiciona os data-labels para responsividade da tabela
     document.querySelectorAll('table').forEach(table => {
         const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
         table.querySelectorAll('tbody tr').forEach(row => {
@@ -216,16 +251,21 @@ async function initializeDashboard(user) {
         });
     });
 
+    // Busca o perfil completo do usuário
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
         alert('Erro crítico: Perfil do usuário não encontrado.');
         return handleLogout();
     }
+    
+    // Configura o estado global da aplicação
     setCurrentUserProfile(profile);
     setupPermissions(profile.role);
     showDashboard();
-    await loadClientsData();
-    navigateToPage('home');
+    
+    // **CORREÇÃO APLICADA AQUI**
+    // Apenas carrega os dados da página inicial, sem chamar a navegação completa
+    await loadPageData('home');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
