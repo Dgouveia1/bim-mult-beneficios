@@ -21,19 +21,4 @@
 @import url('pages/_agenda.css');
 @import url('pages/_disparos.css'); 
 @import url('pages/_clientes.css');
-
-/* Estilos específicos para a impressão */
-@media print {
-   body * {
-       visibility: hidden; /* Esconde tudo */
-   }
-   #print-area, #print-area * {
-       visibility: visible; /* Mostra apenas a área de impressão */
-   }
-   #print-area {
-       position: absolute;
-       left: 0;
-       top: 0;
-       width: 100%;
-   }
-}
+@import url('pages/_prontuario.css');

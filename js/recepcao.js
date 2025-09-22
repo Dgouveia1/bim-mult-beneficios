@@ -81,6 +81,7 @@ async function renderReceptionQueue() {
                 <div class="patient-card-body">
                     <p><strong>Profissional:</strong> ${appt.professionals.name}</p>
                     <p><strong>Status:</strong> <span class="status status-${statusClass}">${appt.status.replace('_', ' ').toUpperCase()}</span></p>
+                    ${appt.procedure ? `<p><strong>Observações:</strong> ${appt.procedure}</p>` : ''}
                 </div>
                 <div class="patient-card-actions">
                     <button class="btn btn-secondary checkin-btn" data-id="${appt.id}" ${appt.status !== 'agendado' ? 'disabled' : ''}>

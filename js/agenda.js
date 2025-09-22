@@ -4,6 +4,8 @@ import { getCurrentUserProfile } from './auth.js';
 
 let currentScheduleDate = new Date();
 let scheduleSubscription = null;
+let calendarDate = new Date();
+let isCalendarListenerAttached = false; // Variável de controle
 
 const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c', '#e67e22'];
 
@@ -23,9 +25,201 @@ function changeDay(offset) {
 function updateDateDisplay() {
     const display = document.getElementById('currentDateDisplay');
     if (display) {
-        display.textContent = currentScheduleDate.toLocaleString('pt-BR', {
-            day: '2-digit', month: 'long', year: 'numeric'
+        display.textContent = currentScheduleDate.toLocaleDateString('pt-BR', {
+            weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
         });
+    }
+}
+
+// =================================================================
+// LÓGICA DO MINI-CALENDÁRIO (CORRIGIDA)
+// =================================================================
+
+function renderMiniCalendar() {
+    const container = document.getElementById('miniCalendarContainer');
+    if (!container) return;
+
+    calendarDate.setDate(1);
+    const month = calendarDate.getMonth();
+    const year = calendarDate.getFullYear();
+    const monthName = new Date(year, month).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let html = `
+        <div class="mini-calendar-header">
+            <button id="calendarPrevMonth"><i class="fas fa-chevron-left"></i></button>
+            <span>${monthName}</span>
+            <button id="calendarNextMonth"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="mini-calendar-grid">
+            <div class="mini-calendar-day">D</div><div class="mini-calendar-day">S</div><div class="mini-calendar-day">T</div><div class="mini-calendar-day">Q</div><div class="mini-calendar-day">Q</div><div class="mini-calendar-day">S</div><div class="mini-calendar-day">S</div>`;
+
+    for (let i = 0; i < firstDay; i++) {
+        html += `<div class="mini-calendar-date other-month"></div>`;
+    }
+
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+        let classes = 'mini-calendar-date';
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            classes += ' today';
+        }
+        html += `<div class="${classes}" data-day="${day}">${day}</div>`;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function setupCalendarEventListeners() {
+    // Evita adicionar os mesmos listeners várias vezes
+    if (isCalendarListenerAttached) return;
+
+    const toggleBtn = document.getElementById('calendarToggleBtn');
+    const container = document.getElementById('miniCalendarContainer');
+    if (!toggleBtn || !container) return;
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        const isVisible = container.style.display === 'block';
+        if (!isVisible) {
+            calendarDate = new Date(currentScheduleDate);
+            renderMiniCalendar();
+        }
+        container.style.display = isVisible ? 'none' : 'block';
+    });
+
+    container.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique dentro do calendário o feche
+        const target = e.target;
+        if (target.closest('#calendarPrevMonth')) {
+            calendarDate.setMonth(calendarDate.getMonth() - 1);
+            renderMiniCalendar();
+        } else if (target.closest('#calendarNextMonth')) {
+            calendarDate.setMonth(calendarDate.getMonth() + 1);
+            renderMiniCalendar();
+        } else if (target.classList.contains('mini-calendar-date') && !target.classList.contains('other-month')) {
+            const day = parseInt(target.dataset.day, 10);
+            currentScheduleDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
+            loadScheduleView();
+            container.style.display = 'none';
+        }
+    });
+
+    // Fecha o calendário se clicar fora
+    document.addEventListener('click', () => {
+        if (container.style.display === 'block') {
+            container.style.display = 'none';
+        }
+    });
+
+    isCalendarListenerAttached = true; // Marca que os listeners foram configurados
+}
+
+// =================================================================
+// LÓGICA DA AGENDA
+// =================================================================
+
+async function loadScheduleView() {
+    const container = document.getElementById('scheduleContainer');
+    if (!container) return;
+
+    unsubscribeSchedule();
+    container.innerHTML = 'Carregando agenda...';
+    await renderSchedule();
+
+    scheduleSubscription = _supabase.channel('public:appointments_agenda')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async () => {
+            await loadAppointments();
+        })
+        .subscribe();
+}
+
+async function renderSchedule() {
+    const container = document.getElementById('scheduleContainer');
+    if (!container) return;
+    
+    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4', 'Consultório 5'];
+
+    try {
+        let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
+        for (let h = 7; h < 22; h++) {
+            html += `<div class="time-slot">${String(h).padStart(2, '0')}:00</div>`;
+            html += `<div class="time-slot">${String(h).padStart(2, '0')}:30</div>`;
+        }
+        html += '</div><div class="professionals-grid">';
+        rooms.forEach(room => {
+            html += `<div class="professional-column" data-room-name="${room}"><div class="schedule-header">${room}</div>`;
+            for (let h = 7; h < 22; h++) {
+                html += `<div class="time-slot" data-time="${h}:00"></div><div class="time-slot" data-time="${h}:30"></div>`;
+            }
+            html += '</div>';
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        
+        await loadAppointments();
+        updateDateDisplay();
+        setupCalendarEventListeners(); // Configura os eventos do calendário AQUI
+
+    } catch (error) {
+        container.innerHTML = `<div style="color:red;">Erro ao carregar a agenda: ${error.message}</div>`;
+    }
+}
+
+
+async function loadAppointments() {
+
+    const year = currentScheduleDate.getFullYear();
+    const month = String(currentScheduleDate.getMonth() + 1).padStart(2, '0'); // getMonth() é 0-11
+    const day = String(currentScheduleDate.getDate()).padStart(2, '0');
+    const selectedDate = `${year}-${month}-${day}`;
+    
+    try {
+        const { data: professionals, error: profError } = await _supabase.from('professionals').select('*');
+        if (profError) throw profError;
+        
+        professionals.forEach((prof, index) => {
+            prof.color = professionalColors[index % professionalColors.length];
+        });
+
+        const { data: appointments, error } = await _supabase.from('appointments')
+            .select('*, professionals(name)').eq('appointment_date', selectedDate).order('start_time');
+        if (error) throw error;
+
+        document.querySelectorAll('.appointment-card').forEach(card => card.remove());
+
+        if (!appointments) return;
+
+        appointments.forEach(appointment => {
+            const roomColumn = document.querySelector(`.professional-column[data-room-name="${appointment.room}"]`);
+            if (roomColumn) {
+                const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
+                const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
+                const startTime = startHour + startMinute / 60;
+                const endTime = endHour + endMinute / 60;
+                const duration = Math.max(0.5, endTime - startTime); // Garante duração mínima
+
+                const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + 50;
+                const height = (duration * 120) - 2;
+
+                const card = document.createElement('div');
+                card.className = 'appointment-card';
+                card.dataset.appointmentId = appointment.id;
+                card.style.top = `${top}px`;
+                card.style.height = `${height}px`;
+                
+                const professional = professionals.find(p => p.id === appointment.professional_id);
+                const profColor = professional ? professional.color : '#7f8c8d';
+
+                card.innerHTML = `<div class="professional-flag" style="background-color: ${profColor};"></div><strong>${appointment.patient_name}</strong><small>${appointment.professionals.name}</small>`;
+                roomColumn.appendChild(card);
+            }
+        });
+        
+    } catch(error) {
+        console.error('Erro ao carregar agendamentos:', error);
     }
 }
 
@@ -88,144 +282,6 @@ function setupPatientSearch() {
         }
     });
 }
-
-async function loadScheduleView() {
-    const container = document.getElementById('scheduleContainer');
-    if (!container) return;
-
-    unsubscribeSchedule();
-    container.innerHTML = 'Carregando agenda...';
-    await renderSchedule();
-
-    scheduleSubscription = _supabase.channel('public:appointments_agenda')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async payload => {
-            console.log('📅 [AGENDA] Mudança detectada!', payload);
-            const { data: professionals } = await _supabase.from('professionals').select('*');
-            loadAppointments(professionals || []);
-        })
-        .subscribe();
-    
-    console.log('📅 [AGENDA] Inscrição de tempo real ativada.');
-}
-
-async function renderSchedule() {
-    const container = document.getElementById('scheduleContainer');
-    if (!container) return;
-    
-    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4', 'Consultório 5'];
-
-    try {
-        const { data: professionals, error } = await _supabase.from('professionals').select('*').order('name');
-        if (error) throw error;
-        
-        professionals.forEach((prof, index) => {
-            prof.color = professionalColors[index % professionalColors.length];
-        });
-        
-        let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
-        for(let h = 7; h < 22; h++) {
-            html += `<div class="time-slot">${String(h).padStart(2, '0')}:00</div>`;
-            html += `<div class="time-slot">${String(h).padStart(2, '0')}:30</div>`;
-        }
-        html += '</div>';
-
-        html += '<div class="professionals-grid">';
-        rooms.forEach(room => {
-            html += `<div class="professional-column" data-room-name="${room}">`;
-            html += `<div class="schedule-header">${room}</div>`;
-            for(let h = 7; h < 22; h++) {
-                html += `<div class="time-slot" data-time="${h}:00"></div>`;
-                html += `<div class="time-slot" data-time="${h}:30"></div>`;
-            }
-            html += '</div>';
-        });
-        html += '</div>';
-        container.innerHTML = html;
-        
-        loadAppointments(professionals);
-        updateDateDisplay();
-
-    } catch (error) {
-        container.innerHTML = `<div style="color:red;">Erro ao carregar a agenda: ${error.message}</div>`;
-    }
-}
-
-async function loadAppointments(professionals) {
-    const selectedDate = currentScheduleDate.toISOString().split('T')[0];
-    const tableBody = document.getElementById('proximosAgendamentosBody');
-    const currentUser = getCurrentUserProfile();
-
-    let loggedInProfessionalId = null;
-    if (currentUser.role === 'medicos') {
-        const { data: professionalProfile } = await _supabase
-            .from('professionals').select('id').eq('user_id', currentUser.id).single();
-        if (professionalProfile) {
-            loggedInProfessionalId = professionalProfile.id;
-        }
-    }
-
-    try {
-        const { data: appointments, error } = await _supabase.from('appointments')
-            .select('*, professionals(name)').eq('appointment_date', selectedDate).order('start_time');
-        if (error) throw error;
-
-        document.querySelectorAll('.appointment-card').forEach(card => card.remove());
-        if (tableBody) tableBody.innerHTML = '';
-
-        if (appointments.length === 0) {
-            if (tableBody) tableBody.innerHTML = '<tr><td colspan="4">Nenhum agendamento para este dia.</td></tr>';
-            return;
-        }
-
-        appointments.forEach(appointment => {
-            const isOwnAppointment = loggedInProfessionalId === null || appointment.professional_id === loggedInProfessionalId;
-            
-            const roomColumn = document.querySelector(`.professional-column[data-room-name="${appointment.room}"]`);
-            if(roomColumn) {
-                const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
-                const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + 50;
-                const height = 58;
-
-                const card = document.createElement('div');
-                card.style.top = `${top}px`;
-                card.style.height = `${height}px`;
-
-                if (isOwnAppointment) {
-                    const professional = professionals.find(p => p.id === appointment.professional_id);
-                    const profColor = professional ? professional.color : '#7f8c8d';
-                    card.className = 'appointment-card';
-                    card.dataset.appointmentId = appointment.id;
-                    card.innerHTML = `
-                        <div class="professional-flag" style="background-color: ${profColor};"></div>
-                        <strong>${appointment.patient_name}</strong>
-                        <small>${appointment.professionals.name}</small>
-                    `;
-                } else {
-                    card.className = 'appointment-card blocked';
-                    card.innerHTML = `<strong>Horário não disponível</strong>`;
-                }
-                roomColumn.appendChild(card);
-            }
-            
-            if (tableBody && isOwnAppointment) {
-                const row = document.createElement('tr');
-                let statusClass = appointment.status === 'chegou' ? 'active' : 'pending';
-                row.innerHTML = `
-                    <td>${appointment.patient_name}</td>
-                    <td>${appointment.start_time.substring(0, 5)}</td>
-                    <td>${appointment.professionals.name || 'N/A'}</td>
-                    <td><span class="status status-${statusClass}">${appointment.status.replace('_', ' ').toUpperCase()}</span></td>
-                `;
-                tableBody.appendChild(row);
-            }
-        });
-        
-    } catch(error) {
-        console.error('Erro ao carregar agendamentos:', error);
-        if (tableBody) tableBody.innerHTML = '<tr><td colspan="4" style="color:red;">Erro ao carregar.</td></tr>';
-    }
-}
-
 async function openNewAppointmentModal() {
     const modal = document.getElementById('appointmentModal');
     if (!modal) return;
@@ -283,9 +339,11 @@ async function openAppointmentDetails(appointmentId) {
         document.getElementById('detailsAppointmentRoom').value = appointment.room;
 
         const profSelect = document.getElementById('detailsAppointmentProfessional');
-        const allProfessionals = await _supabase.from('professionals').select('*');
+        const { data: allProfessionals, error: profError } = await _supabase.from('professionals').select('*');
+        if (profError) throw profError;
+
         profSelect.innerHTML = '';
-        allProfessionals.data.forEach(prof => {
+        allProfessionals.forEach(prof => {
             const option = document.createElement('option');
             option.value = prof.id;
             option.textContent = prof.name;

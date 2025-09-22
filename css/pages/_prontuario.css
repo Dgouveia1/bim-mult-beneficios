@@ -1,0 +1,175 @@
+/* =================================================================
+   PÁGINA: PRONTUÁRIO (VERSÃO MELHORADA)
+   ================================================================= */
+
+/* Ajusta o card principal da página */
+/* Faz o Prontuário ocupar toda a largura da viewport */
+#prontuarioPage {
+    margin: 0;
+    padding: 0;
+    width: 100vw;   /* 100% da viewport */
+    max-width: 100vw;
+}
+
+#prontuarioPage > .card {
+    width: 100vw;   /* força largura total */
+    min-height: 100vh;
+    margin: 0;
+    padding: 30px;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+
+/* ----------------------------
+   BARRA DE BUSCA
+----------------------------- */
+#prontuarioPage .search-container {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto 30px auto; /* Centraliza horizontalmente e adiciona margem inferior */
+}
+
+#prontuarioPage .search-container input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+#prontuarioPage .search-container input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
+    outline: none;
+}
+
+#prontuarioPage .search-container i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-medium);
+    pointer-events: none;
+}
+
+#prontuarioPage #prontuarioHistoryContainer > p {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--gray-medium);
+    font-size: 1.1rem;
+}
+
+/* ----------------------------
+   INFORMAÇÕES DO PACIENTE
+----------------------------- */
+#prontuarioPatientInfo {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #f8fafc;
+    border: 1px solid #eef2f5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+#prontuarioPatientInfo::before {
+    content: "\f007";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--primary-color);
+}
+
+#prontuarioPatientInfo h4 {
+    font-size: 18px;
+    color: var(--secondary-dark);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eef2f5;
+}
+
+#prontuarioPatientInfo p {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+#prontuarioPatientInfo span {
+    font-weight: 600;
+    color: var(--secondary-dark);
+}
+
+/* ----------------------------
+   HISTÓRICO DE CONSULTAS
+----------------------------- */
+#prontuarioHistoryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaçamento entre os cards */
+}
+
+/* Estilo para cada item (card) do histórico */
+.historico-item.card {
+    padding: 20px;
+    margin-bottom: 0; /* Remove a margem padrão do componente card */
+    border: 1px solid #eef2f5;
+    border-left: 5px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* sombra mais suave */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.historico-item.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.historico-item p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.historico-item .details-link {
+    font-weight: 600;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.historico-item .details-link:hover {
+    color: var(--secondary-dark);
+}
+
+/* Detalhes escondidos/mostrados com animação */
+.full-details {
+    display: none;
+    margin-top: 10px;
+    border-top: 1px dashed #eee;
+    padding-top: 10px;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-5px);}
+    to   {opacity: 1; transform: translateY(0);}
+}
+
+/* ----------------------------
+   LISTA DE PACIENTES (quando há múltiplos)
+----------------------------- */
+.paciente-selecao-item {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.paciente-selecao-item:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}

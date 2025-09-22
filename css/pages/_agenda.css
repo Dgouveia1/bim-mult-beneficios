@@ -12,8 +12,13 @@
 }
 
 .time-column {
-    flex: 0 0 80px;
+    flex: 0 0 80px; /* Mantém a largura fixa */
     border-right: 1px solid #eef2f5;
+    
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: #fdfdfd; 
 }
 
 .professionals-grid {
@@ -173,4 +178,121 @@
     bottom: 0;
     width: 6px;
     border-radius: 6px 0 0 6px;
+}
+
+/* =================================================================
+   PÁGINA: AGENDA - MINI CALENDÁRIO
+   ================================================================= */
+
+   #miniCalendarContainer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    width: 300px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+
+.mini-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.mini-calendar-header span {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--secondary-dark);
+}
+
+.mini-calendar-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.mini-calendar-header button:hover {
+    background-color: #f0f0f0;
+}
+
+.mini-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.mini-calendar-day,
+.mini-calendar-date {
+    text-align: center;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+.mini-calendar-day {
+    font-weight: 500;
+    color: var(--gray-medium);
+}
+
+.mini-calendar-date {
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.mini-calendar-date:hover {
+    background-color: var(--primary-light);
+    color: #fff;
+}
+
+.mini-calendar-date.today {
+    background-color: var(--secondary-color);
+    color: #fff;
+    font-weight: bold;
+}
+
+.mini-calendar-date.other-month {
+    color: #ccc;
+}
+
+/* =================================================================
+   PÁGINA: AGENDA - AJUSTES NO CABEÇALHO
+   ================================================================= */
+
+   #agendaPage .content-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between; /* Empurra os grupos para as extremidades */
+    gap: 20px;
+}
+
+.agenda-header-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 25px; /* Espaço entre o título "Agenda" e a navegação */
+}
+
+#agendaPage .date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative; /* Necessário para o mini-calendário */
+}
+
+#agendaPage #currentDateDisplay {
+    color: var(--secondary-dark);
+    margin: 0;
+    padding: 0 5px;
+    font-size: 1.1rem; /* Ajuste de tamanho da fonte da data */
+    white-space: nowrap;
 }

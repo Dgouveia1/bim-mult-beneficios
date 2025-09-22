@@ -6,6 +6,7 @@
     <title>Bim Benefícios - Sistema Interno</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
 </head>
 <body>
     <div class="login-container" id="loginScreen">
@@ -44,13 +45,17 @@
                 <div class="menu-item" id="menu-cartao"><i class="fas fa-id-card"></i> Cartão Bim</div>
                 <div class="submenu" id="submenu-cartao">
                     <a href="#" class="submenu-item" data-page="clientes">Clientes</a>
+                    <a href="#" class="submenu-item" data-page="carteirinha">Gerar Carteirinha</a>
+
                 </div>
                 
                 <div class="menu-item" id="menu-clinica"><i class="fas fa-clinic-medical"></i> Clínica Bim</div>
                 <div class="submenu" id="submenu-clinica">
                     <a href="#" class="submenu-item" data-page="recepcao">Recepção</a>
                     <a href="#" class="submenu-item" data-page="agenda">Agenda</a>
-                    <a href="#" class="submenu-item" data-page="pacientes">Pacientes</a>
+                    <a href="#" class="submenu-item" data-page="pacientes">Atendimentos</a>
+                    <a href="#" class="submenu-item" data-page="prontuario">Prontuário</a>
+
                 </div>
             
                 <div class="admin-only">
@@ -124,6 +129,28 @@
                         </div>
                     </div>
                 </div>
+                <div class="page-content" id="carteirinhaPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Gerar Carteirinha</h2>
+                    </div>
+                    <div class="card">
+                        <div class="form-group" style="padding: 20px; max-width: 500px;">
+                            <label for="carteirinhaSearchInput">Buscar Cliente</label>
+                            <div class="autocomplete-container">
+                                <input type="text" id="carteirinhaSearchInput" placeholder="Digite o nome do titular..." autocomplete="off">
+                                <div class="autocomplete-results" id="carteirinhaSearchResults"></div>
+                            </div>
+                        </div>
+                
+                        <div id="cardsPreview" style="padding: 0 20px 20px 20px;">
+                            <div id="cardsContainer" class="cards-container">
+                                </div>
+                            <button class="btn btn-success" id="downloadCardsBtn" style="display: none; margin-top: 20px;">
+                                <i class="fas fa-download"></i> Baixar Carteirinhas
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="page-content" id="recepcaoPage">
                     <div class="content-header">
@@ -133,134 +160,169 @@
                 </div>
 
                 <div class="page-content" id="agendaPage">
-                    <div class="content-header" style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
-                        <h2 class="page-title">Agenda</h2>
-                        <div class="date-navigation">
-                            <button class="btn btn-secondary btn-small" id="prevDayBtn"><i class="fas fa-chevron-left"></i></button>
-                            <h3 id="currentDateDisplay" style="color: var(--secondary-dark);"></h3>
-                            <button class="btn btn-secondary btn-small" id="nextDayBtn"><i class="fas fa-chevron-right"></i></button>
+                    <div class="content-header">
+                        <div class="agenda-header-group">
+                            <h2 class="page-title">Agenda</h2>
+                            <div class="date-navigation">
+                                <button class="btn btn-secondary btn-small" id="prevDayBtn"><i class="fas fa-chevron-left"></i></button>
+                                <h3 id="currentDateDisplay"></h3>
+                                <button class="btn btn-secondary btn-small" id="nextDayBtn"><i class="fas fa-chevron-right"></i></button>
+                                <button class="btn btn-secondary btn-small" id="calendarToggleBtn">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                                <div id="miniCalendarContainer" style="display: none;"></div>
+                            </div>
                         </div>
                         
-                        <div style="margin-left: auto;">
+                        <div class="agenda-header-actions">
                             <button class="btn" id="newAppointmentBtn"><i class="fas fa-plus"></i> Novo Agendamento</button>
                         </div>
                     </div>
                     <div class="card">
                         <div class="schedule-container" id="scheduleContainer"></div>
-                        <div class="table-section" style="margin-top: 30px;">
-                            <h3 style="margin-bottom: 15px; color: var(--secondary-dark);">Próximos Agendamentos</h3>
-                            <div class="table-container">
-                                <table id="proximosAgendamentosTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Paciente</th>
-                                            <th>Horário</th>
-                                            <th>Profissional</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="proximosAgendamentosBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 
                 <div class="page-content" id="pacientesPage">
-                    <div class="pacientes-container">
-                        <div class="consulta-coluna" id="filaAtendimento">
+                    <div class="atendimento-layout">
+                
+                        <div class="atendimento-fila-coluna">
                             <div class="coluna-header"><h3>Aguardando Atendimento</h3></div>
-                            <div class="lista-pacientes-espera" id="patientQueueList"></div>
-                        </div>
-
-                        <div class="consulta-coluna" id="infoPaciente">
-                            <div class="paciente-info-header card">
-                                <h4>Informações do Paciente</h4>
-                                <p><strong>Nome:</strong> <span id="currentPatientName">Selecione um paciente</span></p>
-                                <p><strong>Idade:</strong> <span id="currentPatientAge">-</span></p>
-                                <p><strong>Plano:</strong> <span id="currentPatientPlan">-</span></p>
-                            </div>
-                            <div class="coluna-header"><h3>Histórico de Consultas</h3></div>
-                            <div class="historico-consultas" id="patientHistoryContainer">
-                                <p>Selecione um paciente para ver o histórico.</p>
-                            </div>
-                        </div>
-
-                        <div class="consulta-coluna" id="areaAtendimento">
-                            <div class="card" id="consultationWorkspace" style="display: none;">
-                                <input type="hidden" id="currentAppointmentId">
-                                <div class="atendimento-botoes">
-                                    <button class="btn btn-secondary active" data-aba="conduta">Conduta</button>
-                                    <button class="btn btn-secondary" data-aba="receita">Receita</button>
-                                    <button class="btn btn-secondary" data-aba="exames">Exames</button>
+                            <div class="lista-pacientes-espera" id="patientQueueList">
                                 </div>
-                                <div class="atendimento-conteudo">
-                                    <div class="aba-conteudo active" id="abaConduta">
+                        </div>
+                
+                        <div class="atendimento-main-panel">
+                
+                            <div class="card" id="noPatientSelected">
+                                <p style="text-align: center; padding: 20px; font-size: 1.1rem; color: var(--gray-medium);">
+                                    <i class="fas fa-hand-pointer" style="font-size: 1.5rem; margin-bottom: 10px;"></i><br>
+                                    Selecione um paciente da fila para iniciar.
+                                </p>
+                            </div>
+                            
+                            <div class="card" id="consultationWorkspace" style="display: none; height: 100%; flex-direction: column;">
+                                <input type="hidden" id="currentAppointmentId">
+                                
+                                <div class="atendimento-paciente-header">
+                                    <h3 id="currentPatientName">Nome do Paciente</h3>
+                                    <div>
+                                        <span><strong>Plano:</strong> <span id="currentPatientPlan">N/A</span></span>
+                                        <span style="margin-left: 20px;"><strong>Idade:</strong> <span id="currentPatientAge">-</span></span>
+                                    </div>
+                                    <button class="btn btn-secondary btn-small" id="backToQueueBtn" title="Voltar para a Fila"><i class="fas fa-arrow-left"></i> Voltar</button>
+                                </div>
+                            
+                                <div class="atendimento-tab-nav">
+                                    <button class="btn-tab active" data-tab="Atendimento">Atendimento Atual</button>
+                                    <button class="btn-tab" data-tab="Receita">Receita</button>
+                                    <button class="btn-tab" data-tab="Atestado">Atestado</button>
+                                    <button class="btn-tab" data-tab="ExamesLab">Exames Laboratoriais</button>
+                                    <button class="btn-tab" data-tab="ExamesImg">Exames de Imagem</button>
+                                    <button class="btn-tab" data-tab="AutCirurgia">Autorização de Cirurgia</button>
+                                    <button class="btn-tab" data-tab="PosCirurgia">Cuidados Pós-Cirúrgicos</button>
+                                    <button class="btn-tab" data-tab="Orcamentos">Orçamentos</button>
+                                    <button class="btn-tab" data-tab="Historico">Histórico Completo</button>
+                                    <button class="btn-tab" data-tab="Dados">Dados do Paciente</button>
+                                </div>
+                            
+                                <div class="atendimento-tab-content">
+                                    <div class="tab-pane active" id="tabAtendimento">
                                         <div class="form-group"><label>Queixa Principal / Anamnese</label><textarea id="queixaPrincipal" rows="4"></textarea></div>
                                         <div class="form-group"><label>Exame Físico</label><textarea id="exameFisico" rows="4"></textarea></div>
                                         <div class="form-group"><label>Conduta</label><textarea id="conduta" rows="4"></textarea></div>
-                                        <div class="form-group">
-                                            <label>Anexar Exame</label>
-                                            <div class="laudo-container" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px;">
-                                                <textarea id="laudoTexto" rows="4" placeholder="Digite o laudo do exame aqui..."></textarea>
-                                                <label for="fileUploadInput" class="btn btn-secondary" style="margin-top: 10px; width: fit-content;">
-                                                    <i class="fas fa-paperclip"></i> Anexar Arquivo
-                                                </label>
-                                                <input type="file" id="fileUploadInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-                                                <div id="uploadStatus" style="font-size: 12px; margin-top: 5px;"></div>
-                                                <ul id="attachmentsList" style="list-style: none; padding: 0; margin-top: 10px;"></ul>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaConduta">Imprimir Conduta</button>
+                                        <div class="form-group"><label>Anexar Arquivos</label><div class="laudo-container" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px;"><label for="fileUploadInput" class="btn btn-secondary" style="margin-top: 10px; width: fit-content;"><i class="fas fa-paperclip"></i> Anexar Arquivo</label><input type="file" id="fileUploadInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;"><div id="uploadStatus" style="font-size: 12px; margin-top: 5px;"></div><ul id="attachmentsList" style="list-style: none; padding: 0; margin-top: 10px;"></ul></div></div>
                                     </div>
-                                    <div class="aba-conteudo" id="abaReceita">
+                                    
+                                    <div class="tab-pane" id="tabReceita">
                                         <div class="form-group"><label>Receituário</label><textarea id="receituario" rows="12"></textarea></div>
-                                        <button type="button" class="btn btn-secondary btn-small print-btn" data-target="abaReceita">Imprimir Receita</button>
+                                        <button type="button" class="btn btn-secondary btn-small" id="imprimirReceitaBtn">Imprimir Receita</button>
                                     </div>
-                                    <div class="aba-conteudo" id="abaExames">
-                                        <div class="protocol-controls">
-                                            <div class="form-group">
-                                                <label for="protocolSelect">Carregar Protocolo</label>
-                                                <select id="protocolSelect">
-                                                    <option value="">Selecione um protocolo</option>
-                                                </select>
-                                            </div>
-                                            <button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar Protocolo</button>
-                                        </div>
-                                        <hr>
+                
+                                    <div class="tab-pane" id="tabAtestado">
                                         <div class="form-group">
-                                            <label for="examSearchInput">Buscar Exame na Lista</label>
-                                            <div class="autocomplete-container">
-                                                <input type="text" id="examSearchInput" placeholder="Digite para buscar..." autocomplete="off">
-                                                <div class="autocomplete-results" id="examSearchResults"></div>
-                                            </div>
+                                            <label>Descrição do Atestado</label>
+                                            <textarea id="atestadoTexto" rows="10" placeholder="Digite aqui o conteúdo para o atestado..."></textarea>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="manualExamInput">Adicionar Exame Manualmente</label>
-                                            <div class="manual-add-container">
-                                                <input type="text" id="manualExamInput" placeholder="Ex: Raio-X de Tórax">
-                                                <button type="button" class="btn btn-small" id="addManualExamBtn">Adicionar</button>
-                                            </div>
-                                        </div>
-                                        <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5>
-                                        <div class="selected-exams-container">
-                                            <select id="selectedExamsList" multiple></select>
-                                            <button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtn">Remover Selecionado</button>
-                                        </div>
-                                        <button type="button" class="btn btn-secondary btn-small" id="printExamsBtn" style="margin-top: 20px;">
-                                            <i class="fas fa-print"></i> Imprimir Pedido e Orçamento
+                                        <button type="button" class="btn btn-secondary btn-small" id="imprimirAtestadoBtn">
+                                            <i class="fas fa-file-medical"></i> Imprimir Atestado
                                         </button>
                                     </div>
+                            
+                                    <div class="tab-pane" id="tabExamesLab">
+                                         <div class="protocol-controls"><div class="form-group"><label for="protocolSelect">Carregar Protocolo</label><select id="protocolSelect"><option value="">Selecione</option></select></div><button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar Protocolo</button></div><hr><div class="form-group"><label for="examSearchInput">Buscar Exame</label><div class="autocomplete-container"><input type="text" id="examSearchInput" autocomplete="off"><div class="autocomplete-results" id="examSearchResults"></div></div></div><div class="form-group"><label for="manualExamInput">Adicionar Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInput"><button type="button" class="btn btn-small" id="addManualExamBtn">Adicionar</button></div></div><h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5><div class="selected-exams-container"><select id="selectedExamsList" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtn">Remover</button></div><button type="button" class="btn btn-secondary btn-small" id="printExamsBtn" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido e Orçamento</button>
+                                    </div>
+                            
+                                    <div class="tab-pane" id="tabExamesImg">
+                                        <div class="protocol-controls"><div class="form-group"><label for="protocolSelectImg">Carregar Protocolo</label><select id="protocolSelectImg"><option value="">Selecione</option></select></div><button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtnImg"><i class="fas fa-save"></i> Salvar Protocolo</button></div><hr><div class="form-group"><label for="manualExamInputImg">Adicionar Exame de Imagem Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInputImg" placeholder="Ex: Raio-X do Tórax"><button type="button" class="btn btn-small" id="addManualExamBtnImg">Adicionar</button></div></div><h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Solicitados</h5><div class="selected-exams-container"><select id="selectedExamsListImg" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtnImg">Remover</button></div><button type="button" class="btn btn-secondary btn-small" id="printExamsBtnImg" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido</button>
+                                    </div>
+                                            
+                                    <div class="tab-pane" id="tabAutCirurgia">
+                                        <div class="form-group">
+                                            <label>Conteúdo da Autorização de Cirurgia</label>
+                                            <textarea id="autorizacaoCirurgiaTexto" rows="10" placeholder="Digite aqui o conteúdo para a autorização..."></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-small" id="imprimirAutorizacaoCirurgiaBtn">
+                                            <i class="fas fa-file-signature"></i> Imprimir Autorização
+                                        </button>
+                                    </div>
+                
+                                    <div class="tab-pane" id="tabPosCirurgia">
+                                        <div class="form-group">
+                                            <label>Recomendações e Cuidados Pós-Cirúrgicos</label>
+                                            <textarea id="cuidadosPosCirurgiaTexto" rows="10" placeholder="Digite aqui as recomendações para o paciente..."></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-small" id="imprimirCuidadosPosCirurgiaBtn">
+                                            <i class="fas fa-medkit"></i> Imprimir Cuidados
+                                        </button>
+                                    </div>
+                            
+                                    <div class="tab-pane" id="tabOrcamentos">
+                                         <div class="form-group">
+                                            <label>Conteúdo do Orçamento</label>
+                                            <textarea id="orcamentoTexto" rows="10" placeholder="Digite ou cole aqui o orçamento..."></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-small" id="imprimirOrcamentoBtn">
+                                            <i class="fas fa-file-invoice-dollar"></i> Imprimir Orçamento
+                                        </button>
+                                    </div>
+                            
+                                    <div class="tab-pane" id="tabHistorico">
+                                        <div class="historico-consultas" id="patientHistoryContainer"></div>
+                                    </div>
+                            
+                                    <div class="tab-pane" id="tabDados">
+                                        <div class="dados-paciente-grid">
+                                            <p><strong>Nome Completo:</strong> <span id="dadosNome"></span></p><p><strong>CPF:</strong> <span id="dadosCPF"></span></p><p><strong>Telefone:</strong> <span id="dadosTelefone"></span></p><p><strong>Plano:</strong> <span id="dadosPlano"></span></p><p><strong>Status:</strong> <span id="dadosStatus"></span></p><p><strong>Email:</strong> <span id="dadosEmail"></span></p><p><strong>Endereço:</strong> <span id="dadosEndereco"></span></p>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                                 <div class="atendimento-actions">
-                                    <button class="btn btn-success" id="finalizeConsultationBtn">Finalizar Consulta</button>
+                                    <button class="btn btn-success" id="finalizeConsultationBtn"><i class="fas fa-check-circle"></i> Finalizar e Salvar Consulta</button>
                                 </div>
-                            </div>
-                            <div class="card" id="noPatientSelected">
-                                <p style="text-align: center; padding: 20px;">Selecione um paciente da fila para iniciar o atendimento.</p>
-                            </div>
+                            </div> 
                         </div>
-                    </div> 
+                    </div>
+                </div>                <div class="page-content" id="prontuarioPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Prontuário Eletrônico</h2>
+                    </div>
+                    <div class="card">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="search" id="prontuarioSearchInput" placeholder="Buscar paciente por nome...">
+                        </div>
+                        <div id="prontuarioPatientInfo" style="display: none;">                             <h4>Informações do Paciente</h4>
+                            <p><strong>Nome:</strong> <span id="prontuarioPatientName"></span></p>
+                            <p><strong>CPF:</strong> <span id="prontuarioPatientCPF"></span></p>
+                            <p><strong>Plano:</strong> <span id="prontuarioPatientPlan"></span></p>
+                        </div>
+                        <div class="historico-consultas" id="prontuarioHistoryContainer">
+                            <p>Busque por um paciente para ver seu histórico de consultas.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="page-content" id="laboratorioPage">
@@ -426,7 +488,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="appointmentProcedure">Procedimento</label>
+                            <label for="appointmentProcedure">Observações</label>
                             <input type="text" id="appointmentProcedure" name="procedure">
                         </div>
                         <div class="form-group">
@@ -717,23 +779,28 @@
     </div>
 
     
+    
+
+    <div class="modal" id="printPreviewModal">
+        <div class="modal-content" style="max-width: 850px; width: 95%;">
+            <div class="modal-header">
+                <h2 id="printPreviewTitle">Pré-visualização do Documento</h2>
+                <button class="close-btn" data-close-modal="printPreviewModal">&times;</button>
+            </div>
+            <div class="modal-body" style="background-color: #e0e0e0; padding: 20px;">
+                <div id="printPreviewContent" class="print-preview-area">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="printPreviewModal">Fechar</button>
+                <button type="button" class="btn btn-success" id="confirmPrintBtn"><i class="fas fa-print"></i> Imprimir</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <script src="js/main.js" type="module"></script>
-    <script src="js/ui.js" type="module"></script>
-    <script src="js/auth.js" type="module"></script>
-    <script src="js/usuarios.js" type="module"></script>
-    <script src="js/recepcao.js" type="module"></script>
-    <script src="js/agenda.js" type="module"></script>
-    <script src="js/pacientes.js" type="module"></script>
-    <script src="js/clientes.js" type="module"></script>
-    <script src="js/laboratorio.js" type="module"></script>
-    <script src="js/produtos.js" type="module"></script>
-    <script src="js/financeiro.js" type="module"></script>
-    <script src="js/disparos.js" type="module"></script>
-    <script src="js/navigation.js" type="module"></script>
-    <script src="js/events.js" type="module"></script>
-    </body>
+</body>
 </html>

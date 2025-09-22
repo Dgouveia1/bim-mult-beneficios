@@ -10,6 +10,9 @@ import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
+import { setupProntuarioPage } from './prontuario.js'; 
+import { setupCarteirinhaPage } from './carteirinha.js'
+
 
 const newClientModalEl = document.getElementById('newClientModal');
 
@@ -51,18 +54,24 @@ function navigateToPage(pageName) {
     loadPageData(pageName);
 }
 
-function loadPageData(pageName) {
-    if (pageName === 'clientes') loadClientsData();
-    else if (pageName === 'agenda') loadScheduleView();
-    else if (pageName === 'recepcao') loadReceptionQueue();
-    else if (pageName === 'pacientes') loadPatientsData();
-    else if (pageName === 'laboratorio') loadLaboratoryData();
-    else if (pageName === 'usuarios') loadUsersData();
-    else if (pageName === 'profissionais') loadProfessionalsData();
+async function loadPageData(pageName) { // Adicionado 'async'
+    if (pageName === 'clientes') await loadClientsData(); // Adicionado 'await' para consistência
+    else if (pageName === 'agenda') await loadScheduleView();
+    else if (pageName === 'recepcao') await loadReceptionQueue();
+    else if (pageName === 'pacientes') await loadPatientsData();
+    else if (pageName === 'laboratorio') await loadLaboratoryData();
+    else if (pageName === 'usuarios') await loadUsersData();
+    else if (pageName === 'profissionais') await loadProfessionalsData();
     else if (pageName === 'disparos') {
-        loadMunicipios();
-    };
-}
+        await loadMunicipios();
+    } else if (pageName === 'prontuario') {
+        await loadClientsData(); // <-- GARANTE QUE OS CLIENTES SÃO CARREGADOS PRIMEIRO
+        setupProntuarioPage();   // <-- SÓ DEPOIS CONFIGURA A PÁGINA
+    } else if (pageName === 'carteirinha') {
+        setupCarteirinhaPage();
+    }
+}                                     
+
 
 function setupEventListeners() {
     // EVENTOS PARA O MENU (FUNCIONA EM TODAS AS TELAS)
