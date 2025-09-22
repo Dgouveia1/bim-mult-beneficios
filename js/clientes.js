@@ -335,15 +335,15 @@ async function handleUpdateClient(event) {
     const titularData = {
         nome: formProps.details_nome,
         sobrenome: formProps.details_sobrenome,
-        telefone: formProps.details_telefone,
-        cpf: formProps.details_cpf,
-        email: formProps.details_email,
+        telefone: formProps.telefone,
+        cpf: formProps.cpf,
+        email: formProps.email,
         data_nascimento: formatDateForSupabase(formProps.details_data_nascimento),
-        plano: formProps.details_plano,
-        status: formProps.details_status,
-        cep: formProps.details_cep,
-        endereco: formProps.details_endereco,
-        municipio: formProps.details_municipio,
+        plano: formProps.plano,
+        status: formProps.status,
+        cep: formProps.cep,
+        endereco: formProps.endereco,
+        municipio: formProps.municipio,
     };
     
     submitButton.disabled = true;
