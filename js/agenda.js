@@ -31,6 +31,8 @@ function updateDateDisplay() {
     }
 }
 
+
+
 // =================================================================
 // LÓGICA DO MINI-CALENDÁRIO (CORRIGIDA)
 // =================================================================
@@ -284,29 +286,128 @@ function setupPatientSearch() {
 }
 async function openNewAppointmentModal() {
     const modal = document.getElementById('appointmentModal');
-    if (!modal) return;
-    
+    const form = document.getElementById('appointmentForm');
+    form.reset();
+    document.getElementById('patientSearchResults').innerHTML = ''; // Limpa resultados antigos
+
+    // Carrega os profissionais no select (código que você já tem)
     const professionalSelect = document.getElementById('appointmentProfessional');
-    if (professionalSelect) {
-        professionalSelect.innerHTML = '<option>Carregando...</option>';
-        try {
-            const { data: professionals, error } = await _supabase.from('professionals').select('*').order('name');
-            if (error) throw error;
-            
-            professionalSelect.innerHTML = '<option value="">Selecione um profissional</option>';
-            professionals.forEach(prof => {
-                const option = document.createElement('option');
-                option.value = prof.id;
-                option.textContent = prof.name;
-                professionalSelect.appendChild(option);
-            });
-        } catch (error) {
-            professionalSelect.innerHTML = '<option value="">Erro ao carregar</option>';
-        }
+    professionalSelect.innerHTML = '<option value="">Carregando...</option>';
+    try {
+        const { data: professionals, error } = await _supabase.from('professionals').select('id, name').order('name');
+        if (error) throw error;
+        professionalSelect.innerHTML = '<option value="">Selecione</option>';
+        professionals.forEach(p => {
+            professionalSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+        });
+    } catch (error) {
+        console.error('Erro ao carregar profissionais:', error);
+        professionalSelect.innerHTML = '<option value="">Erro ao carregar</option>';
     }
-    document.getElementById('appointmentDate').valueAsDate = new Date();
-    setupPatientSearch();
+
     modal.style.display = 'flex';
+
+    // =================================================================
+    // ================ INÍCIO DO CÓDIGO DE CORREÇÃO ===================
+    // =================================================================
+    const searchInput = document.getElementById('appointmentPatientSearch');
+    const searchResultsContainer = document.getElementById('patientSearchResults');
+    const patientNameInput = document.getElementById('appointmentPatientName');
+    const patientCPFInput = document.getElementById('appointmentPatientCPF');
+    
+    let searchTimeout;
+
+    const handleSearch = (event) => {
+        const query = event.target.value.toLowerCase().trim();
+        searchResultsContainer.innerHTML = '';
+        searchResultsContainer.style.display = 'none';
+
+        if (query.length < 3) {
+            return;
+        }
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            // =================================================================
+            // ================ INÍCIO DA LÓGICA CORRIGIDA ===================
+            // =================================================================
+            
+            // 1. Busca nos TITULARES
+            const { data: titulares, error: titularesError } = await _supabase
+                .from('clients')
+                .select('nome, sobrenome, cpf')
+                .or(`nome.ilike.%${query}%,sobrenome.ilike.%${query}%,cpf.ilike.%${query}%`);
+
+            if (titularesError) {
+                console.error('Erro na busca de titulares:', titularesError);
+            }
+
+            // 2. Busca nos DEPENDENTES
+            const { data: dependentes, error: dependentesError } = await _supabase
+                .from('dependents')
+                .select('nome, sobrenome, cpf') // Puxa o nome do titular
+                .or(`nome.ilike.%${query}%,sobrenome.ilike.%${query}%,cpf.ilike.%${query}%`);
+            
+            if (dependentesError) {
+                console.error('Erro na busca de dependentes:', dependentesError);
+            }
+
+            // 3. Combina os resultados
+            const results = [];
+            
+            if (titulares) {
+                titulares.forEach(titular => {
+                    results.push({ ...titular, isDependente: false }); 
+                });
+            }
+
+            if (dependentes) {
+                dependentes.forEach(dep => {
+                    const titularName = dep.titulares ? `${dep.titulares.nome} ${dep.titulares.sobrenome}` : 'N/A';
+                    results.push({ ...dep, titularName: titularName, isDependente: true });
+                });
+            }
+
+            // =================================================================
+            // ================== FIM DA LÓGICA CORRIGIDA ====================
+            // =================================================================
+
+            // O código para exibir os resultados permanece o mesmo
+            searchResultsContainer.innerHTML = ''; // Limpa antes de adicionar novos
+            if (results.length > 0) {
+                searchResultsContainer.style.display = 'block';
+                results.forEach(person => {
+                    const item = document.createElement('div');
+                    item.classList.add('autocomplete-item');
+                    
+                    let text = `${person.nome} ${person.sobrenome} (CPF: ${person.cpf || 'N/A'})`;
+                    if (person.isDependente) {
+                        text += ` - [Dependente de: ${person.titularName}]`;
+                    }
+                    item.textContent = text;
+                    
+                    item.addEventListener('click', () => {
+                        searchInput.value = `${person.nome} ${person.sobrenome}`;
+                        patientNameInput.value = `${person.nome} ${person.sobrenome}`;
+                        patientCPFInput.value = person.cpf || '';
+                        searchResultsContainer.style.display = 'none';
+                    });
+
+                    searchResultsContainer.appendChild(item);
+                });
+            } else {
+                 searchResultsContainer.style.display = 'block';
+                 searchResultsContainer.innerHTML = '<div class="autocomplete-item-not-found">Nenhum cliente encontrado.</div>';
+            }
+        }, 300);
+    }
+
+    // Limpa o listener antigo para evitar duplicação e adiciona o novo
+    searchInput.removeEventListener('input', handleSearch);
+    searchInput.addEventListener('input', handleSearch);
+    // =================================================================
+    // ================== FIM DO CÓDIGO DE CORREÇÃO ====================
+    // =================================================================
 }
 
 function closeAppointmentModal() {

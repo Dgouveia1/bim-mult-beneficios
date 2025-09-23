@@ -110,7 +110,6 @@ async function loadPageData(pageName) {
 }                                     
 
 function setupEventListeners() {
-    // ... (O restante desta função permanece exatamente o mesmo)
     const dashboard = document.getElementById('dashboard');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');

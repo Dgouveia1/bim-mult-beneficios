@@ -102,6 +102,8 @@ async function loadClientsData() {
     }
 }
 
+
+
 function renderClientsTable(people) {
     if (!clientsTableBody) return;
     clientsTableBody.innerHTML = '';
