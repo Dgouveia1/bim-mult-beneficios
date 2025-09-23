@@ -5,7 +5,7 @@ import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, 
 import { fetchAddressByCEP } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
-import { loadPatientsData, selectPatient, finalizeConsultation, printContent, printExamDocuments, removeExam, unsubscribePatients  } from './pacientes.js';
+import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients  } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
@@ -201,7 +201,11 @@ function setupEventListeners() {
         const printExamsButton = target.closest('#printExamsBtn');
         const printGenericButton = target.closest('.print-btn');
         if (printExamsButton) printExamDocuments();
-        else if (printGenericButton) printContent(printGenericButton.dataset.target);
+        if (printGenericButton) {
+            // delega para a função do módulo de pacientes que monta a pré-visualização
+            // e abre o modal de impressão
+            import('./pacientes.js').then(mod => mod.triggerPrintFromElement(printGenericButton)).catch(err => console.error(err));
+        }
         const removeExamButton = target.closest('.remove-item-btn');
         if (removeExamButton) removeExam(parseInt(removeExamButton.dataset.examId));
         const tabButton = target.closest('.atendimento-botoes .btn');

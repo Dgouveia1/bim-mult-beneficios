@@ -1,30 +1,29 @@
 /* =================================================================
-   PÁGINA: PACIENTES (NOVO LAYOUT DE ABAS)
+   PÁGINA: PACIENTES (LAYOUT SEM SCROLL INTERNO)
    ================================================================= */
 
    #pacientesPage.active {
     display: flex;
-    height: 100%;
 }
 
 .atendimento-layout {
     display: flex;
     gap: 20px;
     width: 100%;
-    height: 100%;
 }
 
 /* Coluna da Fila (Esquerda) */
 .atendimento-fila-coluna {
-    flex: 0 0 300px; /* Largura fixa */
+    flex: 0 0 300px;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    height: 100%;
     background: var(--white);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
     padding: 15px;
+    /* Define uma altura máxima e permite que apenas a fila role */
+    max-height: calc(100vh - 120px); 
 }
 
 .coluna-header {
@@ -38,8 +37,8 @@
 }
 
 .lista-pacientes-espera {
-    overflow-y: auto;
-    height: 100%;
+    overflow-y: auto; /* A rolagem agora é só na lista */
+    flex-grow: 1;
 }
 
 .paciente-espera-item {
@@ -65,8 +64,7 @@
 
 /* Painel Principal (Direita) */
 .atendimento-main-panel {
-    flex: 1; /* Ocupa o resto do espaço */
-    height: 100%;
+    flex: 1;
 }
 
 /* Cabeçalho do Paciente no Painel */
@@ -84,13 +82,18 @@
     font-size: 1.5rem;
 }
 
+.atendimento-paciente-header .header-actions {
+    display: flex;
+    gap: 10px;
+}
+
 /* Navegação das Abas */
 .atendimento-tab-nav {
     display: flex;
     gap: 10px;
     border-bottom: 1px solid #eee;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Permite que as abas quebrem a linha */
+    flex-wrap: wrap;
 }
 
 .btn-tab {
@@ -117,12 +120,9 @@
     font-weight: 600;
 }
 
-/* Conteúdo das Abas */
+/* Conteúdo das Abas (SEM SCROLL INTERNO) */
 .atendimento-tab-content {
-    flex: 1; /* Faz o conteúdo ocupar o espaço disponível */
-    overflow-y: auto;
-    padding-right: 10px; /* Espaço para a barra de rolagem */
-    height: calc(100vh - 350px); /* Altura calculada para permitir rolagem interna */
+    padding-bottom: 20px; /* Espaço antes do rodapé */
 }
 
 .tab-pane {
@@ -136,76 +136,83 @@
 
 /* Rodapé com Ações */
 .atendimento-actions {
-    margin-top: auto; /* Empurra para o final */
+    margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-end;
 }
 
-/* Histórico e Dados do Paciente dentro da aba */
-.historico-consultas {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+/* =================================================================
+   LAYOUT DE IMPRESSÃO (AJUSTADO PARA A TELA)
+   ================================================================= */
 
-.historico-item {
-    padding: 15px;
-}
-
-.dados-paciente-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
-}
-
-.dados-paciente-grid p {
-    background-color: #f9f9f9;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 15px;
+.interactive-print-container {
+    width: 100%; /* Ocupa a largura disponível */
+    max-width: 800px; /* Limita a largura máxima */
+    height: auto;
+    aspect-ratio: 210 / 297; /* Proporção de uma folha A4 */
+    position: relative;
+    background-image: url('/imagens/padra_impressao.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    font-family: Arial, sans-serif;
     color: #333;
-    border-left: 3px solid var(--primary-color);
-}
-
-/* --- NOVOS ESTILOS PARA ABA DE EXAMES --- */
-.protocol-controls {
-    display: flex;
-    align-items: flex-end;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-.protocol-controls .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-.manual-add-container {
-    display: flex;
-    gap: 10px;
-}
-.manual-add-container input {
-    flex: 1;
-}
-
-.selected-exams-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-#selectedExamsList,
-#selectedExamsListImg { /* Seletor da lista de imagem adicionado aqui */
-    width: 100%;
-    flex: 1;
-    min-height: 150px;
-    border-radius: 8px;
-    padding: 10px;
+    margin: 0 auto;
     border: 1px solid #ddd;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden; /* Garante que os filhos não ultrapassem a borda */
 }
 
-#selectedExamsList option,
-#selectedExamsListImg option { /* Estilo do option agrupado para ambos */
-    padding: 5px;
-    border-bottom: 1px solid #eee;
+.printable-title {
+    position: absolute;
+    top: 9%; /* Posição relativa */
+    left: 10%;
+    width: 80%;
+    text-align: center;
+    font-size: 1.2vw; /* Tamanho da fonte relativo à largura */
+    font-weight: bold;
+    color: var(--secondary-dark);
+    box-sizing: border-box;
+}
+
+.printable-patient-data {
+    position: absolute;
+    top: 15%; /* Posição relativa */
+    left: 10%;
+    width: 80%;
+    font-size: 0.8vw; /* Tamanho da fonte relativo */
+    line-height: 1.5;
+}
+
+.printable-content-input {
+    position: absolute;
+    top: 25%; /* Posição relativa */
+    left: 10%;
+    width: 80%;
+    height: 50%;
+    border: none;
+    background-color: transparent;
+    padding: 1%;
+    font-size: 0.9vw; /* Tamanho da fonte relativo */
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    font-family: Arial, sans-serif;
+}
+
+.printable-content-input:focus {
+    border: 1px dashed var(--primary-color);
+    background-color: rgba(255, 228, 196, 0.2);
+}
+
+.printable-professional-signature {
+    position: absolute;
+    bottom: 12%; /* Posição relativa */
+    left: 10%;
+    width: 80%;
+    text-align: center;
+    font-size: 0.8vw; /* Tamanho da fonte relativo */
+    line-height: 1.4;
 }

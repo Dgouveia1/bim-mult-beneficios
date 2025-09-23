@@ -105,7 +105,7 @@
     position: relative;
     font-family: Arial, sans-serif;
     color: #333;
-    background-image: url('../imagens/padra_impressao.png');
+    background-image: url('/imagens/padra_impressao.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     box-sizing: border-box;
