@@ -603,57 +603,86 @@ async function triggerPrintFromElement(button) {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgData = await imageToBase64('imagens/padra_impressao.png');
-        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
 
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(16);
-        pdf.setTextColor('#3a506b');
-        pdf.text(type.toUpperCase(), 105, 45, { align: 'center' });
+        // --- CORREÇÃO APLICADA AQUI: USA DADOS DO OBJETO EM MEMÓRIA ---
+        let patientName = currentSelectedPatientData ? `${currentSelectedPatientData.nome} ${currentSelectedPatientData.sobrenome || ''}`.trim() : '';
+        let patientCPF = currentSelectedPatientData?.cpf || '';
+        let patientAddress = currentSelectedPatientData?.endereco || '';
 
-        const patientName = document.getElementById('dadosNome')?.textContent || 'N/A';
-        const patientCPF = document.getElementById('dadosCPF')?.textContent || 'N/A';
-        const patientAddress = document.getElementById('dadosEndereco')?.textContent || 'N/A';
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(11);
-        pdf.setTextColor('#333333');
-        pdf.text(`Paciente: ${patientName}`, 20, 65);
-        pdf.text(`CPF: ${patientCPF}`, 20, 72);
-        pdf.text(`Endereço: ${patientAddress}`, 20, 79);
-
-        const textLines = pdf.splitTextToSize(contentText, 170);
-        // --- CORREÇÃO APLICADA AQUI ---
-        pdf.text(textLines, 20, 95);
-        // Calcula a posição Y após o texto
-        const textBlockHeight = textLines.length * (pdf.getLineHeight() / pdf.internal.scaleFactor);
-        let contentYPosition = 95 + textBlockHeight + 10;
-        
-        if (type === 'Pedido de Exames Laboratoriais' && examList.length > 0) {
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('ORÇAMENTO', 20, contentYPosition);
-            pdf.setFont('helvetica', 'normal');
-            contentYPosition += 7;
-            
-            let totalValue = 0;
-            examList.forEach(exam => {
-                const examValue = parseFloat(exam.value || 0);
-                const examText = `${exam.name}: R$ ${examValue.toFixed(2)}`;
-                pdf.text(examText, 25, contentYPosition);
-                contentYPosition += 6;
-                totalValue += examValue;
-            });
-
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2)}`, 20, contentYPosition + 2);
+        // 2. Se a fonte primária falhou, usa os dados da tela como fallback (plano B)
+        if (!patientName) {
+            patientName = document.getElementById('currentPatientName')?.textContent || 'N/A';
+        }
+        // Os detalhes de CPF e Endereço estão na aba "Dados do Paciente"
+        if (!patientCPF) {
+            patientCPF = document.getElementById('dadosCPF')?.textContent || 'N/A';
+        }
+        if (!patientAddress) {
+            patientAddress = document.getElementById('dadosEndereco')?.textContent || 'N/A';
         }
 
         const profName = currentProfessionalData?.name || 'Profissional não identificado';
         const profCRM = currentProfessionalData?.CRM || '';
-        pdf.text('_________________________________________', 105, 250, { align: 'center' });
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(profName, 105, 257, { align: 'center' });
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(profCRM, 105, 264, { align: 'center' });
+        
+        const createPageLayout = (title) => {
+            pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(16);
+            pdf.setTextColor('#3a506b');
+            pdf.text(title.toUpperCase(), 105, 45, { align: 'center' });
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(11);
+            pdf.setTextColor('#333333');
+            pdf.text(`Paciente: ${patientName}`, 20, 65);
+            pdf.text(`CPF: ${patientCPF}`, 20, 72);
+            pdf.text(`Endereço: ${patientAddress}`, 20, 79);
+            pdf.text('_________________________________________', 105, 250, { align: 'center' });
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(profName, 105, 257, { align: 'center' });
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(profCRM, 105, 264, { align: 'center' });
+        };
+
+        if (type === 'Pedido de Exames Laboratoriais' && examList.length > 0) {
+            createPageLayout('PEDIDO DE EXAMES LABORATORIAIS');
+            const examNamesText = examList.map(exam => `- ${exam.name}`).join('\n');
+            const textLines = pdf.splitTextToSize(examNamesText, 170);
+            pdf.text(textLines, 20, 95);
+
+            // --- CÓDIGO CORRIGIDO PARA O ORÇAMENTO DETALHADO ---
+            pdf.addPage();
+            createPageLayout('ORÇAMENTO');
+            
+            let totalValue = 0;
+            let yPosition = 95; // Posição inicial para a lista de exames no PDF
+            
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(11);
+            
+            examList.forEach(exam => {
+                const examValue = parseFloat(exam.value || 0);
+                totalValue += examValue;
+                const examText = `- ${exam.name}`;
+                
+                // Adiciona o texto do exame ao PDF
+                pdf.text(examText, 20, yPosition);
+                yPosition += 7; // Incrementa a posição vertical para a próxima linha
+            });
+
+            // Adiciona uma linha separadora antes do total
+            pdf.line(20, yPosition, 190, yPosition); 
+            yPosition += 10;
+
+            // Escreve o VALOR TOTAL
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(14);
+            pdf.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2).replace('.', ',')}`, 105, yPosition, { align: 'center' });
+
+        } else {
+            createPageLayout(type);
+            const textLines = pdf.splitTextToSize(contentText, 170);
+            pdf.text(textLines, 20, 95);
+        }
 
         const fileName = `${type.replace(/\s+/g, '_').toLowerCase()}_${patientName.replace(/\s+/g, '_')}.pdf`;
         pdf.save(fileName);
