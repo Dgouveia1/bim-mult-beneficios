@@ -52,6 +52,7 @@
                 <div class="submenu" id="submenu-clinica">
                     <a href="#" class="submenu-item" data-page="recepcao">Recepção</a>
                     <a href="#" class="submenu-item" data-page="agenda">Agenda</a>
+                    <a href="#" class="submenu-item" data-page="confirmacoes">Confirmações</a>
                     <a href="#" class="submenu-item" data-page="pacientes">Atendimentos</a>
                     <a href="#" class="submenu-item" data-page="prontuario">Prontuário</a>
 
@@ -149,7 +150,7 @@
                         <h2 class="page-title">Gerar Carteirinha</h2>
                         <div class="carteirinha-container">
                             <div class="card">
-                                <h3 class="card-title">Buscar Membro</h3>
+                                <h3 class="card-title">Buscar Cliente</h3>
                                 <div class="search-container">
                                     <input type="text" id="carteirinhaSearchInput" placeholder="Digite o nome ou CPF do titular ou dependente...">
                                     <i class="fas fa-search search-icon"></i>
@@ -164,7 +165,7 @@
                                     <button id="printCarteirinhasBtn" class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir</button>
                                 </div>
                                 <div id="generatedCardsContainer">
-                                    <p>Nenhuma carteirinha gerada. Busque e selecione um membro acima.</p>
+                                    <p>Nenhuma carteirinha gerada. Busque e selecione um cliente acima.</p>
                                 </div>
                             </div>
                         </div>
@@ -199,6 +200,29 @@
                     <div class="card">
                         <div class="schedule-container" id="scheduleContainer"></div>
 
+                    </div>
+                </div>
+
+                <div class="page-content" id="confirmacoesPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Confirmações de Agenda (Próximos 5 dias)</h2>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="confirmationsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Telefone</th>
+                                        <th>Data/Hora</th>
+                                        <th>Profissional</th>
+                                        <th>Observações</th>
+                                        <th>Confirmado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="confirmationsTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 
@@ -253,7 +277,7 @@
                                     
                                     <div class="tab-pane" id="tabReceita">
                                         <button type="button" class="btn btn-secondary btn-small print-btn"  data-type="Receituário" data-content-id="receituario" style="margin-bottom: 15px; float: right;">
-                                            <i class="fas fa-print"></i> Imprimir Receita
+                                            <i class="fas fa-print"></i> Salvar Receita
                                         </button>
                                         <div class="interactive-print-container" id="receitaPrintArea">
                                             <div class="printable-title">RECEITUÁRIO</div>
@@ -265,7 +289,7 @@
                 
                                     <div class="tab-pane" id="tabAtestado">
                                         <button type="button" class="btn btn-secondary btn-small print-btn" data-type="Atestado Médico" data-content-id="atestadoTexto" style="margin-bottom: 15px; float: right;">
-                                            <i class="fas fa-print"></i> Imprimir Atestado
+                                            <i class="fas fa-print"></i> Salvar Atestado
                                         </button>
                                          <div class="interactive-print-container" id="atestadoPrintArea">
                                             <div class="printable-title">ATESTADO MÉDICO</div>
@@ -276,16 +300,49 @@
                                     </div>
                             
                                     <div class="tab-pane" id="tabExamesLab">
-                                         <div class="protocol-controls"><div class="form-group"><label for="protocolSelect">Carregar Protocolo</label><select id="protocolSelect"><option value="">Selecione</option></select></div><button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar Protocolo</button></div><hr><div class="form-group"><label for="examSearchInput">Buscar Exame</label><div class="autocomplete-container"><input type="text" id="examSearchInput" autocomplete="off"><div class="autocomplete-results" id="examSearchResults"></div></div></div><div class="form-group"><label for="manualExamInput">Adicionar Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInput"><button type="button" class="btn btn-small" id="addManualExamBtn">Adicionar</button></div></div><h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5><div class="selected-exams-container"><select id="selectedExamsList" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtn">Remover</button></div><button type="button" class="btn btn-secondary btn-small print-btn" data-type="Pedido de Exames Laboratoriais" data-content-id="selectedExamsList" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido e Orçamento</button>
+                                        <div class="editor-preview-layout">
+                                            <div class="editor-column">
+                                                <div class="protocol-controls">
+                                                    <div class="form-group"><label for="protocolSelect">Carregar Protocolo</label><select id="protocolSelect"><option value="">Selecione</option></select></div>
+                                                    <button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar Protocolo</button>
+                                                </div>
+                                                <hr>
+                                                <div class="form-group"><label for="examSearchInput">Buscar Exame</label><div class="autocomplete-container"><input type="text" id="examSearchInput" autocomplete="off"><div class="autocomplete-results" id="examSearchResults"></div></div></div>
+                                                <div class="form-group"><label for="manualExamInput">Adicionar Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInput"><button type="button" class="btn btn-small" id="addManualExamBtn">Adicionar</button></div></div>
+                                                <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Selecionados</h5>
+                                                <div class="selected-exams-container"><select id="selectedExamsList" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtn">Remover</button></div>
+                                                <button type="button" class="btn btn-secondary btn-small print-btn" data-type="Pedido de Exames Laboratoriais" data-content-id="selectedExamsList" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido e Orçamento</button>
+                                            </div>
+                                            <div class="preview-column">
+                                                <div class="interactive-print-container" id="labExamPreviewContainer">
+                                                    </div>
+                                            </div>
+                                        </div>
                                     </div>
                             
                                     <div class="tab-pane" id="tabExamesImg">
-                                        <div class="protocol-controls"><div class="form-group"><label for="protocolSelectImg">Carregar Protocolo</label><select id="protocolSelectImg"><option value="">Selecione</option></select></div><button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtnImg"><i class="fas fa-save"></i> Salvar Protocolo</button></div><hr><div class="form-group"><label for="manualExamInputImg">Adicionar Exame de Imagem Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInputImg" placeholder="Ex: Raio-X do Tórax"><button type="button" class="btn btn-small" id="addManualExamBtnImg">Adicionar</button></div></div><h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Solicitados</h5><div class="selected-exams-container"><select id="selectedExamsListImg" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtnImg">Remover</button></div><button type="button" class="btn btn-secondary btn-small print-btn" data-type="Pedido de Exames de Imagem" data-content-id="selectedExamsListImg" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido</button>
+                                        <div class="editor-preview-layout">
+                                            <div class="editor-column">
+                                                <div class="protocol-controls">
+                                                    <div class="form-group"><label for="protocolSelectImg">Carregar Protocolo</label><select id="protocolSelectImg"><option value="">Selecione</option></select></div>
+                                                    <button type="button" class="btn btn-secondary btn-small" id="saveProtocolBtnImg"><i class="fas fa-save"></i> Salvar Protocolo</button>
+                                                </div>
+                                                <hr>
+                                                <div class="form-group"><label for="manualExamInputImg">Adicionar Exame de Imagem Manualmente</label><div class="manual-add-container"><input type="text" id="manualExamInputImg" placeholder="Ex: Raio-X do Tórax"><button type="button" class="btn btn-small" id="addManualExamBtnImg">Adicionar</button></div></div>
+                                                <h5 style="margin-top: 20px; margin-bottom: 10px;">Exames Solicitados</h5>
+                                                <div class="selected-exams-container"><select id="selectedExamsListImg" multiple></select><button type="button" class="btn btn-danger btn-small" id="removeSelectedExamBtnImg">Remover</button></div>
+                                                <button type="button" class="btn btn-secondary btn-small print-btn" data-type="Pedido de Exames de Imagem" data-content-id="selectedExamsListImg" style="margin-top: 20px;"><i class="fas fa-print"></i> Imprimir Pedido</button>
+                                            </div>
+                                            <div class="preview-column">
+                                                 <div class="interactive-print-container" id="imgExamPreviewContainer">
+                                                    </div>
+                                            </div>
+                                        </div>
                                     </div>
                                             
                                     <div class="tab-pane" id="tabPosCirurgia">
                                         <button type="button" class="btn btn-secondary btn-small print-btn" data-type="Cuidados Pós-Cirúrgicos" data-content-id="cuidadosPosCirurgiaTexto" style="margin-bottom: 15px; float: right;">
-                                            <i class="fas fa-medkit"></i> Imprimir Cuidados
+                                            <i class="fas fa-medkit"></i> Salvar Cuidados
                                         </button>
                                         <div class="interactive-print-container" id="posCirurgiaPrintArea">
                                             <div class="printable-title">CUIDADOS PÓS-CIRÚRGICOS</div>
@@ -297,7 +354,7 @@
                             
                                     <div class="tab-pane" id="tabOrcamentos">
                                         <button type="button" class="btn btn-secondary btn-small print-btn" data-type="Orçamento" data-content-id="orcamentoTexto" style="margin-bottom: 15px; float: right;">
-                                            <i class="fas fa-file-invoice-dollar"></i> Imprimir Orçamento
+                                            <i class="fas fa-file-invoice-dollar"></i> Salvar Orçamento
                                         </button>
                                         <div class="interactive-print-container" id="orcamentoPrintArea">
                                             <div class="printable-title">ORÇAMENTO</div>
@@ -798,6 +855,22 @@
         </div>
     </div>
 
+    <div class="modal" id="printPreviewModal">
+        <div class="modal-content" style="max-width: 850px; width: 95%;">
+            <div class="modal-header">
+                <h2 id="printPreviewTitle">Pré-visualização do Documento</h2>
+                <button class="close-btn" data-close-modal="printPreviewModal">&times;</button>
+            </div>
+            <div class="modal-body" style="background-color: #e0e0e0; padding: 20px; overflow-x: auto;">
+                <div id="printPreviewContent">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="printPreviewModal">Fechar</button>
+                <button type="button" class="btn btn-success" id="confirmPrintBtn"><i class="fas fa-print"></i> Imprimir</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

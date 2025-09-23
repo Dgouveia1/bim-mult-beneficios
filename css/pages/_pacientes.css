@@ -144,6 +144,26 @@
 }
 
 /* =================================================================
+   ESTILOS PARA EXAMES (NOVO)
+   ================================================================= */
+
+.selected-exams-container {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start; /* Alinha o botão no topo */
+}
+
+.selected-exams-container select {
+    flex-grow: 1; /* Faz a caixa de seleção expandir */
+    min-height: 150px; /* Garante uma altura mínima para visualização */
+}
+
+.selected-exams-container button {
+    flex-shrink: 0; /* Impede que o botão "Remover" seja espremido */
+}
+
+
+/* =================================================================
    LAYOUT DE IMPRESSÃO (AJUSTADO PARA A TELA)
    ================================================================= */
 

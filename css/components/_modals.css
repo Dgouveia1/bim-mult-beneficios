@@ -84,72 +84,8 @@
     margin-top: 15px;
 }
 
-/* =================================================================
-   ESTILOS PARA O MODAL E PREVIEW DE IMPRESSÃO (NOVO)
-   ================================================================= */
-.print-preview-container {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
 
-.print-preview-area {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    overflow: hidden;
-    position: relative;
-    font-family: Arial, sans-serif;
-    color: #333;
-    background-image: url('/imagens/padra_impressao.png');
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    box-sizing: border-box;
-    padding: 2.5cm 2cm;
-}
-
-.print-title {
-    text-align: center;
-    font-size: 20pt;
-    font-weight: bold;
-    margin-bottom: 1.5cm;
-    height: 1.5cm;
-}
-
-.print-patient-data {
-    margin-bottom: 1.5cm;
-    font-size: 11pt;
-    line-height: 1.5;
-    height: 3cm;
-}
-
-.print-content-area {
-    min-height: 10cm;
-    font-size: 12pt;
-    line-height: 1.6;
-}
-/* Importante para que a quebra de linha do textarea seja respeitada */
-.print-content-area pre {
-    white-space: pre-wrap;
-    font-family: inherit;
-    font-size: inherit;
-    margin: 0;
-}
-
-.print-professional-signature {
-    position: absolute;
-    bottom: 3.5cm;
-    right: 2cm;
-    text-align: center;
-    font-size: 11pt;
-    line-height: 1.4;
-}
-
-/* Ajuste para layout lado a lado do editor e preview */
+/* Layout lado a lado do editor e preview */
 .editor-preview-layout {
     display: flex;
     gap: 20px;
@@ -169,6 +105,8 @@
 
 @media (min-width: 1024px) {
     .preview-column {
-        display: block; /* Visível em telas maiores */
+        display: flex; /* Visível em telas maiores */
+        justify-content: center;
+        align-items: flex-start;
     }
 }

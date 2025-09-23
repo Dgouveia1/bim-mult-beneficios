@@ -11,7 +11,8 @@ import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
-import { setupCarteirinhaPage } from './carteirinha.js'
+import { setupCarteirinhaPage } from './carteirinha.js';
+import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
 
 
 const newClientModalEl = document.getElementById('newClientModal');
@@ -101,6 +102,7 @@ async function loadPageData(pageName) {
     else if (pageName === 'usuarios') await loadUsersData();
     else if (pageName === 'profissionais') await loadProfessionalsData();
     else if (pageName === 'disparos') await loadMunicipios();
+    else if (pageName === 'confirmacoes') await loadConfirmationsData();
     else if (pageName === 'prontuario') {
         await loadClientsData();
         setupProntuarioPage();
@@ -176,6 +178,18 @@ function setupEventListeners() {
         });
     }
 
+    document.body.addEventListener('change', async function(event) {
+        if (event.target.classList.contains('confirmation-checkbox')) {
+            const checkbox = event.target;
+            const appointmentId = checkbox.dataset.appointmentId;
+            const isConfirmed = checkbox.checked;
+            
+            checkbox.disabled = true; // Desabilita para dar feedback visual
+            await updateConfirmationStatus(appointmentId, isConfirmed);
+            checkbox.disabled = false; // Reabilita após salvar
+        }
+    });
+
     document.body.addEventListener('click', function(event) {
         const target = event.target;
         if (target.closest('.close-btn') || target.closest('[data-close-modal]')) {
@@ -202,8 +216,6 @@ function setupEventListeners() {
         const printGenericButton = target.closest('.print-btn');
         if (printExamsButton) printExamDocuments();
         if (printGenericButton) {
-            // delega para a função do módulo de pacientes que monta a pré-visualização
-            // e abre o modal de impressão
             import('./pacientes.js').then(mod => mod.triggerPrintFromElement(printGenericButton)).catch(err => console.error(err));
         }
         const removeExamButton = target.closest('.remove-item-btn');
@@ -242,7 +254,6 @@ function setupEventListeners() {
 }
 
 async function initializeDashboard(user) {
-    // Adiciona os data-labels para responsividade da tabela
     document.querySelectorAll('table').forEach(table => {
         const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
         table.querySelectorAll('tbody tr').forEach(row => {
@@ -254,20 +265,16 @@ async function initializeDashboard(user) {
         });
     });
 
-    // Busca o perfil completo do usuário
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
         alert('Erro crítico: Perfil do usuário não encontrado.');
         return handleLogout();
     }
     
-    // Configura o estado global da aplicação
     setCurrentUserProfile(profile);
     setupPermissions(profile.role);
     showDashboard();
     
-    // **CORREÇÃO APLICADA AQUI**
-    // Apenas carrega os dados da página inicial, sem chamar a navegação completa
     await loadPageData('home');
 }
 

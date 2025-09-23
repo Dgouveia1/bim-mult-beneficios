@@ -1,0 +1,24 @@
+/* =================================================================
+   PÁGINA: CONFIRMAÇÕES
+   ================================================================= */
+
+   #confirmacoesPage .card {
+    padding: 0; /* Remove padding do card para a tabela ocupar tudo */
+}
+
+#confirmacoesPage th {
+    background-color: var(--primary-color); /* Cor laranja para o cabeçalho */
+}
+
+/* Centraliza o conteúdo da célula de confirmação */
+.confirmation-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Estilo para a caixa de seleção */
+.confirmation-checkbox {
+    width: 1.3em;
+    height: 1.3em;
+    cursor: pointer;
+}

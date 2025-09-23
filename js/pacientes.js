@@ -16,12 +16,6 @@ const noPatientSelectedDiv = document.getElementById('noPatientSelected');
 const patientQueueListContainer = document.getElementById('patientQueueList');
 
 // --- FUNÇÃO AUXILIAR PARA CONVERTER IMAGEM PARA BASE64 ---
-/**
- * Converte uma URL de imagem para o formato Base64.
- * Essencial para embutir a imagem no PDF de forma confiável.
- * @param {string} url - A URL da imagem a ser convertida.
- * @returns {Promise<string>} Uma promessa que resolve com a string Base64 da imagem.
- */
 function imageToBase64(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -105,11 +99,77 @@ function renderPatientsList(data) {
     });
 }
 
+// --- PRÉ-VISUALIZAÇÃO DE EXAMES (NOVO) ---
+function updateLabExamPreview() {
+    const container = document.getElementById('labExamPreviewContainer');
+    if (!container) return;
+
+    let contentHTML = '';
+    if (selectedExams.length > 0) {
+        contentHTML = `<ul>${selectedExams.map(exam => `<li>${exam.name.split(' (R$')[0]}</li>`).join('')}</ul>`;
+    } else {
+        contentHTML = '<p style="text-align:center; color: #888;">Nenhum exame selecionado.</p>';
+    }
+    
+    container.innerHTML = `
+        <div class="printable-title">PEDIDO DE EXAMES LABORATORIAIS</div>
+        <div class="printable-patient-data" id="labPreviewPatientData"></div>
+        <div class="printable-content-input" style="height: auto; max-height: 50%; overflow-y: auto;">${contentHTML}</div>
+        <div class="printable-professional-signature" id="labPreviewProfData"></div>
+    `;
+
+    // Re-popula os dados do paciente e profissional
+    const patientDataEl = document.getElementById('labPreviewPatientData');
+    const profDataEl = document.getElementById('labPreviewProfData');
+    if (patientDataEl && profDataEl) {
+        const patientName = currentSelectedPatientData?.nome ? `${currentSelectedPatientData.nome} ${currentSelectedPatientData.sobrenome || ''}` : document.getElementById('currentPatientName').textContent;
+        const patientCPF = currentSelectedPatientData?.cpf || 'Não informado';
+        const patientAddress = currentSelectedPatientData?.endereco || 'Não informado';
+        const profName = currentProfessionalData?.name || 'Profissional não identificado';
+        const profCRM = currentProfessionalData?.CRM || '';
+        
+        patientDataEl.innerHTML = `<b>Paciente:</b> ${patientName}<br><b>CPF:</b> ${patientCPF}<br><b>Endereço:</b> ${patientAddress}`;
+        profDataEl.innerHTML = `<p>_________________________________________</p><b>${profName}</b><br><span>${profCRM}</span>`;
+    }
+}
+
+function updateImageExamPreview() {
+    const container = document.getElementById('imgExamPreviewContainer');
+    if (!container) return;
+
+    let contentHTML = '';
+    if (selectedImageExams.length > 0) {
+        contentHTML = `<ul>${selectedImageExams.map(exam => `<li>${exam.name}</li>`).join('')}</ul>`;
+    } else {
+        contentHTML = '<p style="text-align:center; color: #888;">Nenhum exame selecionado.</p>';
+    }
+
+    container.innerHTML = `
+        <div class="printable-title">PEDIDO DE EXAMES DE IMAGEM</div>
+        <div class="printable-patient-data" id="imgPreviewPatientData"></div>
+        <div class="printable-content-input" style="height: auto; max-height: 50%; overflow-y: auto;">${contentHTML}</div>
+        <div class="printable-professional-signature" id="imgPreviewProfData"></div>
+    `;
+
+    // Re-popula os dados do paciente e profissional
+    const patientDataEl = document.getElementById('imgPreviewPatientData');
+    const profDataEl = document.getElementById('imgPreviewProfData');
+    if (patientDataEl && profDataEl) {
+        const patientName = currentSelectedPatientData?.nome ? `${currentSelectedPatientData.nome} ${currentSelectedPatientData.sobrenome || ''}` : document.getElementById('currentPatientName').textContent;
+        const patientCPF = currentSelectedPatientData?.cpf || 'Não informado';
+        const patientAddress = currentSelectedPatientData?.endereco || 'Não informado';
+        const profName = currentProfessionalData?.name || 'Profissional não identificado';
+        const profCRM = currentProfessionalData?.CRM || '';
+        
+        patientDataEl.innerHTML = `<b>Paciente:</b> ${patientName}<br><b>CPF:</b> ${patientCPF}<br><b>Endereço:</b> ${patientAddress}`;
+        profDataEl.innerHTML = `<p>_________________________________________</p><b>${profName}</b><br><span>${profCRM}</span>`;
+    }
+}
+
 // --- LÓGICA PRINCIPAL DO ATENDIMENTO ---
 async function selectPatient(appointmentId) {
     if (!appointmentId) return;
 
-    // Limpa o estado da consulta anterior
     selectedExams = [];
     selectedImageExams = [];
     currentUploadedFiles = [];
@@ -117,7 +177,7 @@ async function selectPatient(appointmentId) {
     renderSelectedExams();
     renderSelectedImageExams();
     renderAttachments();
-
+    
     document.querySelectorAll('.paciente-espera-item').forEach(item => item.classList.remove('active'));
     document.querySelector(`.paciente-espera-item[data-appointment-id="${appointmentId}"]`)?.classList.add('active');
     consultationWorkspaceDiv.style.display = 'flex';
@@ -146,6 +206,10 @@ async function selectPatient(appointmentId) {
         }
 
         populatePrintableFields();
+        // Renderiza as pré-visualizações iniciais
+        updateLabExamPreview();
+        updateImageExamPreview();
+
         await loadPatientHistory(appt.patient_name);
         await loadAttachments(appointmentId);
         await loadProtocols();
@@ -234,7 +298,6 @@ async function loadPatientHistory(patientName) {
     }
 }
 
-// --- LÓGICA DE EXAMES, PROTOCOLOS E ANEXOS ---
 function setupManualExamEntry() {
     const addManualBtnLab = document.getElementById('addManualExamBtn');
     addManualBtnLab?.addEventListener('click', () => {
@@ -311,6 +374,7 @@ function renderSelectedExams() {
         option.textContent = `${exam.name} (R$ ${parseFloat(exam.value || 0).toFixed(2)})`;
         select.appendChild(option);
     });
+    updateLabExamPreview();
 }
 function renderSelectedImageExams() {
     const select = document.getElementById('selectedExamsListImg');
@@ -322,6 +386,7 @@ function renderSelectedImageExams() {
         option.textContent = exam.name;
         select.appendChild(option);
     });
+    updateImageExamPreview();
 }
 function removeExam(examId) {
     selectedExams = selectedExams.filter(exam => exam.id.toString() !== examId.toString());
@@ -458,8 +523,7 @@ function renderAttachments() {
     });
 }
 
-
-// --- AÇÕES FINAIS E IMPRESSÃO (LÓGICA FINAL COM JSPDF PARA SALVAR) ---
+// --- AÇÕES FINAIS E GERAÇÃO DE PDF ---
 async function finalizeConsultation() {
     const appointmentId = document.getElementById('currentAppointmentId').value;
     const submitButton = document.getElementById('finalizeConsultationBtn');
@@ -497,10 +561,6 @@ async function finalizeConsultation() {
     }
 }
 
-/**
- * Pega o conteúdo de um elemento, formata e gera um PDF para download.
- * @param {HTMLElement} button - O botão que acionou a ação.
- */
 async function triggerPrintFromElement(button) {
     if (!button) return;
     const type = button.dataset.type || button.getAttribute('data-type');
@@ -513,10 +573,15 @@ async function triggerPrintFromElement(button) {
 
     let contentText = '';
     let isContentEmpty = true;
+    let examList = [];
 
     if (contentElement.tagName === 'SELECT') {
-        if (contentElement.options.length > 0) {
-            contentText = Array.from(contentElement.options).map(opt => `- ${opt.textContent}`).join('\n');
+        const selectedOptions = Array.from(contentElement.options);
+        if (selectedOptions.length > 0) {
+            if (type === 'Pedido de Exames Laboratoriais') {
+                examList = selectedExams;
+            }
+            contentText = selectedOptions.map(opt => `- ${opt.textContent.split(' (R$')[0]}`).join('\n');
             isContentEmpty = false;
         }
     } else { 
@@ -537,7 +602,6 @@ async function triggerPrintFromElement(button) {
     try {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-
         const imgData = await imageToBase64('imagens/padra_impressao.png');
         pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
 
@@ -558,7 +622,30 @@ async function triggerPrintFromElement(button) {
         pdf.text(`Endereço: ${patientAddress}`, 20, 79);
 
         const textLines = pdf.splitTextToSize(contentText, 170);
+        // --- CORREÇÃO APLICADA AQUI ---
         pdf.text(textLines, 20, 95);
+        // Calcula a posição Y após o texto
+        const textBlockHeight = textLines.length * (pdf.getLineHeight() / pdf.internal.scaleFactor);
+        let contentYPosition = 95 + textBlockHeight + 10;
+        
+        if (type === 'Pedido de Exames Laboratoriais' && examList.length > 0) {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('ORÇAMENTO', 20, contentYPosition);
+            pdf.setFont('helvetica', 'normal');
+            contentYPosition += 7;
+            
+            let totalValue = 0;
+            examList.forEach(exam => {
+                const examValue = parseFloat(exam.value || 0);
+                const examText = `${exam.name}: R$ ${examValue.toFixed(2)}`;
+                pdf.text(examText, 25, contentYPosition);
+                contentYPosition += 6;
+                totalValue += examValue;
+            });
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2)}`, 20, contentYPosition + 2);
+        }
 
         const profName = currentProfessionalData?.name || 'Profissional não identificado';
         const profCRM = currentProfessionalData?.CRM || '';
@@ -568,7 +655,6 @@ async function triggerPrintFromElement(button) {
         pdf.setFont('helvetica', 'normal');
         pdf.text(profCRM, 105, 264, { align: 'center' });
 
-        // MODIFICAÇÃO PRINCIPAL: Troca 'dataurlnewwindow' por 'save'
         const fileName = `${type.replace(/\s+/g, '_').toLowerCase()}_${patientName.replace(/\s+/g, '_')}.pdf`;
         pdf.save(fileName);
 
@@ -620,7 +706,6 @@ function setupPacientesEventListeners() {
     setupExamSearch();
     setupManualExamEntry();
 }
-
 
 // --- INICIALIZAÇÃO ---
 initializeExamsCache();
