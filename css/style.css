@@ -11,6 +11,8 @@
 @import url('components/_tables.css');
 @import url('components/_search.css');
 @import url('components/_modals.css');
+@import url("components/carteirinha.css");
+
 
 /* Importa estilos específicos de cada página */
 @import url('pages/_login.css');
@@ -23,3 +25,4 @@
 @import url('pages/_clientes.css');
 @import url('pages/_prontuario.css');
 @import url('pages/_home.css');
+@import url('pages/_carteirinha.css');

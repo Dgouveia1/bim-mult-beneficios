@@ -1,164 +1,253 @@
 import { _supabase } from './supabase.js';
 
-// Função para desenhar um cartão individual (seja titular ou dependente)
-function drawCard(person, personType) {
-    const cardWrapper = document.createElement('div');
-    cardWrapper.className = 'card-wrapper';
+let searchTimeout = null;
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    const background = new Image();
-    // Certifique-se que o caminho para a imagem está correto
-    background.src = 'imagens/CARTEIRINHA.png'; 
-
-    background.onload = () => {
-        canvas.width = background.width;
-        canvas.height = background.height;
-        ctx.drawImage(background, 0, 0);
-
-        // Configurações do texto (ajuste as coordenadas X, Y se necessário)
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(person.nome.toUpperCase(), 45, 235); 
-
-        ctx.font = '20px Arial';
-        ctx.fillText(`CPF: ${person.cpf || 'N/A'}`, 45, 265);
-        
-        canvas.dataset.personName = person.nome.replace(/\s+/g, '_');
-        canvas.dataset.personType = personType;
-
-        const title = document.createElement('p');
-        title.className = 'card-title';
-        title.textContent = `${person.nome} (${personType})`;
-        
-        cardWrapper.appendChild(title);
-        cardWrapper.appendChild(canvas);
-        document.getElementById('cardsContainer').appendChild(cardWrapper);
-    };
-
-    background.onerror = () => {
-        console.error("Erro ao carregar a imagem de fundo da carteirinha.");
-        const cardsContainer = document.getElementById('cardsContainer');
-        cardsContainer.innerHTML = '<p style="color: red;">Erro: Não foi possível carregar o modelo da carteirinha. Verifique se o arquivo `imagens/CARTEIRINHA.png` existe.</p>';
-    }
-}
-
-// Função principal que é chamada quando um cliente é selecionado
-function generateCards(client) {
-    const cardsContainer = document.getElementById('cardsContainer');
-    const downloadBtn = document.getElementById('downloadCardsBtn');
-    
-    cardsContainer.innerHTML = ''; // Limpa cartões anteriores
-
-    if (!client) {
-        downloadBtn.style.display = 'none';
-        return;
-    }
-
-    // Gerar cartão para o titular
-    drawCard(client, 'titular');
-
-    // Gerar cartões para os dependentes
-    if (client.dependentes && typeof client.dependentes === 'string' && client.dependentes.startsWith('[')) {
-        try {
-            const dependents = JSON.parse(client.dependentes);
-            if (Array.isArray(dependents)) {
-                dependents.forEach(dep => {
-                    if (dep.nome_dependente && dep.cpf_dependente) {
-                        drawCard({ nome: dep.nome_dependente, cpf: dep.cpf_dependente }, 'dependente');
-                    }
-                });
-            }
-        } catch (e) {
-            console.error("Erro ao processar dependentes:", e);
-        }
-    }
-    
-    downloadBtn.style.display = 'block';
-}
-
-// Função para baixar todos os cartões gerados
-function downloadAllCards() {
-    const canvases = document.querySelectorAll('#cardsContainer canvas');
-    if (canvases.length === 0) {
-        alert('Nenhum cartão para baixar.');
-        return;
-    }
-    canvases.forEach((canvas, index) => {
-        const personName = canvas.dataset.personName;
-        const personType = canvas.dataset.personType;
-        const link = document.createElement('a');
-        link.download = `${personName}_(${personType})_bim.png`;
-        link.href = canvas.toDataURL('image/png');
-        setTimeout(() => link.click(), index * 200);
+/**
+ * Converte uma URL de imagem para o formato Base64.
+ * Essencial para embutir a imagem no PDF sem problemas de carregamento.
+ * @param {string} url - A URL da imagem a ser convertida.
+ * @returns {Promise<string>} Uma promessa que resolve com a string Base64 da imagem.
+ */
+function imageToBase64(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            resolve(dataURL);
+        };
+        img.onerror = reject;
+        img.src = url;
     });
 }
 
-// ==================================================================
-// LÓGICA DE BUSCA ATUALIZADA AQUI
-// ==================================================================
-async function searchClients(query) {
-    const searchResults = document.getElementById('carteirinhaSearchResults');
-    searchResults.innerHTML = '';
-    if (query.length < 3) {
-        searchResults.style.display = 'none';
+
+// Função principal que configura os ouvintes de eventos da página
+function setupCarteirinhaPage() {
+    const searchInput = document.getElementById('carteirinhaSearchInput');
+    const printBtn = document.getElementById('printCarteirinhasBtn');
+
+    if (!searchInput || !printBtn) {
+        console.error('Erro: Elementos essenciais da página de carteirinha não foram encontrados.');
         return;
     }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm.length > 2) {
+                await searchMembers(searchTerm);
+            } else {
+                clearSearchResults();
+            }
+        }, 500);
+    });
+    
+    printBtn.style.display = 'none';
+}
+
+// Limpa a lista de resultados da busca
+function clearSearchResults() {
+    const resultsList = document.getElementById('searchResults');
+    if(resultsList) resultsList.innerHTML = '';
+}
+
+// Busca por titulares e dependentes no banco de dados
+async function searchMembers(searchTerm) {
+    const resultsList = document.getElementById('searchResults');
+    if(!resultsList) return;
+    resultsList.innerHTML = '<li class="search-result-item">Buscando...</li>';
 
     try {
-        // Busca no Supabase em tempo real, assim como na página de Clientes
-        const { data, error } = await _supabase
-            .from('people')
-            .select('nome, cpf, dependentes')
-            .or(`nome.ilike.%${query}%`) // Busca pelo nome
-            .limit(10); // Limita a 10 resultados para performance
+        const { data: titulares, error: titularError } = await _supabase
+            .from('clients')
+            .select('id, nome, sobrenome, cpf, created_at')
+            .or(`nome.ilike.%${searchTerm}%,sobrenome.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
 
-        if (error) throw error;
+        if (titularError) throw titularError;
 
-        if (data.length > 0) {
-            data.forEach(person => {
-                const div = document.createElement('div');
-                div.textContent = person.nome;
-                div.addEventListener('click', () => {
-                    document.getElementById('carteirinhaSearchInput').value = person.nome;
-                    searchResults.innerHTML = '';
-                    searchResults.style.display = 'none';
-                    generateCards(person); // Gera os cartões para o cliente selecionado
-                });
-                searchResults.appendChild(div);
-            });
-            searchResults.style.display = 'block';
-        } else {
-            searchResults.style.display = 'none';
-        }
+        const { data: dependentes, error: dependenteError } = await _supabase
+            .from('dependents')
+            .select('id, nome, sobrenome, cpf, created_at, titular_id')
+            .or(`nome.ilike.%${searchTerm}%,sobrenome.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+
+        if (dependenteError) throw dependenteError;
+
+        const combinedResults = [
+            ...titulares.map(t => ({ ...t, type: 'titular' })),
+            ...dependentes.map(d => ({ ...d, type: 'dependente' }))
+        ];
+
+        renderSearchResults(combinedResults);
+
     } catch (error) {
-        console.error('Erro ao buscar clientes:', error);
-        searchResults.style.display = 'none';
+        console.error('Erro ao buscar membros:', error);
+        resultsList.innerHTML = '<li class="search-result-item">Ocorreu um erro na busca.</li>';
     }
 }
 
-// Configura a página e os eventos
-export function setupCarteirinhaPage() {
-    const searchInput = document.getElementById('carteirinhaSearchInput');
-    const searchResults = document.getElementById('carteirinhaSearchResults');
-    const downloadBtn = document.getElementById('downloadCardsBtn');
-    
-    let debounceTimer;
-    searchInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        // Aguarda um pouco após o usuário parar de digitar para fazer a busca
-        debounceTimer = setTimeout(() => {
-            searchClients(searchInput.value);
-        }, 300); 
-    });
+// Exibe os resultados da busca na tela
+function renderSearchResults(results) {
+    const resultsList = document.getElementById('searchResults');
+    if(!resultsList) return;
+    clearSearchResults();
 
-    document.addEventListener('click', (e) => {
-        if (!searchResults.contains(e.target) && e.target !== searchInput) {
-            searchResults.style.display = 'none';
-        }
-    });
+    if (results.length === 0) {
+        resultsList.innerHTML = '<li class="search-result-item">Nenhum resultado encontrado.</li>';
+        return;
+    }
 
-    downloadBtn.addEventListener('click', downloadAllCards);
+    results.forEach(member => {
+        const li = document.createElement('li');
+        li.className = 'search-result-item';
+        li.innerHTML = `
+            <span class="result-name">${member.nome} ${member.sobrenome || ''}</span>
+            <span class="result-cpf">${member.cpf || 'CPF não informado'}</span>
+            <span class="result-type ${member.type}">${member.type}</span>
+        `;
+        li.addEventListener('click', () => generateCards(member));
+        resultsList.appendChild(li);
+    });
 }
+
+// Gera as carteirinhas com base no membro selecionado
+async function generateCards(selectedMember) {
+    clearSearchResults();
+    const searchInput = document.getElementById('carteirinhaSearchInput');
+    if(searchInput) searchInput.value = '';
+    
+    const container = document.getElementById('generatedCardsContainer');
+    if(!container) return;
+    container.innerHTML = '<p>Carregando carteirinhas...</p>';
+
+    let membersToGenerate = [];
+
+    if (selectedMember.type === 'titular') {
+        const { data: dependentes, error } = await _supabase
+            .from('dependents')
+            .select('id, nome, sobrenome, cpf, created_at')
+            .eq('titular_id', selectedMember.id);
+        
+        if (error) {
+            console.error('Erro ao buscar dependentes:', error);
+            container.innerHTML = '<p>Erro ao carregar dependentes.</p>';
+            return;
+        }
+        membersToGenerate = [selectedMember, ...dependentes];
+
+    } else {
+        const { data: titular, error } = await _supabase
+            .from('clients')
+            .select('id, nome, sobrenome, cpf, created_at')
+            .eq('id', selectedMember.titular_id)
+            .single();
+
+        if (error) {
+            console.error('Erro ao buscar titular do dependente:', error);
+            container.innerHTML = '<p>Erro ao carregar dados do titular.</p>';
+            return;
+        }
+        const { data: todosDependentes, error: depsError } = await _supabase
+            .from('dependents')
+            .select('id, nome, sobrenome, cpf, created_at')
+            .eq('titular_id', selectedMember.titular_id);
+
+        if (depsError) {
+             console.error('Erro ao buscar todos os dependentes:', error);
+             container.innerHTML = '<p>Erro ao carregar grupo familiar.</p>';
+             return;
+        }
+
+        membersToGenerate = [titular, ...todosDependentes];
+    }
+    
+    container.innerHTML = ''; 
+
+    if(membersToGenerate.length === 0) {
+        container.innerHTML = '<p>Nenhum membro para gerar carteirinha.</p>';
+        return;
+    }
+
+    membersToGenerate.forEach(member => {
+        const cardWrapper = document.createElement('div');
+        cardWrapper.className = 'card-wrapper';
+
+        const validade = new Date(member.created_at);
+        validade.setDate(validade.getDate() + 365);
+        const validadeFormatada = validade.toLocaleDateString('pt-BR');
+
+        cardWrapper.innerHTML = `
+            <div class="card-info">
+                <p class="card-nome">${member.nome} ${member.sobrenome || ''}</p>
+                <div class="card-details">
+                    <span class="card-cpf">CPF: ${member.cpf || 'N/A'}</span>
+                    <span class="card-validade">Validade: ${validadeFormatada}</span>
+                </div>
+            </div>
+            <button class="save-card-btn" title="Salvar como PDF">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+        `;
+        
+        cardWrapper.querySelector('.save-card-btn').addEventListener('click', async () => {
+            const button = cardWrapper.querySelector('.save-card-btn');
+            const originalButtonContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                // 1. Carrega a imagem de fundo e converte para Base64
+                const imgData = await imageToBase64('imagens/CARTEIRINHA.png');
+                
+                // 2. Define as dimensões do PDF (padrão de cartão de crédito em mm)
+                const cardWidthMM = 85.6;
+                const cardHeightMM = 53.98;
+                
+                // 3. Cria o objeto PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: [cardWidthMM, cardHeightMM]
+                });
+
+                // 4. Adiciona a imagem de fundo
+                pdf.addImage(imgData, 'PNG', 0, 0, cardWidthMM, cardHeightMM);
+
+                // 5. Adiciona os textos sobre a imagem
+                pdf.setFont("helvetica", "bold");
+                pdf.setTextColor(0, 0, 0); // Cor preta
+
+                // Nome do membro (coordenadas em mm a partir do canto superior esquerdo)
+                pdf.setFontSize(8);
+                const memberName = `${member.nome} ${member.sobrenome || ''}`;
+                pdf.text(memberName, 8, 32);
+
+                // CPF e Validade
+                pdf.setFontSize(7);
+                pdf.text(`CPF: ${member.cpf || 'N/A'}`, 8, 48);
+                pdf.text(`Validade: ${validadeFormatada}`, cardWidthMM - 8, 48, { align: 'right' });
+
+                // 6. Salva o arquivo
+                pdf.save(`carteirinha-${member.nome.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+
+            } catch (error) {
+                console.error('Erro ao gerar PDF da carteirinha:', error);
+                alert('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalButtonContent;
+            }
+        });
+
+        container.appendChild(cardWrapper);
+    });
+}
+
+export { setupCarteirinhaPage };

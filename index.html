@@ -150,28 +150,30 @@
                         </div>
                     </div>
                 </div>
-                <div class="page-content" id="carteirinhaPage">
-                    <div class="content-header">
+                    <div class="page-content" id="carteirinhaPage">
                         <h2 class="page-title">Gerar Carteirinha</h2>
-                    </div>
-                    <div class="card">
-                        <div class="form-group" style="padding: 20px; max-width: 500px;">
-                            <label for="carteirinhaSearchInput">Buscar Cliente</label>
-                            <div class="autocomplete-container">
-                                <input type="text" id="carteirinhaSearchInput" placeholder="Digite o nome do titular..." autocomplete="off">
-                                <div class="autocomplete-results" id="carteirinhaSearchResults"></div>
+                        <div class="carteirinha-container">
+                            <div class="card">
+                                <h3 class="card-title">Buscar Membro</h3>
+                                <div class="search-container">
+                                    <input type="text" id="carteirinhaSearchInput" placeholder="Digite o nome ou CPF do titular ou dependente...">
+                                    <i class="fas fa-search search-icon"></i>
+                                </div>
+                                <ul id="searchResults" class="search-results-list">
+                                    </ul>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Carteirinhas Geradas</h3>
+                                    <button id="printCarteirinhasBtn" class="btn btn-secondary"><i class="fas fa-print"></i> Imprimir</button>
+                                </div>
+                                <div id="generatedCardsContainer">
+                                    <p>Nenhuma carteirinha gerada. Busque e selecione um membro acima.</p>
+                                </div>
                             </div>
                         </div>
-                
-                        <div id="cardsPreview" style="padding: 0 20px 20px 20px;">
-                            <div id="cardsContainer" class="cards-container">
-                                </div>
-                            <button class="btn btn-success" id="downloadCardsBtn" style="display: none; margin-top: 20px;">
-                                <i class="fas fa-download"></i> Baixar Carteirinhas
-                            </button>
-                        </div>
                     </div>
-                </div>
                 
                 <div class="page-content" id="recepcaoPage">
                     <div class="content-header">
@@ -821,7 +823,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="js/main.js" type="module"></script>
+    
 </body>
 </html>
