@@ -1,0 +1,728 @@
+categoria,objeto,detalhes
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: checkin_time | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: confirmacao | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'agendado'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: patient_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: appointment_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: numero | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cep | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: endereco | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: data_nascimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: carteirinha | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: vendedor | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: municipio | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: cuidados_pos_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: laudo_texto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: atestado | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: procedimentos | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: exame_fisico | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: conduta | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: created_at | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: data_nascimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: protocol_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: protocol_name | TIPO: character varying(255) | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: Nome do protocolo para fácil identificação.
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: ID do profissional que criou o protocolo.
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Array de objetos JSON contendo os exames do protocolo.
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: record_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: method | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: tabela | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: grupo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: custo | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: specialty | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: CRM | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: full_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: role | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: assignee_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'todo'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: priority | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: clients,CONSTRAINT: clients_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_key | TIPO: UNIQUE | COLUNA(S): appointment_id
+2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_titular_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): titular_id | REFERENCIA: clients(id)
+2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: exams,CONSTRAINT: exams_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: fk_professional | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: image_exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: medical_records,CONSTRAINT: medical_records_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: professionals,CONSTRAINT: professionals_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: professionals,null
+2. CONSTRAINTS (CHAVES),TABELA: profiles,null
+2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_assignee_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): assignee_id | REFERENCIA: profiles(id)
+2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+3. ÍNDICES,TABELA: appointments,ÍNDICE: appointments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX appointments_pkey ON public.appointments USING btree (id)
+3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
+3. ÍNDICES,TABELA: clients,ÍNDICE: clients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX clients_pkey ON public.clients USING btree (id)
+3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_appointment_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_appointment_id_key ON public.consultations USING btree (appointment_id)
+3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_pkey ON public.consultations USING btree (id)
+3. ÍNDICES,TABELA: dependents,ÍNDICE: dependents_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX dependents_pkey ON public.dependents USING btree (id)
+3. ÍNDICES,TABELA: exam_protocols,ÍNDICE: exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exam_protocols_pkey ON public.exam_protocols USING btree (id)
+3. ÍNDICES,TABELA: exams,ÍNDICE: exams_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exams_pkey ON public.exams USING btree (id)
+3. ÍNDICES,TABELA: image_exam_protocols,ÍNDICE: image_exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX image_exam_protocols_pkey ON public.image_exam_protocols USING btree (id)
+3. ÍNDICES,TABELA: medical_records,ÍNDICE: medical_records_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX medical_records_pkey ON public.medical_records USING btree (id)
+3. ÍNDICES,TABELA: payments,ÍNDICE: payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (id)
+3. ÍNDICES,TABELA: products,ÍNDICE: products_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)
+3. ÍNDICES,TABELA: professionals,ÍNDICE: professionals_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX professionals_pkey ON public.professionals USING btree (id)
+3. ÍNDICES,TABELA: profiles,ÍNDICE: profiles_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
+3. ÍNDICES,TABELA: tasks,ÍNDICE: tasks_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX tasks_pkey ON public.tasks USING btree (id)
+4. FUNÇÕES (RPC),FUNÇÃO: diagnose_name_matching,"CREATE OR REPLACE FUNCTION public.diagnose_name_matching()
+ RETURNS TABLE(client_name_original text, appointment_name_original text, normalized_client_name text, normalized_appointment_name text, is_match boolean)
+ LANGUAGE sql
+AS $function$
+-- O FULL OUTER JOIN é usado para garantir que veremos todos os nomes de ambas as
+-- tabelas, mesmo que eles não tenham uma correspondência na outra tabela.
+SELECT
+c.nome || ' ' || c.sobrenome AS client_name_original,
+a.patient_name AS appointment_name_original,
+normalize_name(c.nome || ' ' || c.sobrenome) AS normalized_client_name,
+normalize_name(a.patient_name) AS normalized_appointment_name,
+-- A coluna 'is_match' nos dirá se a nossa lógica de normalização está funcionando
+-- para cada par de nomes.
+normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name) AS is_match
+FROM
+public.clients c
+FULL OUTER JOIN
+public.appointments a ON normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name)
+LIMIT 100; -- Limitamos a 100 resultados para facilitar a análise inicial.
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_churn_risk_clients,"CREATE OR REPLACE FUNCTION public.get_churn_risk_clients()
+ RETURNS TABLE(nome text, telefone text, email text, plano text, ultima_consulta date)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+WITH last_appointment AS (
+SELECT
+a.client_id,
+MAX(a.appointment_date) AS last_date
+FROM public.appointments a
+WHERE a.client_id IS NOT NULL
+GROUP BY a.client_id
+)
+SELECT
+(c.nome || ' ' || c.sobrenome) as nome,
+c.telefone,
+c.email,
+c.plano,
+la.last_date AS ultima_consulta
+FROM public.clients c
+LEFT JOIN last_appointment la ON c.id = la.client_id
+WHERE
+c.status = 'ATIVO'
+AND (la.last_date IS NULL OR la.last_date < (CURRENT_DATE - INTERVAL '90 days'));
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_client_acquisition_forecast,"CREATE OR REPLACE FUNCTION public.get_client_acquisition_forecast(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    avg_last_4_weeks DECIMAL;
+BEGIN
+    -- Calcula a média de novos clientes semanais das últimas 4 semanas completas
+    SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
+    FROM (
+        SELECT COUNT(c.id)::decimal as weekly_count
+        FROM public.clients c
+        WHERE c.created_at >= date_trunc('week', now() - interval '4 weeks')::date
+          AND c.created_at < date_trunc('week', now())::date
+          AND (plan_filter = 'all' OR c.plano = plan_filter)
+        GROUP BY date_trunc('week', c.created_at)
+    ) AS last_weeks;
+
+    -- Retorna os dados históricos e a previsão
+    RETURN QUERY
+    WITH historical_data AS (
+        SELECT
+            -- CORREÇÃO: Garante que o resultado seja do tipo DATE
+            (date_trunc('week', c.created_at))::date AS week_start,
+            COUNT(c.id) AS count,
+            FALSE AS is_forecast
+        FROM public.clients c
+        WHERE c.created_at >= date_trunc('week', now() - interval '8 weeks')::date
+          AND c.created_at < date_trunc('week', now())::date
+          AND (plan_filter = 'all' OR c.plano = plan_filter)
+        -- CORREÇÃO: Agrupa pela expressão convertida para DATE
+        GROUP BY (date_trunc('week', c.created_at))::date
+    ),
+    forecast_data AS (
+        SELECT
+            (date_trunc('week', now())::date + (n.week_num || ' weeks')::interval)::date AS week_start,
+            ROUND(avg_last_4_weeks)::bigint AS count,
+            TRUE AS is_forecast
+        FROM generate_series(0, 3) AS n(week_num)
+    )
+    SELECT * FROM historical_data
+    UNION ALL
+    SELECT * FROM forecast_data
+    ORDER BY week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_client_report_data,"CREATE OR REPLACE FUNCTION public.get_client_report_data()
+ RETURNS TABLE(client_name text, phone text, plan text, registration_date date, last_consultation_date date, avg_recurrence_days numeric)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+WITH client_appointments AS (
+SELECT
+c.id as client_id,
+(c.nome || ' ' || c.sobrenome) AS client_name,
+c.telefone, c.plano, c.created_at::date as registration_date,
+a.appointment_date,
+a.appointment_date - LAG(a.appointment_date, 1) OVER(PARTITION BY c.id ORDER BY a.appointment_date) as diff_days
+FROM public.clients c
+JOIN public.appointments a ON c.id = a.client_id
+WHERE c.status = 'ATIVO'
+)
+SELECT
+ca.client_name, ca.telefone, ca.plano, ca.registration_date,
+MAX(ca.appointment_date) as last_consultation_date,
+ROUND(AVG(ca.diff_days), 0) as avg_recurrence_days
+FROM client_appointments ca
+GROUP BY ca.client_id, ca.client_name, ca.telefone, ca.plano, ca.registration_date
+ORDER BY ca.client_name;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_consultation_forecast,"CREATE OR REPLACE FUNCTION public.get_consultation_forecast(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    avg_last_4_weeks DECIMAL;
+BEGIN
+    SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
+    FROM (
+        SELECT COUNT(a.id)::decimal as weekly_count
+        FROM public.appointments a
+        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
+        WHERE a.appointment_date >= date_trunc('week', now() - interval '4 weeks')::date
+          AND a.appointment_date < date_trunc('week', now())::date
+          AND (plan_filter = 'all' OR c.plano = plan_filter)
+        GROUP BY date_trunc('week', a.appointment_date)
+    ) AS last_weeks;
+RETURN QUERY
+    WITH historical_data AS (
+        SELECT
+            date_trunc('week', a.appointment_date)::date AS week_start,
+            COUNT(a.id) AS count,
+            FALSE AS is_forecast
+        FROM public.appointments a
+        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
+        WHERE a.appointment_date >= date_trunc('week', now() - interval '8 weeks')::date
+          AND a.appointment_date < date_trunc('week', now())::date
+          AND (plan_filter = 'all' OR c.plano = plan_filter)
+        GROUP BY week_start
+    ),
+    forecast_data AS (
+        SELECT
+            (date_trunc('week', now())::date + (n.week_num || ' weeks')::interval)::date AS week_start,
+            ROUND(avg_last_4_weeks)::bigint AS count,
+            TRUE AS is_forecast
+        FROM generate_series(0, 3) AS n(week_num)
+    )
+    SELECT * FROM historical_data
+    UNION ALL
+    SELECT * FROM forecast_data
+    ORDER BY week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_consultations_by_professional,"CREATE OR REPLACE FUNCTION public.get_consultations_by_professional(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(professional_name text, count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+SELECT
+p.name AS professional_name,
+COUNT(a.id) AS count
+FROM public.appointments a
+JOIN public.professionals AS p ON a.professional_id = p.id
+JOIN public.clients AS c ON a.client_id = c.id
+WHERE a.appointment_date >= date_trunc('month', CURRENT_DATE)
+AND a.appointment_date < (date_trunc('month', CURRENT_DATE) + interval '1 month')
+AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+GROUP BY p.name
+ORDER BY count DESC;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_daily_metrics,"CREATE OR REPLACE FUNCTION public.get_daily_metrics(plan_filter text DEFAULT 'all'::text)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+result JSON;
+BEGIN
+WITH today_appointments AS (
+SELECT a.*
+FROM public.appointments a
+JOIN public.clients c ON a.client_id = c.id
+WHERE a.appointment_date = CURRENT_DATE
+AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+),
+revenue AS (
+SELECT COALESCE(SUM(p.amount), 0) as total
+FROM public.payments p
+JOIN today_appointments ta ON p.appointment_id = ta.id
+)
+SELECT json_build_object(
+'consultas_dia', (SELECT COUNT(id) FROM today_appointments),
+'capital_esperado', (SELECT total FROM revenue),
+'clientes_ativos', (SELECT COUNT(id) FROM public.clients WHERE status = 'ATIVO' AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))))
+)
+INTO result;
+RETURN result;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_metrics,"CREATE OR REPLACE FUNCTION public.get_dashboard_metrics(plan_filter text DEFAULT 'all'::text)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+result json;
+start_current_month date := date_trunc('month', CURRENT_DATE);
+end_current_month date := start_current_month + interval '1 month';
+start_last_month date := start_current_month - interval '1 month';
+end_last_month date := start_current_month;
+BEGIN
+WITH
+clients_filtered AS (
+SELECT id, plano, created_at, status
+FROM public.clients
+WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+),
+current_month_metrics AS (
+SELECT
+COUNT(DISTINCT cf.id) FILTER (WHERE cf.created_at >= start_current_month AND cf.created_at < end_current_month) AS novos_clientes,
+COUNT(DISTINCT a.id) AS consultas_mes,
+COALESCE(SUM(p.amount), 0) AS faturamento_total,
+COUNT(DISTINCT a.id) FILTER (WHERE a.status = 'cancelado') AS noshow_count
+FROM clients_filtered AS cf
+LEFT JOIN public.appointments a ON cf.id = a.client_id AND a.appointment_date >= start_current_month AND a.appointment_date < end_current_month
+LEFT JOIN public.payments p ON a.id = p.appointment_id
+),
+last_month_metrics AS (
+SELECT
+COUNT(DISTINCT cf.id) FILTER (WHERE cf.created_at >= start_last_month AND cf.created_at < end_last_month) AS novos_clientes,
+COUNT(DISTINCT a.id) AS consultas_mes,
+COALESCE(SUM(p.amount), 0) AS faturamento_total,
+COUNT(DISTINCT a.id) FILTER (WHERE a.status = 'cancelado') AS noshow_count
+FROM clients_filtered AS cf
+LEFT JOIN public.appointments a ON cf.id = a.client_id AND a.appointment_date >= start_last_month AND a.appointment_date < end_last_month
+LEFT JOIN public.payments p ON a.id = p.appointment_id
+),
+titulares_count AS (
+SELECT
+COUNT(id) FILTER (WHERE created_at < end_current_month AND status = 'ATIVO') as current,
+COUNT(id) FILTER (WHERE created_at < end_last_month AND status = 'ATIVO') as previous
+FROM clients_filtered
+)
+SELECT json_build_object(
+'total_titulares', json_build_object('current', tc.current, 'previous', tc.previous),
+'novos_clientes', json_build_object('current', cmm.novos_clientes, 'previous', lmm.novos_clientes),
+'consultas_mes', json_build_object('current', cmm.consultas_mes, 'previous', lmm.consultas_mes),
+'ticket_medio', json_build_object(
+'current', CASE WHEN cmm.consultas_mes > 0 THEN cmm.faturamento_total / cmm.consultas_mes ELSE 0 END,
+'previous', CASE WHEN lmm.consultas_mes > 0 THEN lmm.faturamento_total / lmm.consultas_mes ELSE 0 END
+),
+'noshow_rate', json_build_object(
+'current', CASE WHEN (cmm.consultas_mes + cmm.noshow_count) > 0 THEN (cmm.noshow_count * 100.0 / (cmm.consultas_mes + cmm.noshow_count)) ELSE 0 END,
+'previous', CASE WHEN (lmm.consultas_mes + lmm.noshow_count) > 0 THEN (lmm.noshow_count * 100.0 / (lmm.consultas_mes + lmm.noshow_count)) ELSE 0 END
+)
+) INTO result
+FROM current_month_metrics cmm, last_month_metrics lmm, titulares_count tc;
+RETURN result;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_monthly_cohorts,"CREATE OR REPLACE FUNCTION public.get_monthly_cohorts(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(cohort_month text, month_number integer, active_clients bigint, total_in_cohort bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+WITH cohorts AS (
+SELECT id AS client_id, date_trunc('month', created_at)::date AS cohort_date
+FROM public.clients
+WHERE status = 'ATIVO' AND (plan_filter = 'all' OR plano = plan_filter)
+),
+activity AS (
+SELECT DISTINCT
+c.id AS client_id,
+date_trunc('month', a.appointment_date)::date AS activity_date
+FROM public.appointments a
+JOIN public.clients c ON normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name)
+WHERE (plan_filter = 'all' OR c.plano = plan_filter)
+),
+cohort_activity AS (
+SELECT
+c.client_id, c.cohort_date,
+EXTRACT(YEAR FROM a.activity_date)::int * 12 + EXTRACT(MONTH FROM a.activity_date)::int
+- (EXTRACT(YEAR FROM c.cohort_date)::int * 12 + EXTRACT(MONTH FROM c.cohort_date)::int) AS month_number
+FROM cohorts c JOIN activity a ON c.client_id = a.client_id
+WHERE a.activity_date >= c.cohort_date
+),
+cohort_size AS (
+SELECT cohort_date, count(*) AS total FROM cohorts GROUP BY cohort_date
+)
+SELECT
+to_char(ca.cohort_date, 'YYYY-MM') AS cohort_month, ca.month_number,
+count(DISTINCT ca.client_id) AS active_clients, cs.total AS total_in_cohort
+FROM cohort_activity ca JOIN cohort_size cs ON ca.cohort_date = cs.cohort_date
+GROUP BY ca.cohort_date, ca.month_number, cs.total
+ORDER BY ca.cohort_date, ca.month_number;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_my_role,"CREATE OR REPLACE FUNCTION public.get_my_role()
+ RETURNS text
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+  RETURN (
+    SELECT role
+    FROM public.profiles
+    WHERE id = auth.uid()
+  );
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(status_label text, count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+WITH today_appointments AS (
+    SELECT
+        a.id, a.status, a.checkin_time, a.payment_status
+    FROM public.appointments a
+    JOIN public.clients c ON a.client_id = c.id
+    WHERE a.appointment_date = CURRENT_DATE
+    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+)
+SELECT 'Agendados' AS status_label, COUNT(*) AS count -- CORRIGIDO
+FROM today_appointments
+WHERE status = 'agendado' AND checkin_time IS NULL
+UNION ALL
+SELECT 'Aguardando Atendimento' AS status_label, COUNT(*) AS count -- CORRIGIDO
+FROM today_appointments
+WHERE checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado')
+UNION ALL
+SELECT 'Atendimentos Finalizados' AS status_label, COUNT(*) AS count -- CORRIGIDO
+FROM today_appointments
+WHERE status = 'finalizado'
+UNION ALL
+SELECT 'Pagamentos Pendentes' AS status_label, COUNT(*) AS count -- CORRIGIDO
+FROM today_appointments
+WHERE status = 'finalizado' AND payment_status = 'pendente';
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status()
+ RETURNS TABLE(status_label text, count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  RETURN QUERY
+  WITH today_appointments AS (
+    SELECT
+      id,
+      status, -- ex: 'agendado', 'confirmado', 'finalizado'
+      checkin_time,
+      payment_status -- ex: 'pendente', 'pago'
+    FROM
+      public.appointments
+    WHERE
+      appointment_date = CURRENT_DATE
+  )
+  SELECT
+    'Agendados' AS status_label,
+    count(*) AS count
+  FROM
+    today_appointments
+  WHERE
+    status = 'agendado' AND checkin_time IS NULL
+  
+  UNION ALL
+  
+  SELECT
+    'Aguardando Atendimento' AS status_label,
+    count(*) AS count
+  FROM
+    today_appointments
+  WHERE
+    checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado') -- Considera que fez check-in mas ainda não foi finalizado
+    
+  UNION ALL
+  
+  SELECT
+    'Atendimentos Finalizados' AS status_label,
+    count(*) AS count
+  FROM
+    today_appointments
+  WHERE
+    status = 'finalizado' -- Supondo que você tenha um status 'finalizado'
+
+  UNION ALL
+
+  SELECT
+    'Pagamentos Pendentes' AS status_label,
+    count(*) AS count
+  FROM
+    today_appointments
+  WHERE
+    status = 'finalizado' AND payment_status = 'pendente';
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_consultations,"CREATE OR REPLACE FUNCTION public.get_weekly_consultations()
+ RETURNS TABLE(week_start date, count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  RETURN QUERY
+    SELECT
+      date_trunc('week', a.appointment_date)::date AS week_start,
+      COUNT(c.id) AS count
+    FROM
+      public.consultations AS c
+    JOIN
+      public.appointments AS a ON c.appointment_id = a.id
+    GROUP BY
+      week_start
+    ORDER BY
+      week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_titulares,"CREATE OR REPLACE FUNCTION public.get_weekly_titulares(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(week_label text, cumulative_count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  RETURN QUERY
+  WITH weekly_new_clients AS (
+    SELECT
+      date_trunc('week', c.created_at)::date AS week_start,
+      COUNT(c.id) AS new_clients_in_week
+    FROM
+      public.clients c
+    WHERE
+      c.status = 'ATIVO' AND c.created_at IS NOT NULL
+      AND (plan_filter = 'all' OR c.plano = plan_filter)
+    GROUP BY week_start
+  )
+  SELECT
+    to_char(wnc.week_start, 'YYYY-MM-DD') AS week_label,
+    SUM(wnc.new_clients_in_week) OVER (ORDER BY wnc.week_start)::bigint AS cumulative_count
+  FROM
+    weekly_new_clients wnc
+  ORDER BY wnc.week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: login,"CREATE OR REPLACE FUNCTION public.login(email_param text, password_param text)
+ RETURNS json
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+declare
+  usr record;
+  token_payload json;
+begin
+  select * from public.users where email = email_param into usr;
+
+  if usr is null then
+    return '{""error"": ""Usuário não encontrado"", ""status"": 404}';
+  end if;
+
+  -- Compara a senha enviada com o hash armazenado usando a extensão pgcrypto
+  if usr.password_hash = crypt(password_param, usr.password_hash) then
+    -- Se a senha estiver correta, prepara o payload do token
+    token_payload := json_build_object(
+      'userId', usr.id,
+      'roleId', usr.role_id
+    );
+    return json_build_object('payload', token_payload, 'status', 200);
+  else
+    -- Se a senha estiver incorreta
+    return '{""error"": ""Senha incorreta"", ""status"": 401}';
+  end if;
+end;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: normalize_name,"CREATE OR REPLACE FUNCTION public.normalize_name(text)
+ RETURNS text
+ LANGUAGE sql
+ IMMUTABLE
+AS $function$
+SELECT lower(trim(regexp_replace(unaccent($1), '\s+', ' ', 'g')));
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(text)
+ RETURNS text
+ LANGUAGE c
+ STABLE PARALLEL SAFE STRICT
+AS '$libdir/unaccent', $function$unaccent_dict$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(regdictionary, text)
+ RETURNS text
+ LANGUAGE c
+ STABLE PARALLEL SAFE STRICT
+AS '$libdir/unaccent', $function$unaccent_dict$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent_init,"CREATE OR REPLACE FUNCTION public.unaccent_init(internal)
+ RETURNS internal
+ LANGUAGE c
+ PARALLEL SAFE
+AS '$libdir/unaccent', $function$unaccent_init$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent_lexize,"CREATE OR REPLACE FUNCTION public.unaccent_lexize(internal, internal, internal, internal)
+ RETURNS internal
+ LANGUAGE c
+ PARALLEL SAFE
+AS '$libdir/unaccent', $function$unaccent_lexize$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: update_appointments_with_client_id,"CREATE OR REPLACE FUNCTION public.update_appointments_with_client_id()
+ RETURNS text
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+rec RECORD;
+found_id BIGINT;
+updated_count INT := 0;
+BEGIN
+-- Percorre cada agendamento na sua tabela que ainda não tem um client_id
+FOR rec IN SELECT id, patient_name FROM public.appointments WHERE client_id IS NULL LOOP
+-- Para cada agendamento, procura por um cliente com o nome correspondente
+SELECT c.id INTO found_id
+FROM public.clients c
+WHERE normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(rec.patient_name)
+LIMIT 1; -- Pega apenas o primeiro resultado para evitar erros
+
+    -- Se um cliente for encontrado (found_id não é nulo), atualiza o agendamento
+    IF found_id IS NOT NULL THEN
+        UPDATE public.appointments
+        SET client_id = found_id
+        WHERE id = rec.id;
+        updated_count := updated_count + 1;
+    END IF;
+END LOOP;
+
+RETURN 'Atualização concluída. ' || updated_count || ' agendamentos foram vinculados a clientes.';
+
+END;
+$function$
+"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: appointments,POLÍTICA: Permitir leitura para usuários logados | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable insert for authenticated medical users | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): ((auth.role() = 'authenticated'::text) AND (( SELECT profiles.role
+   FROM profiles
+  WHERE (profiles.id = auth.uid())) = 'medicos'::text))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable update for owning medical users | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((auth.role() = 'authenticated'::text) AND (( SELECT professionals.id
+   FROM professionals
+  WHERE (professionals.user_id = auth.uid())) = professional_id)) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,POLÍTICA: Enable read access for all authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,"POLÍTICA: Enable insert for owning professionals | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
+   FROM professionals
+  WHERE (professionals.id = exam_protocols.professional_id)))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,"POLÍTICA: Permitir inserção para profissionais donos do protocolo de im | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
+   FROM professionals
+  WHERE (professionals.id = image_exam_protocols.professional_id)))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,POLÍTICA: Permitir leitura de protocolos de imagem para usuários autenti | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem criar novos perfis | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem editar perfis | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A

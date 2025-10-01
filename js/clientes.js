@@ -212,6 +212,7 @@ async function handleNewClientSubmit(event) {
     titularData.data_nascimento = formatDateForSupabase(titularData.data_nascimento);
 
     try {
+        // CORREÇÃO: Adicionado .select() para retornar o cliente recém-criado
         const { data: newTitular, error: titularError } = await _supabase
             .from('clients')
             .insert(titularData)
