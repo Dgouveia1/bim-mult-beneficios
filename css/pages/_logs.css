@@ -1,0 +1,22 @@
+/* =================================================================
+   PÁGINA: LOGS DO SISTEMA
+   ================================================================= */
+
+   #logsPage .card {
+    padding: 0;
+}
+
+#logsPage pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.log-action {
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--secondary-dark);
+}

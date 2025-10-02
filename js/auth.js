@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { initializeDashboard } from './main.js';
-import { showLoginScreen } from './ui.js'; // Importa do novo arquivo ui.js
+import { showLoginScreen } from './ui.js';
+import { logAction } from './logger.js';
 
 let currentUserProfile = null;
 
@@ -20,6 +21,7 @@ async function handleLogin(event) {
         if (profileError) throw profileError;
 
         currentUserProfile = profile;
+        await logAction('LOGIN', { email: email });
         await initializeDashboard(data.user);
     } catch (error) {
         alert('Credenciais inválidas.');
@@ -27,9 +29,10 @@ async function handleLogin(event) {
 }
 
 async function handleLogout() {
+    await logAction('LOGOUT', {});
     await _supabase.auth.signOut();
     currentUserProfile = null;
-    showLoginScreen(); // Agora usa a função importada de ui.js
+    showLoginScreen();
 }
 
 function getCurrentUserProfile() {
@@ -62,3 +65,4 @@ function setupPermissions(role) {
 }
 
 export { handleLogin, handleLogout, setupPermissions, getCurrentUserProfile, setCurrentUserProfile };
+

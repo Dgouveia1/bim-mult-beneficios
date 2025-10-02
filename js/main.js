@@ -13,6 +13,7 @@ import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
+import { loadLogsData } from './logs.js'; // Importa a função da nova página de logs
 
 
 const newClientModalEl = document.getElementById('newClientModal');
@@ -103,6 +104,7 @@ async function loadPageData(pageName) {
     else if (pageName === 'profissionais') await loadProfessionalsData();
     else if (pageName === 'disparos') await loadMunicipios();
     else if (pageName === 'confirmacoes') await loadConfirmationsData();
+    else if (pageName === 'logs') await loadLogsData(); // << CARREGA DADOS DA PÁGINA DE LOGS
     else if (pageName === 'prontuario') {
         await loadClientsData();
         setupProntuarioPage();
@@ -184,9 +186,9 @@ function setupEventListeners() {
             const appointmentId = checkbox.dataset.appointmentId;
             const isConfirmed = checkbox.checked;
             
-            checkbox.disabled = true; // Desabilita para dar feedback visual
+            checkbox.disabled = true; 
             await updateConfirmationStatus(appointmentId, isConfirmed);
-            checkbox.disabled = false; // Reabilita após salvar
+            checkbox.disabled = false; 
         }
     });
 

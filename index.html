@@ -66,6 +66,8 @@
                         <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
                         <a href="#" class="submenu-item" data-page="disparos">Disparos</a>
                         <a href="#" class="submenu-item" data-page="usuarios">Usuários</a>
+                        <a href="#" class="submenu-item" data-page="logs">Logs do Sistema</a>
+
                     </div>
                 </div>
             
@@ -540,6 +542,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="page-content" id="logsPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Logs de Ações do Sistema</h2>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="logsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Usuário</th>
+                                        <th>Ação</th>
+                                        <th>Detalhes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logsTableBody">
+                                    <!-- Os logs serão inseridos aqui via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
     
    <div class="modal" id="appointmentModal">
         <div class="modal-content">
@@ -550,6 +575,7 @@
             <div class="modal-body">
                 <form id="appointmentForm">
                     <div class="form-row">
+                        <input type="hidden" id="appointmentClientId" name="client_id">
                         <div class="form-group">
                             <label for="appointmentPatientSearch">Paciente</label>
                             <div class="autocomplete-container">
