@@ -1,656 +1,1667 @@
 categoria,objeto,detalhes
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: checkin_time | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: confirmacao | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'agendado'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: patient_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: appointment_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: numero | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cep | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: endereco | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: data_nascimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: carteirinha | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: vendedor | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: municipio | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: cuidados_pos_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: laudo_texto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: atestado | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: procedimentos | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: exame_fisico | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: conduta | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: created_at | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: data_nascimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: protocol_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: protocol_name | TIPO: character varying(255) | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: Nome do protocolo para fácil identificação.
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: ID do profissional que criou o protocolo.
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Array de objetos JSON contendo os exames do protocolo.
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: record_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: method | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addon_groups,COLUNA: selection_type | TIPO: text | NULÁVEL: NO | PADRÃO: 'multiple'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addon_groups,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addon_groups,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addon_groups,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addon_groups,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addons,COLUNA: addon_group_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addons,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addons,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addons,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: addons,COLUNA: price | TIPO: numeric | NULÁVEL: NO | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: message_text | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: customer_phone | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: atendimento_whats,COLUNA: direction | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: categories,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: categories,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: categories,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: get_my_restaurant_id() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: categories,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: comandas,COLUNA: total_amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: comandas,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: comandas,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: gen_random_uuid() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: comandas,COLUNA: table_session_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: comandas,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: number | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: neighborhood | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: cep | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: complement | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: last_address | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: phone | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: state | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: street | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: customers,COLUNA: city | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: total_revenue | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: metric_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: new_customers | TIPO: bigint | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: abandoned_carts | TIPO: bigint | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: average_ticket | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: daily_restaurant_metrics,COLUNA: total_orders | TIPO: bigint | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: stock_quantity | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: unit | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: ingredients,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: get_my_restaurant_id() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: quantity | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: product_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: order_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: product_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: order_items,COLUNA: unit_price | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: waiter_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: customer_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: status | TIPO: USER-DEFINED | NULÁVEL: NO | PADRÃO: 'pendente'::order_status | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: source | TIPO: USER-DEFINED | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: total | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: finish_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: route_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: table_session_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Vincula o pedido a uma sessão de mesa específica.
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: comanda_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Vincula o pedido a uma comanda individual dentro de uma sessão de mesa.
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: waiter_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: discount_amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: delivery_fee | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: order_type | TIPO: text | NULÁVEL: YES | PADRÃO: 'delivery'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: notes | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: payment_method | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: orders,COLUNA: coupon_code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: product_addon_groups,COLUNA: addon_group_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: product_addon_groups,COLUNA: product_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: product_ingredients,COLUNA: product_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: product_ingredients,COLUNA: ingredient_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: product_ingredients,COLUNA: quantity_used | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: stock_control_enabled | TIPO: boolean | NULÁVEL: YES | PADRÃO: false | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: stock_quantity | TIPO: integer | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: get_my_restaurant_id() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: tabela | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: grupo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: stock_control_type | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: image_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: custo | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: specialty | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: CRM | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: price | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: category_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: is_available | TIPO: boolean | NULÁVEL: NO | PADRÃO: true | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: half_iten | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: permite ser fracionado
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: popularity | TIPO: integer | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: full_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: role | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: assignee_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'todo'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: priority | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: clients,CONSTRAINT: clients_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_key | TIPO: UNIQUE | COLUNA(S): appointment_id
-2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_titular_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): titular_id | REFERENCIA: clients(id)
-2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: exams,CONSTRAINT: exams_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: fk_professional | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: image_exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: medical_records,CONSTRAINT: medical_records_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: role | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: description | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: coupon_code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: coupon_type | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: uses_count | TIPO: integer | NULÁVEL: NO | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: max_uses | TIPO: integer | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: is_active | TIPO: boolean | NULÁVEL: NO | PADRÃO: true | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: value | TIPO: numeric | NULÁVEL: NO | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: promotions,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: restaurants,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: gen_random_uuid() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: restaurants,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: restaurants,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: restaurants,"COLUNA: configs | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: JSON para armazenar configurações do cardápio digital, como logo, capa, paleta de cores, etc."
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: table_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: gen_random_uuid() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: total_amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: table_sessions,COLUNA: closed_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tables,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tables,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tables,COLUNA: restaurant_id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tables,COLUNA: number | TIPO: integer | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tables,COLUNA: status | TIPO: text | NULÁVEL: NO | PADRÃO: 'livre'::text | DESCRIÇÃO: N/A
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: restaurant_id_name_unique | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: restaurant_id_name_unique | TIPO: UNIQUE | COLUNA(S): name
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: addon_groups_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: addon_groups_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: restaurant_id_name_unique | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: addon_groups,CONSTRAINT: restaurant_id_name_unique | TIPO: UNIQUE | COLUNA(S): name
+2. CONSTRAINTS (CHAVES),TABELA: addons,CONSTRAINT: addons_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: addons,CONSTRAINT: addons_addon_group_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): addon_group_id | REFERENCIA: addon_groups(id)
+2. CONSTRAINTS (CHAVES),TABELA: atendimento_whats,CONSTRAINT: atendimento_whats_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: atendimento_whats,CONSTRAINT: atendimento_whats_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_restaurant_id_name_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_restaurant_id_name_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_restaurant_id_name_key | TIPO: UNIQUE | COLUNA(S): name
+2. CONSTRAINTS (CHAVES),TABELA: categories,CONSTRAINT: categories_restaurant_id_name_key | TIPO: UNIQUE | COLUNA(S): name
+2. CONSTRAINTS (CHAVES),TABELA: comandas,CONSTRAINT: comandas_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: comandas,CONSTRAINT: comandas_table_session_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): table_session_id | REFERENCIA: table_sessions(id)
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_restaurant_id_phone_key | TIPO: UNIQUE | COLUNA(S): phone
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_restaurant_id_phone_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_restaurant_id_phone_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_restaurant_id_phone_key | TIPO: UNIQUE | COLUNA(S): phone
+2. CONSTRAINTS (CHAVES),TABELA: customers,CONSTRAINT: customers_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_restaurant_id_metric_date_key | TIPO: UNIQUE | COLUNA(S): metric_date
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_restaurant_id_metric_date_key | TIPO: UNIQUE | COLUNA(S): metric_date
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_restaurant_id_metric_date_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: daily_restaurant_metrics,CONSTRAINT: daily_restaurant_metrics_restaurant_id_metric_date_key | TIPO: UNIQUE | COLUNA(S): restaurant_id
+2. CONSTRAINTS (CHAVES),TABELA: ingredients,CONSTRAINT: ingredients_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: ingredients,CONSTRAINT: ingredients_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: order_items,CONSTRAINT: order_items_order_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): order_id | REFERENCIA: orders(id)
+2. CONSTRAINTS (CHAVES),TABELA: order_items,CONSTRAINT: order_items_product_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): product_id | REFERENCIA: products(id)
+2. CONSTRAINTS (CHAVES),TABELA: order_items,CONSTRAINT: order_items_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: orders,null
+2. CONSTRAINTS (CHAVES),TABELA: orders,CONSTRAINT: orders_customer_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): customer_id | REFERENCIA: customers(id)
+2. CONSTRAINTS (CHAVES),TABELA: orders,CONSTRAINT: orders_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: orders,CONSTRAINT: orders_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: orders,CONSTRAINT: orders_table_session_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): table_session_id | REFERENCIA: table_sessions(id)
+2. CONSTRAINTS (CHAVES),TABELA: orders,CONSTRAINT: orders_comanda_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): comanda_id | REFERENCIA: comandas(id)
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_addon_group_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): addon_group_id | REFERENCIA: addon_groups(id)
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_product_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): product_id | REFERENCIA: products(id)
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_pkey | TIPO: PRIMARY KEY | COLUNA(S): addon_group_id
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_pkey | TIPO: PRIMARY KEY | COLUNA(S): addon_group_id
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_pkey | TIPO: PRIMARY KEY | COLUNA(S): product_id
+2. CONSTRAINTS (CHAVES),TABELA: product_addon_groups,CONSTRAINT: product_addon_groups_pkey | TIPO: PRIMARY KEY | COLUNA(S): product_id
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_pkey | TIPO: PRIMARY KEY | COLUNA(S): product_id
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_ingredient_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): ingredient_id | REFERENCIA: ingredients(id)
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_pkey | TIPO: PRIMARY KEY | COLUNA(S): product_id
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_pkey | TIPO: PRIMARY KEY | COLUNA(S): ingredient_id
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_pkey | TIPO: PRIMARY KEY | COLUNA(S): ingredient_id
+2. CONSTRAINTS (CHAVES),TABELA: product_ingredients,CONSTRAINT: product_ingredients_product_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): product_id | REFERENCIA: products(id)
+2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
 2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: professionals,CONSTRAINT: professionals_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: professionals,null
+2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_category_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): category_id | REFERENCIA: categories(id)
 2. CONSTRAINTS (CHAVES),TABELA: profiles,null
 2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_assignee_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): assignee_id | REFERENCIA: profiles(id)
-2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-3. ÍNDICES,TABELA: appointments,ÍNDICE: appointments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX appointments_pkey ON public.appointments USING btree (id)
-3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
-3. ÍNDICES,TABELA: clients,ÍNDICE: clients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX clients_pkey ON public.clients USING btree (id)
-3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_appointment_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_appointment_id_key ON public.consultations USING btree (appointment_id)
-3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_pkey ON public.consultations USING btree (id)
-3. ÍNDICES,TABELA: dependents,ÍNDICE: dependents_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX dependents_pkey ON public.dependents USING btree (id)
-3. ÍNDICES,TABELA: exam_protocols,ÍNDICE: exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exam_protocols_pkey ON public.exam_protocols USING btree (id)
-3. ÍNDICES,TABELA: exams,ÍNDICE: exams_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exams_pkey ON public.exams USING btree (id)
-3. ÍNDICES,TABELA: image_exam_protocols,ÍNDICE: image_exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX image_exam_protocols_pkey ON public.image_exam_protocols USING btree (id)
-3. ÍNDICES,TABELA: medical_records,ÍNDICE: medical_records_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX medical_records_pkey ON public.medical_records USING btree (id)
-3. ÍNDICES,TABELA: payments,ÍNDICE: payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (id)
+2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: promotions,CONSTRAINT: promotions_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: promotions,CONSTRAINT: promotions_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: restaurants,CONSTRAINT: restaurants_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: table_sessions,CONSTRAINT: table_sessions_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: table_sessions,CONSTRAINT: table_sessions_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: table_sessions,CONSTRAINT: table_sessions_table_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): table_id | REFERENCIA: tables(id)
+2. CONSTRAINTS (CHAVES),TABELA: tables,CONSTRAINT: tables_restaurant_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): restaurant_id | REFERENCIA: restaurants(id)
+2. CONSTRAINTS (CHAVES),TABELA: tables,CONSTRAINT: tables_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+3. ÍNDICES,TABELA: addon_groups,ÍNDICE: addon_groups_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX addon_groups_pkey ON public.addon_groups USING btree (id)
+3. ÍNDICES,TABELA: addon_groups,"ÍNDICE: restaurant_id_name_unique | DEFINIÇÃO: CREATE UNIQUE INDEX restaurant_id_name_unique ON public.addon_groups USING btree (restaurant_id, name)"
+3. ÍNDICES,TABELA: addons,ÍNDICE: addons_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX addons_pkey ON public.addons USING btree (id)
+3. ÍNDICES,TABELA: atendimento_whats,ÍNDICE: atendimento_whats_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX atendimento_whats_pkey ON public.atendimento_whats USING btree (id)
+3. ÍNDICES,TABELA: categories,ÍNDICE: categories_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)
+3. ÍNDICES,TABELA: categories,"ÍNDICE: categories_restaurant_id_name_key | DEFINIÇÃO: CREATE UNIQUE INDEX categories_restaurant_id_name_key ON public.categories USING btree (restaurant_id, name)"
+3. ÍNDICES,TABELA: comandas,ÍNDICE: comandas_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX comandas_pkey ON public.comandas USING btree (id)
+3. ÍNDICES,TABELA: customers,"ÍNDICE: customers_restaurant_id_phone_key | DEFINIÇÃO: CREATE UNIQUE INDEX customers_restaurant_id_phone_key ON public.customers USING btree (restaurant_id, phone)"
+3. ÍNDICES,TABELA: customers,ÍNDICE: customers_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (id)
+3. ÍNDICES,TABELA: daily_restaurant_metrics,ÍNDICE: daily_restaurant_metrics_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX daily_restaurant_metrics_pkey ON public.daily_restaurant_metrics USING btree (id)
+3. ÍNDICES,TABELA: daily_restaurant_metrics,"ÍNDICE: daily_restaurant_metrics_restaurant_id_metric_date_key | DEFINIÇÃO: CREATE UNIQUE INDEX daily_restaurant_metrics_restaurant_id_metric_date_key ON public.daily_restaurant_metrics USING btree (restaurant_id, metric_date)"
+3. ÍNDICES,TABELA: ingredients,ÍNDICE: ingredients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX ingredients_pkey ON public.ingredients USING btree (id)
+3. ÍNDICES,TABELA: order_items,ÍNDICE: order_items_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (id)
+3. ÍNDICES,TABELA: orders,ÍNDICE: orders_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)
+3. ÍNDICES,TABELA: product_addon_groups,"ÍNDICE: product_addon_groups_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX product_addon_groups_pkey ON public.product_addon_groups USING btree (product_id, addon_group_id)"
+3. ÍNDICES,TABELA: product_ingredients,"ÍNDICE: product_ingredients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX product_ingredients_pkey ON public.product_ingredients USING btree (product_id, ingredient_id)"
 3. ÍNDICES,TABELA: products,ÍNDICE: products_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)
-3. ÍNDICES,TABELA: professionals,ÍNDICE: professionals_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX professionals_pkey ON public.professionals USING btree (id)
 3. ÍNDICES,TABELA: profiles,ÍNDICE: profiles_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
-3. ÍNDICES,TABELA: tasks,ÍNDICE: tasks_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX tasks_pkey ON public.tasks USING btree (id)
-4. FUNÇÕES (RPC),FUNÇÃO: diagnose_name_matching,"CREATE OR REPLACE FUNCTION public.diagnose_name_matching()
- RETURNS TABLE(client_name_original text, appointment_name_original text, normalized_client_name text, normalized_appointment_name text, is_match boolean)
+3. ÍNDICES,TABELA: promotions,ÍNDICE: promotions_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX promotions_pkey ON public.promotions USING btree (id)
+3. ÍNDICES,TABELA: promotions,"ÍNDICE: unique_coupon_per_restaurant | DEFINIÇÃO: CREATE UNIQUE INDEX unique_coupon_per_restaurant ON public.promotions USING btree (restaurant_id, coupon_code) WHERE (coupon_code IS NOT NULL)"
+3. ÍNDICES,TABELA: restaurants,ÍNDICE: restaurants_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX restaurants_pkey ON public.restaurants USING btree (id)
+3. ÍNDICES,TABELA: table_sessions,ÍNDICE: table_sessions_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX table_sessions_pkey ON public.table_sessions USING btree (id)
+3. ÍNDICES,TABELA: tables,ÍNDICE: tables_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX tables_pkey ON public.tables USING btree (id)
+4. FUNÇÕES (RPC),FUNÇÃO: add_items_to_order,"CREATE OR REPLACE FUNCTION public.add_items_to_order(p_order_id bigint, p_items jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT
+        p_order_id,
+        (item.product_id)::BIGINT,
+        item.product_name,
+        (item.quantity)::NUMERIC,
+        (item.unit_price)::NUMERIC
+    FROM jsonb_to_recordset(p_items) AS item(
+        product_id TEXT,
+        product_name TEXT,
+        quantity TEXT,
+        unit_price TEXT
+    );
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: add_order_to_table,"CREATE OR REPLACE FUNCTION public.add_order_to_table(p_table_session_id uuid, p_comanda_name text, p_items jsonb, p_notes text, p_waiter_id uuid)
+ RETURNS bigint
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_restaurant_id uuid := get_my_restaurant_id();
+    v_session record;
+    v_comanda_id uuid;
+    v_order_total numeric := 0;
+    v_order_id bigint;
+    item jsonb;
+BEGIN
+    -- Valida a sessão da mesa
+    SELECT * INTO v_session FROM public.table_sessions
+    WHERE id = p_table_session_id AND restaurant_id = v_restaurant_id AND closed_at IS NULL;
+
+    IF v_session IS NULL THEN
+        RAISE EXCEPTION 'Sessão da mesa não encontrada, inválida ou já fechada.';
+    END IF;
+
+    -- Procura pela comanda ou cria uma nova se não existir
+    SELECT id INTO v_comanda_id FROM public.comandas
+    WHERE table_session_id = p_table_session_id AND ""name"" = p_comanda_name;
+
+    IF v_comanda_id IS NULL THEN
+        INSERT INTO public.comandas (table_session_id, ""name"")
+        VALUES (p_table_session_id, p_comanda_name)
+        RETURNING id INTO v_comanda_id;
+    END IF;
+
+    -- Calcula o total do novo pedido
+    FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+    LOOP
+        v_order_total := v_order_total + ((item->>'quantity')::numeric * (item->>'unit_price')::numeric);
+    END LOOP;
+
+    -- Cria o pedido, agora incluindo o waiter_id
+    INSERT INTO public.orders (restaurant_id, customer_id, source, status, total, notes, table_session_id, comanda_id, waiter_id)
+    VALUES (v_restaurant_id, 1, 'mesa', 'preparacao', v_order_total, p_notes, p_table_session_id, v_comanda_id, p_waiter_id) -- customer_id=1 (placeholder)
+    RETURNING id INTO v_order_id;
+
+    -- Insere os itens do pedido
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT v_order_id, (i->>'product_id')::bigint, i->>'product_name', (i->>'quantity')::numeric, (i->>'unit_price')::numeric
+    FROM jsonb_array_elements(p_items) as i;
+
+    -- Atualiza os totais na comanda e na sessão da mesa
+    UPDATE public.comandas SET total_amount = total_amount + v_order_total WHERE id = v_comanda_id;
+    UPDATE public.table_sessions SET total_amount = total_amount + v_order_total WHERE id = p_table_session_id;
+
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: add_order_to_table,"CREATE OR REPLACE FUNCTION public.add_order_to_table(p_table_session_id uuid, p_comanda_name text, p_items jsonb, p_notes text, p_waiter_id uuid, p_waiter_name text)
+ RETURNS bigint
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_restaurant_id uuid := get_my_restaurant_id();
+    v_session record;
+    v_comanda_id uuid;
+    v_order_total numeric := 0;
+    v_order_id bigint;
+    item jsonb;
+BEGIN
+    -- Valida a sessão da mesa
+    SELECT * INTO v_session FROM public.table_sessions
+    WHERE id = p_table_session_id AND restaurant_id = v_restaurant_id AND closed_at IS NULL;
+
+    IF v_session IS NULL THEN
+        RAISE EXCEPTION 'Sessão da mesa não encontrada, inválida ou já fechada.';
+    END IF;
+
+    -- Procura pela comanda ou cria uma nova se não existir
+    SELECT id INTO v_comanda_id FROM public.comandas
+    WHERE table_session_id = p_table_session_id AND ""name"" = p_comanda_name;
+
+    IF v_comanda_id IS NULL THEN
+        INSERT INTO public.comandas (table_session_id, ""name"")
+        VALUES (p_table_session_id, p_comanda_name)
+        RETURNING id INTO v_comanda_id;
+    END IF;
+
+    -- Calcula o total do novo pedido
+    FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+    LOOP
+        v_order_total := v_order_total + ((item->>'quantity')::numeric * (item->>'unit_price')::numeric);
+    END LOOP;
+
+    -- Cria o pedido, agora incluindo o waiter_id e waiter_name
+    INSERT INTO public.orders (restaurant_id, customer_id, source, status, total, notes, table_session_id, comanda_id, waiter_id, waiter_name)
+    VALUES (v_restaurant_id, 1, 'mesa', 'preparacao', v_order_total, p_notes, p_table_session_id, v_comanda_id, p_waiter_id, p_waiter_name)
+    RETURNING id INTO v_order_id;
+
+    -- Insere os itens do pedido
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT v_order_id, (i->>'product_id')::bigint, i->>'product_name', (i->>'quantity')::numeric, (i->>'unit_price')::numeric
+    FROM jsonb_array_elements(p_items) as i;
+
+    -- Atualiza os totais na comanda e na sessão da mesa
+    UPDATE public.comandas SET total_amount = total_amount + v_order_total WHERE id = v_comanda_id;
+    UPDATE public.table_sessions SET total_amount = total_amount + v_order_total WHERE id = p_table_session_id;
+
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: add_order_to_table,"CREATE OR REPLACE FUNCTION public.add_order_to_table(p_table_session_id bigint, p_comanda_name text, p_items jsonb, p_notes text, p_waiter_id uuid)
+ RETURNS bigint
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_order_id bigint;
+    v_comanda_id bigint;
+    v_total_price numeric := 0;
+    item record;
+    v_restaurant_id uuid;
+BEGIN
+    -- Calcula o preço total do pedido
+    FOR item IN SELECT * FROM jsonb_to_recordset(p_items) AS x(product_name text, quantity numeric, unit_price numeric)
+    LOOP
+        v_total_price := v_total_price + (item.quantity * item.unit_price);
+    END LOOP;
+
+    -- Descobre a qual restaurante esta sessão pertence
+    SELECT t.restaurant_id INTO v_restaurant_id
+    FROM public.table_sessions ts
+    JOIN public.tables t ON ts.table_id = t.id
+    WHERE ts.id = p_table_session_id;
+
+    -- Insere o pedido principal com o status 'pendente'
+    INSERT INTO public.orders (restaurant_id, total, source, status, notes, waiter_id)
+    VALUES (v_restaurant_id, v_total_price, 'mesa', 'pendente', p_notes, p_waiter_id)
+    RETURNING id INTO v_order_id;
+
+    -- Insere os itens do pedido
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT v_order_id, (x.product_id)::bigint, x.product_name, x.quantity, x.unit_price
+    FROM jsonb_to_recordset(p_items) AS x(product_id text, product_name text, quantity numeric, unit_price numeric);
+
+    -- Cria a comanda e a vincula ao pedido
+    INSERT INTO public.comandas (table_session_id, order_id, name)
+    VALUES (p_table_session_id, v_order_id, p_comanda_name);
+
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: add_order_to_table,"CREATE OR REPLACE FUNCTION public.add_order_to_table(p_table_session_id uuid, p_comanda_name text, p_items jsonb, p_notes text)
+ RETURNS bigint
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_restaurant_id uuid := get_my_restaurant_id();
+    v_session record;
+    v_comanda_id uuid;
+    v_order_total numeric := 0;
+    v_order_id bigint;
+    item jsonb;
+BEGIN
+    -- Valida a sessão da mesa
+    SELECT * INTO v_session FROM public.table_sessions
+    WHERE id = p_table_session_id AND restaurant_id = v_restaurant_id AND closed_at IS NULL;
+
+    IF v_session IS NULL THEN
+        RAISE EXCEPTION 'Sessão da mesa não encontrada, inválida ou já fechada.';
+    END IF;
+
+    -- Procura pela comanda ou cria uma nova se não existir
+    SELECT id INTO v_comanda_id FROM public.comandas
+    WHERE table_session_id = p_table_session_id AND ""name"" = p_comanda_name;
+
+    IF v_comanda_id IS NULL THEN
+        INSERT INTO public.comandas (table_session_id, ""name"")
+        VALUES (p_table_session_id, p_comanda_name)
+        RETURNING id INTO v_comanda_id;
+    END IF;
+
+    -- Calcula o total do novo pedido
+    FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+    LOOP
+        v_order_total := v_order_total + ((item->>'quantity')::numeric * (item->>'unit_price')::numeric);
+    END LOOP;
+
+    -- Cria o pedido
+    INSERT INTO public.orders (restaurant_id, customer_id, source, status, total, notes, table_session_id, comanda_id)
+    VALUES (v_restaurant_id, 1, 'mesa', 'preparacao', v_order_total, p_notes, p_table_session_id, v_comanda_id) -- customer_id=1 (placeholder)
+    RETURNING id INTO v_order_id;
+
+    -- Insere os itens do pedido
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT v_order_id, (i->>'product_id')::bigint, i->>'product_name', (i->>'quantity')::numeric, (i->>'unit_price')::numeric
+    FROM jsonb_array_elements(p_items) as i;
+
+    -- Atualiza os totais na comanda e na sessão da mesa
+    UPDATE public.comandas SET total_amount = total_amount + v_order_total WHERE id = v_comanda_id;
+    UPDATE public.table_sessions SET total_amount = total_amount + v_order_total WHERE id = p_table_session_id;
+
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: add_to_ingredient_stock,"CREATE OR REPLACE FUNCTION public.add_to_ingredient_stock(p_ingredient_id bigint, p_quantity_to_add numeric)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    UPDATE public.ingredients
+    SET stock_quantity = stock_quantity + p_quantity_to_add
+    WHERE id = p_ingredient_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: close_table_session,"CREATE OR REPLACE FUNCTION public.close_table_session(p_session_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    UPDATE public.table_sessions
+    SET closed_at = NOW()
+    WHERE id = p_session_id AND restaurant_id = get_my_restaurant_id();
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: create_manual_order,"CREATE OR REPLACE FUNCTION public.create_manual_order(p_customer_phone text, p_customer_name text, p_customer_address text, p_payment_method text, p_total numeric, p_notes text, p_items order_item_data[])
+ RETURNS bigint
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_customer_id bigint;
+    v_order_id bigint;
+    item public.order_item_data;
+    v_restaurant_id uuid := public.get_my_restaurant_id();
+BEGIN
+    -- 1. Tenta encontrar o cliente pelo telefone. Se não existir, cria um novo (UPSERT).
+    INSERT INTO public.customers (restaurant_id, phone, name, last_address)
+    VALUES (v_restaurant_id, p_customer_phone, p_customer_name, p_customer_address)
+    ON CONFLICT (restaurant_id, phone)
+    DO UPDATE SET
+        name = EXCLUDED.name,
+        last_address = EXCLUDED.last_address
+    RETURNING id INTO v_customer_id;
+
+    -- 2. Insere o novo pedido
+    INSERT INTO public.orders (restaurant_id, customer_id, source, total, payment_method, notes)
+    VALUES (v_restaurant_id, v_customer_id, 'manual', p_total, p_payment_method, p_notes)
+    RETURNING id INTO v_order_id;
+
+    -- 3. Insere os itens do pedido
+    FOREACH item IN ARRAY p_items
+    LOOP
+        INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+        VALUES (v_order_id, item.product_id, item.product_name, item.quantity, item.unit_price);
+    END LOOP;
+
+    -- 4. Retorna o ID do pedido que foi criado
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: create_manual_order,"CREATE OR REPLACE FUNCTION public.create_manual_order(p_customer_phone text, p_customer_name text, p_payment_method text, p_total numeric, p_notes text, p_items order_item_data[], p_cep text, p_street text, p_number text, p_neighborhood text, p_city text, p_state text, p_complement text)
+ RETURNS bigint
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_customer_id bigint;
+    v_order_id bigint;
+    item public.order_item_data;
+    v_restaurant_id uuid := public.get_my_restaurant_id();
+BEGIN
+    -- 1. Tenta encontrar o cliente pelo telefone. Se não existir, cria um novo (UPSERT).
+    --    Agora também atualiza todos os campos de endereço.
+    INSERT INTO public.customers (restaurant_id, phone, name, cep, street, ""number"", neighborhood, city, state, complement)
+    VALUES (v_restaurant_id, p_customer_phone, p_customer_name, p_cep, p_street, p_number, p_neighborhood, p_city, p_state, p_complement)
+    ON CONFLICT (restaurant_id, phone)
+    DO UPDATE SET
+        name = EXCLUDED.name,
+        cep = EXCLUDED.cep,
+        street = EXCLUDED.street,
+        ""number"" = EXCLUDED.number,
+        neighborhood = EXCLUDED.neighborhood,
+        city = EXCLUDED.city,
+        state = EXCLUDED.state,
+        complement = EXCLUDED.complement
+    RETURNING id INTO v_customer_id;
+
+    -- 2. Insere o novo pedido
+    INSERT INTO public.orders (restaurant_id, customer_id, source, total, payment_method, notes)
+    VALUES (v_restaurant_id, v_customer_id, 'manual', p_total, p_payment_method, p_notes)
+    RETURNING id INTO v_order_id;
+
+    -- 3. Insere os itens do pedido
+    FOREACH item IN ARRAY p_items
+    LOOP
+        INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+        VALUES (v_order_id, item.product_id, item.product_name, item.quantity, item.unit_price);
+    END LOOP;
+
+    -- 4. Retorna o ID do pedido que foi criado
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: create_restaurant_and_set_owner,"CREATE OR REPLACE FUNCTION public.create_restaurant_and_set_owner(restaurant_name text, contact_phone text)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+  new_restaurant_id UUID;
+  user_id UUID := auth.uid();
+  restaurant_configs JSONB;
+BEGIN
+  -- 1. Cria o objeto JSON de configurações
+  restaurant_configs := jsonb_build_object('contact_phone', contact_phone);
+
+  -- 2. Insere o novo restaurante com o nome e as configurações
+  INSERT INTO public.restaurants (name, configs)
+  VALUES (restaurant_name, restaurant_configs)
+  RETURNING id INTO new_restaurant_id;
+
+  -- 3. Atualiza a tabela de perfis do usuário com o novo ID e a role
+  UPDATE public.profiles
+  SET
+    restaurant_id = new_restaurant_id,
+    role = 'gerencial'
+  WHERE id = user_id;
+
+  -- 4. CRÍTICO: Atualiza os metadados do usuário no schema 'auth' para a RLS funcionar
+  UPDATE auth.users
+  SET raw_app_meta_data = raw_app_meta_data || 
+    jsonb_build_object('restaurant_id', new_restaurant_id, 'role', 'gerencial')
+  WHERE id = user_id;
+  
+  RETURN new_restaurant_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: decrement_stock,"CREATE OR REPLACE FUNCTION public.decrement_stock()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    order_item RECORD;
+    product_info RECORD;
+    prod_ingredient RECORD;
+BEGIN
+    -- Itera sobre cada item do pedido que foi inserido
+    FOR order_item IN SELECT * FROM new_order_items LOOP
+        -- Busca as informações de controle de estoque do produto vendido
+        SELECT stock_control_enabled, stock_control_type 
+        INTO product_info
+        FROM public.products
+        WHERE id = order_item.product_id;
+
+        -- Se o controle de estoque estiver ativo
+        IF product_info.stock_control_enabled THEN
+            -- Se o controle for por unidade do produto
+            IF product_info.stock_control_type = 'product' THEN
+                UPDATE public.products
+                SET stock_quantity = stock_quantity - order_item.quantity
+                WHERE id = order_item.product_id;
+            
+            -- Se o controle for por ingredientes
+            ELSIF product_info.stock_control_type = 'ingredient' THEN
+                -- Itera sobre cada ingrediente que compõe o produto
+                FOR prod_ingredient IN 
+                    SELECT ingredient_id, quantity_used 
+                    FROM public.product_ingredients
+                    WHERE product_id = order_item.product_id
+                LOOP
+                    -- Decrementa o estoque do ingrediente
+                    UPDATE public.ingredients
+                    SET stock_quantity = stock_quantity - (prod_ingredient.quantity_used * order_item.quantity)
+                    WHERE id = prod_ingredient.ingredient_id;
+                END LOOP;
+            END IF;
+        END IF;
+    END LOOP;
+    RETURN NULL;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: finalize_whatsapp_order,"CREATE OR REPLACE FUNCTION public.finalize_whatsapp_order(p_customer_phone text, p_restaurant_id_param uuid, p_order_data jsonb)
+ RETURNS bigint
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_customer_id BIGINT;
+    v_order_id BIGINT;
+    v_order_total NUMERIC := 0;
+    v_product RECORD;
+    item JSONB;
+BEGIN
+    -- 1. Encontrar o cliente. Se não existir, criar um novo.
+    INSERT INTO public.customers (restaurant_id, phone, name, street, ""number"", neighborhood, city, state, complement)
+    VALUES (
+        p_restaurant_id_param,
+        p_customer_phone,
+        p_order_data->>'customer_name',
+        p_order_data->'address'->>'street',
+        p_order_data->'address'->>'number',
+        p_order_data->'address'->>'neighborhood',
+        p_order_data->'address'->>'city',
+        p_order_data->'address'->>'state',
+        p_order_data->'address'->>'complement'
+    )
+    ON CONFLICT (restaurant_id, phone)
+    DO UPDATE SET
+        name = EXCLUDED.name,
+        street = EXCLUDED.street,
+        ""number"" = EXCLUDED.number,
+        neighborhood = EXCLUDED.neighborhood,
+        city = EXCLUDED.city,
+        state = EXCLUDED.state,
+        complement = EXCLUDED.complement
+    RETURNING id INTO v_customer_id;
+
+    -- 2. Encontrar o 'pre-pedido' mais recente para este cliente.
+    SELECT id INTO v_order_id
+    FROM public.orders
+    WHERE customer_id = v_customer_id AND status = 'pre-pedido'
+    ORDER BY created_at DESC
+    LIMIT 1;
+    
+    -- Se não houver pré-pedido, cria um novo
+    IF v_order_id IS NULL THEN
+        INSERT INTO public.orders (restaurant_id, customer_id, source, status)
+        VALUES (p_restaurant_id_param, v_customer_id, 'whatsapp', 'pre-pedido')
+        RETURNING id INTO v_order_id;
+    END IF;
+
+    -- 3. Inserir os itens e calcular o total
+    FOR item IN SELECT * FROM jsonb_array_elements(p_order_data->'items')
+    LOOP
+        -- Tenta encontrar o produto pelo nome (pode precisar de ajuste fino)
+        SELECT id, price INTO v_product
+        FROM public.products
+        WHERE restaurant_id = p_restaurant_id_param
+          AND lower(name) = lower(item->>'product_name')
+        LIMIT 1;
+
+        IF v_product IS NOT NULL THEN
+            INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+            VALUES (v_order_id, v_product.id, item->>'product_name', (item->>'quantity')::NUMERIC, v_product.price);
+
+            v_order_total := v_order_total + ((item->>'quantity')::NUMERIC * v_product.price);
+        END IF;
+    END LOOP;
+
+    -- 4. Atualizar o pedido para 'pendente' com os dados finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        total = v_order_total,
+        payment_method = p_order_data->>'payment_method',
+        notes = p_order_data->>'notes',
+        created_at = NOW() -- Define o tempo de criação para o momento da finalização
+    WHERE id = v_order_id;
+    
+    RETURN v_order_id;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_client_evolution_chart,"CREATE OR REPLACE FUNCTION public.get_client_evolution_chart(start_date timestamp with time zone, end_date timestamp with time zone, grouping_unit text)
+ RETURNS TABLE(series_date date, new_customers bigint, recurrent_customers bigint)
  LANGUAGE sql
 AS $function$
--- O FULL OUTER JOIN é usado para garantir que veremos todos os nomes de ambas as
--- tabelas, mesmo que eles não tenham uma correspondência na outra tabela.
-SELECT
-c.nome || ' ' || c.sobrenome AS client_name_original,
-a.patient_name AS appointment_name_original,
-normalize_name(c.nome || ' ' || c.sobrenome) AS normalized_client_name,
-normalize_name(a.patient_name) AS normalized_appointment_name,
--- A coluna 'is_match' nos dirá se a nossa lógica de normalização está funcionando
--- para cada par de nomes.
-normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name) AS is_match
-FROM
-public.clients c
-FULL OUTER JOIN
-public.appointments a ON normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name)
-LIMIT 100; -- Limitamos a 100 resultados para facilitar a análise inicial.
+    WITH daily_customers AS (
+        SELECT
+            o.created_at::date as order_date,
+            o.customer_id,
+            -- Verifica se a data da primeira compra do cliente é a mesma da compra atual
+            (MIN(c.created_at) OVER (PARTITION BY o.customer_id))::date = o.created_at::date AS is_new
+        FROM public.orders o
+        JOIN public.customers c ON o.customer_id = c.id
+        WHERE o.restaurant_id = public.get_my_restaurant_id()
+          AND o.status <> 'pre-pedido'
+          AND o.created_at BETWEEN start_date AND end_date
+    )
+    SELECT
+        DATE_TRUNC(grouping_unit, dc.order_date)::date AS series_date,
+        -- Conta clientes distintos que são marcados como 'novos'
+        COUNT(DISTINCT CASE WHEN dc.is_new THEN dc.customer_id END) AS new_customers,
+        -- Conta clientes distintos que NÃO são marcados como 'novos'
+        COUNT(DISTINCT CASE WHEN NOT dc.is_new THEN dc.customer_id END) AS recurrent_customers
+    FROM daily_customers dc
+    GROUP BY series_date
+    ORDER BY series_date;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_churn_risk_clients,"CREATE OR REPLACE FUNCTION public.get_churn_risk_clients()
- RETURNS TABLE(nome text, telefone text, email text, plano text, ultima_consulta date)
+4. FUNÇÕES (RPC),FUNÇÃO: get_customer_analytics,"CREATE OR REPLACE FUNCTION public.get_customer_analytics()
+ RETURNS TABLE(id bigint, name text, phone text, order_count bigint, last_order_date timestamp with time zone, average_ticket numeric)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-RETURN QUERY
-WITH last_appointment AS (
-SELECT
-a.client_id,
-MAX(a.appointment_date) AS last_date
-FROM public.appointments a
-WHERE a.client_id IS NOT NULL
-GROUP BY a.client_id
-)
-SELECT
-(c.nome || ' ' || c.sobrenome) as nome,
-c.telefone,
-c.email,
-c.plano,
-la.last_date AS ultima_consulta
-FROM public.clients c
-LEFT JOIN last_appointment la ON c.id = la.client_id
-WHERE
-c.status = 'ATIVO'
-AND (la.last_date IS NULL OR la.last_date < (CURRENT_DATE - INTERVAL '90 days'));
-END;
-$function$
-"
-4. FUNÇÕES (RPC),FUNÇÃO: get_client_acquisition_forecast,"CREATE OR REPLACE FUNCTION public.get_client_acquisition_forecast(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
- LANGUAGE plpgsql
-AS $function$
-DECLARE
-    avg_last_4_weeks DECIMAL;
-BEGIN
-    -- Calcula a média de novos clientes semanais das últimas 4 semanas completas
-    SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
-    FROM (
-        SELECT COUNT(c.id)::decimal as weekly_count
-        FROM public.clients c
-        WHERE c.created_at >= date_trunc('week', now() - interval '4 weeks')::date
-          AND c.created_at < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
-        GROUP BY date_trunc('week', c.created_at)
-    ) AS last_weeks;
-
-    -- Retorna os dados históricos e a previsão
     RETURN QUERY
-    WITH historical_data AS (
-        SELECT
-            -- CORREÇÃO: Garante que o resultado seja do tipo DATE
-            (date_trunc('week', c.created_at))::date AS week_start,
-            COUNT(c.id) AS count,
-            FALSE AS is_forecast
-        FROM public.clients c
-        WHERE c.created_at >= date_trunc('week', now() - interval '8 weeks')::date
-          AND c.created_at < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
-        -- CORREÇÃO: Agrupa pela expressão convertida para DATE
-        GROUP BY (date_trunc('week', c.created_at))::date
-    ),
-    forecast_data AS (
-        SELECT
-            (date_trunc('week', now())::date + (n.week_num || ' weeks')::interval)::date AS week_start,
-            ROUND(avg_last_4_weeks)::bigint AS count,
-            TRUE AS is_forecast
-        FROM generate_series(0, 3) AS n(week_num)
-    )
-    SELECT * FROM historical_data
-    UNION ALL
-    SELECT * FROM forecast_data
-    ORDER BY week_start;
+    SELECT
+        c.id,
+        c.name,
+        c.phone,
+        COUNT(o.id) as order_count,
+        MAX(o.created_at) as last_order_date,
+        AVG(o.total) as average_ticket
+    FROM
+        public.customers c
+    LEFT JOIN
+        public.orders o ON c.id = o.customer_id
+    WHERE
+        c.restaurant_id = public.get_my_restaurant_id()
+        -- AND o.status <> 'pre-pedido' -- Adicionado para não contar carrinhos abandonados
+    GROUP BY
+        c.id
+    ORDER BY
+        AVG(o.total) DESC NULLS LAST, c.name;
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_client_report_data,"CREATE OR REPLACE FUNCTION public.get_client_report_data()
- RETURNS TABLE(client_name text, phone text, plan text, registration_date date, last_consultation_date date, avg_recurrence_days numeric)
+4. FUNÇÕES (RPC),FUNÇÃO: get_customer_and_last_order,"CREATE OR REPLACE FUNCTION public.get_customer_and_last_order(p_restaurant_id uuid, p_customer_phone text, p_customer_name text DEFAULT NULL::text)
+ RETURNS jsonb
  LANGUAGE plpgsql
-AS $function$
-BEGIN
-RETURN QUERY
-WITH client_appointments AS (
-SELECT
-c.id as client_id,
-(c.nome || ' ' || c.sobrenome) AS client_name,
-c.telefone, c.plano, c.created_at::date as registration_date,
-a.appointment_date,
-a.appointment_date - LAG(a.appointment_date, 1) OVER(PARTITION BY c.id ORDER BY a.appointment_date) as diff_days
-FROM public.clients c
-JOIN public.appointments a ON c.id = a.client_id
-WHERE c.status = 'ATIVO'
-)
-SELECT
-ca.client_name, ca.telefone, ca.plano, ca.registration_date,
-MAX(ca.appointment_date) as last_consultation_date,
-ROUND(AVG(ca.diff_days), 0) as avg_recurrence_days
-FROM client_appointments ca
-GROUP BY ca.client_id, ca.client_name, ca.telefone, ca.plano, ca.registration_date
-ORDER BY ca.client_name;
-END;
-$function$
-"
-4. FUNÇÕES (RPC),FUNÇÃO: get_consultation_forecast,"CREATE OR REPLACE FUNCTION public.get_consultation_forecast(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
- LANGUAGE plpgsql
+ SECURITY DEFINER
 AS $function$
 DECLARE
-    avg_last_4_weeks DECIMAL;
+    v_customer RECORD;
+    v_last_finalized_order JSONB;
+    v_active_pre_order RECORD;
+    v_pre_order_items JSONB;
+    v_order_id_to_return BIGINT;
 BEGIN
-    SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
-    FROM (
-        SELECT COUNT(a.id)::decimal as weekly_count
-        FROM public.appointments a
-        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
-        WHERE a.appointment_date >= date_trunc('week', now() - interval '4 weeks')::date
-          AND a.appointment_date < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
-        GROUP BY date_trunc('week', a.appointment_date)
-    ) AS last_weeks;
-RETURN QUERY
-    WITH historical_data AS (
-        SELECT
-            date_trunc('week', a.appointment_date)::date AS week_start,
-            COUNT(a.id) AS count,
-            FALSE AS is_forecast
-        FROM public.appointments a
-        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
-        WHERE a.appointment_date >= date_trunc('week', now() - interval '8 weeks')::date
-          AND a.appointment_date < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
-        GROUP BY week_start
-    ),
-    forecast_data AS (
-        SELECT
-            (date_trunc('week', now())::date + (n.week_num || ' weeks')::interval)::date AS week_start,
-            ROUND(avg_last_4_weeks)::bigint AS count,
-            TRUE AS is_forecast
-        FROM generate_series(0, 3) AS n(week_num)
-    )
-    SELECT * FROM historical_data
-    UNION ALL
-    SELECT * FROM forecast_data
-    ORDER BY week_start;
+    -- Etapa 1: Encontra ou cria o cliente
+    INSERT INTO public.customers (restaurant_id, phone, name)
+    VALUES (p_restaurant_id, p_customer_phone, COALESCE(p_customer_name, 'Novo Cliente'))
+    ON CONFLICT (restaurant_id, phone)
+    DO UPDATE SET name = COALESCE(p_customer_name, customers.name)
+    RETURNING * INTO v_customer;
+
+    -- Etapa 2: Verifica se existe um 'pre-pedido' ativo para este cliente
+    SELECT * INTO v_active_pre_order FROM public.orders
+    WHERE customer_id = v_customer.id AND status = 'pre-pedido'
+    ORDER BY created_at DESC LIMIT 1;
+
+    -- Etapa 3: Se existir um 'pre-pedido' ativo, usa-o. Caso contrário, cria um novo.
+    IF v_active_pre_order IS NOT NULL THEN
+        v_order_id_to_return := v_active_pre_order.id;
+    ELSE
+        INSERT INTO public.orders (restaurant_id, customer_id, status, source, total)
+        VALUES (p_restaurant_id, v_customer.id, 'pre-pedido', 'cardapio_digital', 0)
+        RETURNING id INTO v_order_id_to_return;
+    END IF;
+
+    -- Etapa 4: Busca os itens do pré-pedido a ser retornado
+    SELECT jsonb_agg(oi) INTO v_pre_order_items
+    FROM public.order_items oi
+    WHERE oi.order_id = v_order_id_to_return;
+
+    -- Etapa 5: Busca o último pedido *finalizado* para a funcionalidade de """"repetir pedido""""
+    SELECT to_jsonb(o) || jsonb_build_object('items', (SELECT jsonb_agg(oi) FROM public.order_items oi WHERE oi.order_id = o.id))
+    INTO v_last_finalized_order
+    FROM public.orders o
+    WHERE o.customer_id = v_customer.id AND o.status = 'finalizado'
+    ORDER BY o.created_at DESC LIMIT 1;
+
+    -- Etapa 6: Retorna todos os dados de forma estruturada
+    RETURN jsonb_build_object(
+        'customer', to_jsonb(v_customer),
+        'lastOrder', v_last_finalized_order,
+        'currentOrder', jsonb_build_object(
+            'id', v_order_id_to_return,
+            'items', COALESCE(v_pre_order_items, '[]'::jsonb)
+        )
+    );
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_consultations_by_professional,"CREATE OR REPLACE FUNCTION public.get_consultations_by_professional(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(professional_name text, count bigint)
+4. FUNÇÕES (RPC),FUNÇÃO: get_customer_export,"CREATE OR REPLACE FUNCTION public.get_customer_export()
+ RETURNS TABLE(name text, phone text, total_orders bigint, average_ticket numeric, first_order_date timestamp with time zone, last_order_date timestamp with time zone, is_potential_churn boolean, is_churn boolean)
+ LANGUAGE sql
+AS $function$
+    WITH customer_stats AS (
+        SELECT
+            c.id,
+            c.name,
+            c.phone,
+            COUNT(o.id) AS total_orders,
+            COALESCE(AVG(o.total), 0) AS average_ticket,
+            MIN(o.created_at) AS first_order_date,
+            MAX(o.created_at) AS last_order_date,
+            CASE
+                WHEN COUNT(o.id) > 1 THEN
+                    EXTRACT(EPOCH FROM (MAX(o.created_at) - MIN(o.created_at))) / 86400.0 / (COUNT(o.id) - 1)
+                ELSE 30 -- Assume um intervalo padrão de 30 dias para clientes de um só pedido
+            END AS avg_days_between_orders
+        FROM public.customers c
+        LEFT JOIN public.orders o ON c.id = o.customer_id
+        WHERE c.restaurant_id = public.get_my_restaurant_id() AND o.status <> 'pre-pedido'
+        GROUP BY c.id, c.name, c.phone
+    )
+    SELECT
+        s.name,
+        s.phone,
+        s.total_orders,
+        s.average_ticket,
+        s.first_order_date,
+        s.last_order_date,
+        -- Risco de Churn: passou do intervalo médio + 15 dias
+        (NOW() - s.last_order_date) > (s.avg_days_between_orders + 15) * INTERVAL '1 day' AS is_potential_churn,
+        -- Churn: passou do intervalo médio + 30 dias
+        (NOW() - s.last_order_date) > (s.avg_days_between_orders + 30) * INTERVAL '1 day' AS is_churn
+    FROM customer_stats s
+    ORDER BY s.last_order_date DESC;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_analytics,"CREATE OR REPLACE FUNCTION public.get_dashboard_analytics(start_date timestamp with time zone, end_date timestamp with time zone)
+ RETURNS TABLE(total_revenue numeric, total_orders bigint, average_ticket numeric, new_customers bigint, abandoned_carts bigint, average_recurrence numeric, global_avg_days_between_orders numeric, potential_churn_customers bigint)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-RETURN QUERY
-SELECT
-p.name AS professional_name,
-COUNT(a.id) AS count
-FROM public.appointments a
-JOIN public.professionals AS p ON a.professional_id = p.id
-JOIN public.clients AS c ON a.client_id = c.id
-WHERE a.appointment_date >= date_trunc('month', CURRENT_DATE)
-AND a.appointment_date < (date_trunc('month', CURRENT_DATE) + interval '1 month')
-AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
-GROUP BY p.name
-ORDER BY count DESC;
+    RETURN QUERY
+    -- CTE para calcular estatísticas gerais de todos os clientes (para churn e recorrência)
+    WITH all_customer_stats AS (
+        SELECT
+            c.id AS customer_id,
+            MAX(o.created_at) AS last_order_date,
+            COUNT(o.id) AS total_orders,
+            CASE
+                WHEN COUNT(o.id) > 1 THEN
+                    EXTRACT(EPOCH FROM (MAX(o.created_at) - MIN(o.created_at))) / 86400.0 / (COUNT(o.id) - 1)
+                ELSE 0
+            END AS avg_days_between_orders
+        FROM
+            public.customers c
+        JOIN
+            public.orders o ON c.id = o.customer_id
+        WHERE
+            c.restaurant_id = public.get_my_restaurant_id() AND o.status <> 'pre-pedido'
+        GROUP BY
+            c.id
+    )
+    -- A consulta principal que usa as datas e as estatísticas gerais
+    SELECT
+        -- Métricas de Faturamento e Pedidos DENTRO do período
+        COALESCE(SUM(o.total), 0)::numeric AS total_revenue,
+        COUNT(DISTINCT o.id)::bigint AS total_orders,
+        COALESCE(AVG(o.total), 0)::numeric AS average_ticket,
+        
+        -- Novos Clientes: conta clientes cuja data de criação foi DENTRO do período
+        (SELECT COUNT(DISTINCT c.id) 
+         FROM public.customers c 
+         WHERE c.restaurant_id = public.get_my_restaurant_id() AND c.created_at BETWEEN start_date AND end_date)::bigint AS new_customers,
+
+        -- Carrinhos Abandonados DENTRO do período
+        (SELECT COUNT(*) FROM public.orders ord 
+         WHERE ord.restaurant_id = public.get_my_restaurant_id() AND ord.status = 'pre-pedido' 
+         AND ord.created_at BETWEEN start_date AND end_date)::bigint AS abandoned_carts,
+
+        -- Métricas de Recorrência e Churn (usam dados de todos os tempos)
+        (SELECT COALESCE(AVG(s.total_orders), 0) FROM all_customer_stats s)::numeric AS average_recurrence,
+        (SELECT COALESCE(AVG(s.avg_days_between_orders), 0) FROM all_customer_stats s)::numeric AS global_avg_days_between_orders,
+        (SELECT COUNT(*) FROM all_customer_stats s 
+         WHERE (NOW() - s.last_order_date) > (s.avg_days_between_orders + 15) * INTERVAL '1 day')::bigint AS potential_churn_customers
+
+    FROM
+        public.orders o
+    WHERE
+        o.restaurant_id = public.get_my_restaurant_id()
+        AND o.status <> 'pre-pedido'
+        AND o.created_at BETWEEN start_date AND end_date;
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_daily_metrics,"CREATE OR REPLACE FUNCTION public.get_daily_metrics(plan_filter text DEFAULT 'all'::text)
+4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_kpis,"CREATE OR REPLACE FUNCTION public.get_dashboard_kpis(start_date timestamp with time zone, end_date timestamp with time zone)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
 DECLARE
-result JSON;
+    metrics_data jsonb;
+    -- Calcula a duração do período para encontrar o período anterior
+    period_duration interval := end_date - start_date;
+    previous_start_date timestamptz := start_date - period_duration - interval '1 day';
+    previous_end_date timestamptz := end_date - period_duration - interval '1 day';
 BEGIN
-WITH today_appointments AS (
-SELECT a.*
-FROM public.appointments a
-JOIN public.clients c ON a.client_id = c.id
-WHERE a.appointment_date = CURRENT_DATE
-AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
-),
-revenue AS (
-SELECT COALESCE(SUM(p.amount), 0) as total
-FROM public.payments p
-JOIN today_appointments ta ON p.appointment_id = ta.id
-)
-SELECT json_build_object(
-'consultas_dia', (SELECT COUNT(id) FROM today_appointments),
-'capital_esperado', (SELECT total FROM revenue),
-'clientes_ativos', (SELECT COUNT(id) FROM public.clients WHERE status = 'ATIVO' AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))))
-)
-INTO result;
-RETURN result;
+    -- Função interna para calcular métricas para um dado período
+    CREATE TEMP TABLE results AS
+    SELECT 
+        -- Primeiro, busca os dados históricos já calculados
+        (SELECT jsonb_build_object(
+            'total_revenue', COALESCE(SUM(total_revenue), 0),
+            'total_orders', COALESCE(SUM(total_orders), 0),
+            'average_ticket', COALESCE(AVG(average_ticket), 0),
+            'new_customers', COALESCE(SUM(new_customers), 0),
+            'abandoned_carts', COALESCE(SUM(abandoned_carts), 0)
+        ) FROM public.daily_restaurant_metrics
+        WHERE restaurant_id = public.get_my_restaurant_id() AND metric_date BETWEEN start_date::date AND end_date::date) AS historical,
+
+        -- Depois, calcula os dados de ""Hoje"" em tempo real
+        (SELECT jsonb_build_object(
+            'total_revenue', COALESCE(SUM(total), 0),
+            'total_orders', COUNT(id),
+            'average_ticket', COALESCE(AVG(total), 0),
+            'new_customers', (SELECT COUNT(*) FROM public.customers WHERE restaurant_id = public.get_my_restaurant_id() AND created_at::date = NOW()::date),
+            'abandoned_carts', (SELECT COUNT(*) FROM public.orders WHERE restaurant_id = public.get_my_restaurant_id() AND status = 'pre-pedido' AND created_at::date = NOW()::date)
+        ) FROM public.orders
+        WHERE restaurant_id = public.get_my_restaurant_id() AND status <> 'pre-pedido' AND created_at::date = NOW()::date) AS today_realtime;
+
+    -- Combina os resultados
+    SELECT jsonb_build_object(
+        'current_period', (SELECT historical FROM results) || (SELECT today_realtime FROM results)
+        -- A lógica para o período anterior pode ser adicionada aqui de forma similar
+    ) INTO metrics_data;
+
+    -- Limpa a tabela temporária
+    DROP TABLE results;
+
+    RETURN metrics_data;
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_metrics,"CREATE OR REPLACE FUNCTION public.get_dashboard_metrics(plan_filter text DEFAULT 'all'::text)
- RETURNS json
- LANGUAGE plpgsql
+4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_timeseries_chart,"CREATE OR REPLACE FUNCTION public.get_dashboard_timeseries_chart(start_date timestamp with time zone, end_date timestamp with time zone, grouping_unit text)
+ RETURNS TABLE(series_date date, total_revenue numeric, total_orders bigint, average_ticket numeric)
+ LANGUAGE sql
 AS $function$
-DECLARE
-result json;
-start_current_month date := date_trunc('month', CURRENT_DATE);
-end_current_month date := start_current_month + interval '1 month';
-start_last_month date := start_current_month - interval '1 month';
-end_last_month date := start_current_month;
+    SELECT
+        DATE_TRUNC(grouping_unit, o.created_at)::date AS series_date,
+        COALESCE(SUM(o.total), 0) AS total_revenue,
+        COUNT(o.id) AS total_orders,
+        COALESCE(AVG(o.total), 0) AS average_ticket
+    FROM public.orders o
+    WHERE o.restaurant_id = public.get_my_restaurant_id()
+      AND o.status <> 'pre-pedido'
+      AND o.created_at BETWEEN start_date AND end_date
+    GROUP BY series_date
+    ORDER BY series_date;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_location_performance_chart,"CREATE OR REPLACE FUNCTION public.get_location_performance_chart(start_date timestamp with time zone, end_date timestamp with time zone)
+ RETURNS TABLE(neighborhood text, order_count bigint)
+ LANGUAGE sql
+AS $function$
+    SELECT
+        c.neighborhood,
+        COUNT(o.id) AS order_count
+    FROM public.orders o
+    JOIN public.customers c ON o.customer_id = c.id
+    WHERE o.restaurant_id = public.get_my_restaurant_id()
+      AND o.status <> 'pre-pedido'
+      AND c.neighborhood IS NOT NULL
+      AND o.created_at BETWEEN start_date AND end_date
+    GROUP BY c.neighborhood
+    ORDER BY order_count DESC;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_my_profile,"CREATE OR REPLACE FUNCTION public.get_my_profile()
+ RETURNS TABLE(full_name text, role text, restaurant_id uuid, restaurant_name text, configs jsonb)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
-WITH
-clients_filtered AS (
-SELECT id, plano, created_at, status
-FROM public.clients
-WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
-),
-current_month_metrics AS (
-SELECT
-COUNT(DISTINCT cf.id) FILTER (WHERE cf.created_at >= start_current_month AND cf.created_at < end_current_month) AS novos_clientes,
-COUNT(DISTINCT a.id) AS consultas_mes,
-COALESCE(SUM(p.amount), 0) AS faturamento_total,
-COUNT(DISTINCT a.id) FILTER (WHERE a.status = 'cancelado') AS noshow_count
-FROM clients_filtered AS cf
-LEFT JOIN public.appointments a ON cf.id = a.client_id AND a.appointment_date >= start_current_month AND a.appointment_date < end_current_month
-LEFT JOIN public.payments p ON a.id = p.appointment_id
-),
-last_month_metrics AS (
-SELECT
-COUNT(DISTINCT cf.id) FILTER (WHERE cf.created_at >= start_last_month AND cf.created_at < end_last_month) AS novos_clientes,
-COUNT(DISTINCT a.id) AS consultas_mes,
-COALESCE(SUM(p.amount), 0) AS faturamento_total,
-COUNT(DISTINCT a.id) FILTER (WHERE a.status = 'cancelado') AS noshow_count
-FROM clients_filtered AS cf
-LEFT JOIN public.appointments a ON cf.id = a.client_id AND a.appointment_date >= start_last_month AND a.appointment_date < end_last_month
-LEFT JOIN public.payments p ON a.id = p.appointment_id
-),
-titulares_count AS (
-SELECT
-COUNT(id) FILTER (WHERE created_at < end_current_month AND status = 'ATIVO') as current,
-COUNT(id) FILTER (WHERE created_at < end_last_month AND status = 'ATIVO') as previous
-FROM clients_filtered
-)
-SELECT json_build_object(
-'total_titulares', json_build_object('current', tc.current, 'previous', tc.previous),
-'novos_clientes', json_build_object('current', cmm.novos_clientes, 'previous', lmm.novos_clientes),
-'consultas_mes', json_build_object('current', cmm.consultas_mes, 'previous', lmm.consultas_mes),
-'ticket_medio', json_build_object(
-'current', CASE WHEN cmm.consultas_mes > 0 THEN cmm.faturamento_total / cmm.consultas_mes ELSE 0 END,
-'previous', CASE WHEN lmm.consultas_mes > 0 THEN lmm.faturamento_total / lmm.consultas_mes ELSE 0 END
-),
-'noshow_rate', json_build_object(
-'current', CASE WHEN (cmm.consultas_mes + cmm.noshow_count) > 0 THEN (cmm.noshow_count * 100.0 / (cmm.consultas_mes + cmm.noshow_count)) ELSE 0 END,
-'previous', CASE WHEN (lmm.consultas_mes + lmm.noshow_count) > 0 THEN (lmm.noshow_count * 100.0 / (lmm.consultas_mes + lmm.noshow_count)) ELSE 0 END
-)
-) INTO result
-FROM current_month_metrics cmm, last_month_metrics lmm, titulares_count tc;
-RETURN result;
+    RETURN QUERY
+    SELECT
+        p.full_name,
+        p.role,
+        p.restaurant_id,
+        r.name,
+        r.configs
+    FROM
+        public.profiles p
+    JOIN
+        public.restaurants r ON p.restaurant_id = r.id
+    WHERE
+        p.id = auth.uid();
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_monthly_cohorts,"CREATE OR REPLACE FUNCTION public.get_monthly_cohorts(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(cohort_month text, month_number integer, active_clients bigint, total_in_cohort bigint)
- LANGUAGE plpgsql
+4. FUNÇÕES (RPC),FUNÇÃO: get_my_restaurant_id,"CREATE OR REPLACE FUNCTION public.get_my_restaurant_id()
+ RETURNS uuid
+ LANGUAGE sql
+ SECURITY DEFINER
 AS $function$
-BEGIN
-RETURN QUERY
-WITH cohorts AS (
-SELECT id AS client_id, date_trunc('month', created_at)::date AS cohort_date
-FROM public.clients
-WHERE status = 'ATIVO' AND (plan_filter = 'all' OR plano = plan_filter)
-),
-activity AS (
-SELECT DISTINCT
-c.id AS client_id,
-date_trunc('month', a.appointment_date)::date AS activity_date
-FROM public.appointments a
-JOIN public.clients c ON normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name)
-WHERE (plan_filter = 'all' OR c.plano = plan_filter)
-),
-cohort_activity AS (
-SELECT
-c.client_id, c.cohort_date,
-EXTRACT(YEAR FROM a.activity_date)::int * 12 + EXTRACT(MONTH FROM a.activity_date)::int
-- (EXTRACT(YEAR FROM c.cohort_date)::int * 12 + EXTRACT(MONTH FROM c.cohort_date)::int) AS month_number
-FROM cohorts c JOIN activity a ON c.client_id = a.client_id
-WHERE a.activity_date >= c.cohort_date
-),
-cohort_size AS (
-SELECT cohort_date, count(*) AS total FROM cohorts GROUP BY cohort_date
-)
-SELECT
-to_char(ca.cohort_date, 'YYYY-MM') AS cohort_month, ca.month_number,
-count(DISTINCT ca.client_id) AS active_clients, cs.total AS total_in_cohort
-FROM cohort_activity ca JOIN cohort_size cs ON ca.cohort_date = cs.cohort_date
-GROUP BY ca.cohort_date, ca.month_number, cs.total
-ORDER BY ca.cohort_date, ca.month_number;
-END;
+  SELECT restaurant_id
+  FROM public.profiles
+  WHERE id = auth.uid();
 $function$
 "
 4. FUNÇÕES (RPC),FUNÇÃO: get_my_role,"CREATE OR REPLACE FUNCTION public.get_my_role()
  RETURNS text
- LANGUAGE plpgsql
- SECURITY DEFINER
+ LANGUAGE sql
+ STABLE
 AS $function$
-BEGIN
-  RETURN (
-    SELECT role
-    FROM public.profiles
-    WHERE id = auth.uid()
-  );
-END;
+  SELECT NULLIF(current_setting('request.jwt.claims', true)::jsonb->>'role', '')::TEXT;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(status_label text, count bigint)
+4. FUNÇÕES (RPC),FUNÇÃO: get_or_create_table_session,"CREATE OR REPLACE FUNCTION public.get_or_create_table_session(p_table_id bigint)
+ RETURNS bigint
  LANGUAGE plpgsql
 AS $function$
+DECLARE
+    v_session_id bigint;
 BEGIN
-RETURN QUERY
-WITH today_appointments AS (
-    SELECT
-        a.id, a.status, a.checkin_time, a.payment_status
-    FROM public.appointments a
-    JOIN public.clients c ON a.client_id = c.id
-    WHERE a.appointment_date = CURRENT_DATE
-    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
-)
-SELECT 'Agendados' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'agendado' AND checkin_time IS NULL
-UNION ALL
-SELECT 'Aguardando Atendimento' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado')
-UNION ALL
-SELECT 'Atendimentos Finalizados' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'finalizado'
-UNION ALL
-SELECT 'Pagamentos Pendentes' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'finalizado' AND payment_status = 'pendente';
-END;
-$function$
-"
-4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status()
- RETURNS TABLE(status_label text, count bigint)
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  RETURN QUERY
-  WITH today_appointments AS (
-    SELECT
-      id,
-      status, -- ex: 'agendado', 'confirmado', 'finalizado'
-      checkin_time,
-      payment_status -- ex: 'pendente', 'pago'
-    FROM
-      public.appointments
-    WHERE
-      appointment_date = CURRENT_DATE
-  )
-  SELECT
-    'Agendados' AS status_label,
-    count(*) AS count
-  FROM
-    today_appointments
-  WHERE
-    status = 'agendado' AND checkin_time IS NULL
-  
-  UNION ALL
-  
-  SELECT
-    'Aguardando Atendimento' AS status_label,
-    count(*) AS count
-  FROM
-    today_appointments
-  WHERE
-    checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado') -- Considera que fez check-in mas ainda não foi finalizado
-    
-  UNION ALL
-  
-  SELECT
-    'Atendimentos Finalizados' AS status_label,
-    count(*) AS count
-  FROM
-    today_appointments
-  WHERE
-    status = 'finalizado' -- Supondo que você tenha um status 'finalizado'
+    -- 1. Tenta encontrar uma sessão ABERTA para a mesa especificada.
+    SELECT id INTO v_session_id
+    FROM public.table_sessions
+    WHERE table_id = p_table_id AND status = 'open'
+    LIMIT 1;
 
-  UNION ALL
+    -- 2. Se encontrou uma sessão, retorna o ID dela.
+    IF v_session_id IS NOT NULL THEN
+        RETURN v_session_id;
+    END IF;
 
-  SELECT
-    'Pagamentos Pendentes' AS status_label,
-    count(*) AS count
-  FROM
-    today_appointments
-  WHERE
-    status = 'finalizado' AND payment_status = 'pendente';
+    -- 3. Se não encontrou, cria uma NOVA sessão e retorna o novo ID.
+    INSERT INTO public.table_sessions (table_id, status)
+    VALUES (p_table_id, 'open')
+    RETURNING id INTO v_session_id;
+
+    RETURN v_session_id;
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_consultations,"CREATE OR REPLACE FUNCTION public.get_weekly_consultations()
- RETURNS TABLE(week_start date, count bigint)
- LANGUAGE plpgsql
+4. FUNÇÕES (RPC),FUNÇÃO: get_product_performance_chart,"CREATE OR REPLACE FUNCTION public.get_product_performance_chart(start_date timestamp with time zone, end_date timestamp with time zone)
+ RETURNS TABLE(product_name text, category_name text, total_quantity numeric, total_revenue numeric)
+ LANGUAGE sql
 AS $function$
-BEGIN
-  RETURN QUERY
     SELECT
-      date_trunc('week', a.appointment_date)::date AS week_start,
-      COUNT(c.id) AS count
-    FROM
-      public.consultations AS c
-    JOIN
-      public.appointments AS a ON c.appointment_id = a.id
-    GROUP BY
-      week_start
-    ORDER BY
-      week_start;
-END;
+        oi.product_name,
+        c.name AS category_name,
+        SUM(oi.quantity) AS total_quantity,
+        SUM(oi.quantity * oi.unit_price) AS total_revenue
+    FROM public.order_items oi
+    JOIN public.orders o ON oi.order_id = o.id
+    LEFT JOIN public.products p ON oi.product_id = p.id
+    LEFT JOIN public.categories c ON p.category_id = c.id
+    WHERE o.restaurant_id = public.get_my_restaurant_id()
+      AND o.status <> 'pre-pedido'
+      AND o.created_at BETWEEN start_date AND end_date
+    GROUP BY oi.product_name, c.name
+    ORDER BY total_revenue DESC;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_titulares,"CREATE OR REPLACE FUNCTION public.get_weekly_titulares(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(week_label text, cumulative_count bigint)
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  RETURN QUERY
-  WITH weekly_new_clients AS (
-    SELECT
-      date_trunc('week', c.created_at)::date AS week_start,
-      COUNT(c.id) AS new_clients_in_week
-    FROM
-      public.clients c
-    WHERE
-      c.status = 'ATIVO' AND c.created_at IS NOT NULL
-      AND (plan_filter = 'all' OR c.plano = plan_filter)
-    GROUP BY week_start
-  )
-  SELECT
-    to_char(wnc.week_start, 'YYYY-MM-DD') AS week_label,
-    SUM(wnc.new_clients_in_week) OVER (ORDER BY wnc.week_start)::bigint AS cumulative_count
-  FROM
-    weekly_new_clients wnc
-  ORDER BY wnc.week_start;
-END;
-$function$
-"
-4. FUNÇÕES (RPC),FUNÇÃO: login,"CREATE OR REPLACE FUNCTION public.login(email_param text, password_param text)
+4. FUNÇÕES (RPC),FUNÇÃO: get_public_menu_by_slug,"CREATE OR REPLACE FUNCTION public.get_public_menu_by_slug(p_restaurant_slug text)
  RETURNS json
  LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_restaurant RECORD;
+    v_categories JSON;
+    v_result JSON;
+    v_is_open BOOLEAN;
+BEGIN
+    SELECT * INTO v_restaurant
+    FROM public.restaurants
+    WHERE trim(regexp_replace(lower(unaccent(name)), '\s+', '-', 'g')) = p_restaurant_slug
+    LIMIT 1;
+
+    IF v_restaurant IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    v_is_open := is_restaurant_open(v_restaurant.id);
+
+    SELECT json_agg(
+        json_build_object(
+            'id', c.id,
+            'name', c.name,
+            'products', (
+                SELECT json_agg(
+                    json_build_object(
+                        'id', p.id,
+                        'name', p.name,
+                        'description', p.description,
+                        'price', p.price,
+                        'image_url', p.image_url,
+                        'half_iten', p.half_iten,
+                        'popularity', p.popularity,
+                        'addon_groups', (
+                            SELECT json_agg(
+                                json_build_object(
+                                    'id', ag.id,
+                                    'name', ag.name,
+                                    'selection_type', ag.selection_type,
+                                    'addons', (
+                                        SELECT json_agg(
+                                            json_build_object(
+                                                'id', a.id,
+                                                'name', a.name,
+                                                'price', a.price
+                                            ) ORDER BY a.name
+                                        ) FROM public.addons a WHERE a.addon_group_id = ag.id
+                                    )
+                                )
+                            )
+                            FROM public.product_addon_groups pag
+                            JOIN public.addon_groups ag ON pag.addon_group_id = ag.id
+                            WHERE pag.product_id = p.id
+                        )
+                    ) ORDER BY p.name
+                )
+                FROM public.products p
+                WHERE p.category_id = c.id AND p.is_available = true
+            )
+        )
+    )
+    INTO v_categories
+    FROM public.categories c
+    WHERE c.restaurant_id = v_restaurant.id;
+
+    v_result := json_build_object(
+        'id', v_restaurant.id,
+        'name', v_restaurant.name,
+        'configs', v_restaurant.configs,
+        'menu', COALESCE(v_categories, '[]'::json),
+        'isOpen', v_is_open
+    );
+
+    RETURN v_result;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_restaurant_users,"CREATE OR REPLACE FUNCTION public.get_restaurant_users()
+ RETURNS TABLE(id uuid, full_name text, email text, role text)
+ LANGUAGE plpgsql
  SECURITY DEFINER
 AS $function$
-declare
-  usr record;
-  token_payload json;
-begin
-  select * from public.users where email = email_param into usr;
+BEGIN
+    -- Esta função só pode ser chamada por usuários autenticados.
+    IF auth.uid() IS NULL THEN
+        RAISE EXCEPTION 'Acesso negado: Usuário não autenticado.';
+    END IF;
 
-  if usr is null then
-    return '{""error"": ""Usuário não encontrado"", ""status"": 404}';
-  end if;
+    -- Retorna os perfis e e-mails dos usuários que pertencem
+    -- ao mesmo restaurante que o usuário que está fazendo a chamada.
+    RETURN QUERY
+    SELECT
+        p.id,
+        p.full_name,
+        u.email::text, -- CORREÇÃO: Converte o tipo da coluna email
+        p.role
+    FROM
+        public.profiles p
+    JOIN
+        auth.users u ON p.id = u.id
+    WHERE
+        p.restaurant_id = public.get_my_restaurant_id();
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_table_details,"CREATE OR REPLACE FUNCTION public.get_table_details(p_table_id bigint)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_session record;
+    v_comandas jsonb;
+BEGIN
+    -- Encontrar a sessão ativa para a mesa
+    SELECT * INTO v_session FROM public.table_sessions
+    WHERE table_id = p_table_id AND closed_at IS NULL AND restaurant_id = get_my_restaurant_id();
 
-  -- Compara a senha enviada com o hash armazenado usando a extensão pgcrypto
-  if usr.password_hash = crypt(password_param, usr.password_hash) then
-    -- Se a senha estiver correta, prepara o payload do token
-    token_payload := json_build_object(
-      'userId', usr.id,
-      'roleId', usr.role_id
+    IF v_session IS NULL THEN
+        RETURN jsonb_build_object('error', 'Sessão não encontrada para esta mesa.');
+    END IF;
+
+    -- Agregar as comandas e seus respectivos pedidos
+    SELECT jsonb_agg(c_data) INTO v_comandas
+    FROM (
+        SELECT
+            c.id,
+            c.name,
+            c.total_amount,
+            (SELECT jsonb_agg(o_data)
+             FROM (
+                SELECT o.id, o.status, o.total,
+                (SELECT jsonb_agg(oi_data)
+                    FROM (
+                        SELECT oi.product_name, oi.quantity, oi.unit_price
+                        FROM public.order_items oi
+                        WHERE oi.order_id = o.id
+                    ) AS oi_data
+                ) as items
+                FROM public.orders o
+                WHERE o.comanda_id = c.id
+             ) AS o_data
+            ) as orders
+        FROM public.comandas c
+        WHERE c.table_session_id = v_session.id
+    ) AS c_data;
+
+    RETURN jsonb_build_object(
+        'session_id', v_session.id,
+        'total_amount', v_session.total_amount,
+        'start_time', v_session.created_at,
+        'comandas', COALESCE(v_comandas, '[]'::jsonb)
     );
-    return json_build_object('payload', token_payload, 'status', 200);
-  else
-    -- Se a senha estiver incorreta
-    return '{""error"": ""Senha incorreta"", ""status"": 401}';
-  end if;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_tables_with_totals,"CREATE OR REPLACE FUNCTION public.get_tables_with_totals()
+ RETURNS TABLE(id bigint, number integer, status text, session_id uuid, total_amount numeric, start_time timestamp with time zone)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.id,
+        t.number,
+        CASE
+            WHEN ts.id IS NOT NULL AND ts.closed_at IS NULL THEN 'ocupada'::text
+            ELSE 'livre'::text
+        END AS status,
+        ts.id AS session_id,
+        COALESCE(ts.total_amount, 0) AS total_amount,
+        ts.created_at AS start_time
+    FROM
+        public.tables t
+    LEFT JOIN
+        public.table_sessions ts ON t.id = ts.table_id AND ts.closed_at IS NULL
+    WHERE
+        t.restaurant_id = get_my_restaurant_id()
+    ORDER BY
+        t.number;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: handle_ingredient_stock_change,"CREATE OR REPLACE FUNCTION public.handle_ingredient_stock_change()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Se a quantidade em estoque mudou, chama a função de verificação
+    IF NEW.stock_quantity <> OLD.stock_quantity THEN
+        PERFORM public.update_availability_for_products_using_ingredient(NEW.id);
+    END IF;
+    RETURN NEW;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: handle_new_user,"CREATE OR REPLACE FUNCTION public.handle_new_user()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  -- Insere o novo perfil, puxando TODOS os dados dos metadados do usuário
+  insert into public.profiles (id, full_name, role, restaurant_id)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'role', -- Corrigido para ler de user_meta_data
+    (new.raw_user_meta_data->>'restaurant_id')::uuid -- Corrigido para ler de user_meta_data
+  );
+  return new;
 end;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: normalize_name,"CREATE OR REPLACE FUNCTION public.normalize_name(text)
- RETURNS text
- LANGUAGE sql
- IMMUTABLE
+4. FUNÇÕES (RPC),FUNÇÃO: is_restaurant_open,"CREATE OR REPLACE FUNCTION public.is_restaurant_open(p_restaurant_id uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ STABLE
 AS $function$
-SELECT lower(trim(regexp_replace(unaccent($1), '\s+', ' ', 'g')));
+DECLARE
+    v_is_manually_set_open BOOLEAN;
+BEGIN
+    -- 1. Busca o valor do interruptor manual 'is_open' nas configurações do restaurante.
+    SELECT (configs->>'is_open')::BOOLEAN INTO v_is_manually_set_open
+    FROM public.restaurants
+    WHERE id = p_restaurant_id;
+
+    -- 2. Se o interruptor não existir (nulo) ou estiver definido como 'false', o restaurante está fechado.
+    --    A função COALESCE trata o caso de 'is_open' nunca ter sido definido, assumindo 'false' como padrão.
+    RETURN COALESCE(v_is_manually_set_open, FALSE);
+    
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: open_table_session,"CREATE OR REPLACE FUNCTION public.open_table_session(p_table_id bigint, p_comanda_name text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_restaurant_id uuid := get_my_restaurant_id();
+    v_session_id uuid;
+    v_comanda_id uuid;
+BEGIN
+    -- Cria a sessão da mesa
+    INSERT INTO public.table_sessions (restaurant_id, table_id)
+    VALUES (v_restaurant_id, p_table_id)
+    RETURNING id INTO v_session_id;
+
+    -- Cria a primeira comanda para a sessão
+    INSERT INTO public.comandas (table_session_id, name)
+    VALUES (v_session_id, p_comanda_name)
+    RETURNING id INTO v_comanda_id;
+    
+    RETURN jsonb_build_object('session_id', v_session_id, 'comanda_id', v_comanda_id);
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: search_customer_by_phone,"CREATE OR REPLACE FUNCTION public.search_customer_by_phone(p_phone text)
+ RETURNS TABLE(name text, last_address text)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    RETURN QUERY
+    SELECT c.name, c.last_address
+    FROM public.customers c
+    WHERE c.phone = p_phone
+      AND c.restaurant_id = public.get_my_restaurant_id()
+    LIMIT 1;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: submit_final_order,"CREATE OR REPLACE FUNCTION public.submit_final_order(p_order_id bigint, p_customer_id bigint, p_customer_name text, p_payment_method text, p_notes text, p_final_items jsonb, p_cep text, p_street text, p_number text, p_neighborhood text, p_city text, p_state text, p_complement text, p_coupon_code text, p_discount_amount numeric, p_order_type text, p_delivery_fee numeric)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_subtotal NUMERIC;
+    v_final_total NUMERIC;
+BEGIN
+    -- 1. Apaga os itens temporários do pré-pedido
+    DELETE FROM public.order_items WHERE order_id = p_order_id;
+
+    -- 2. Insere os novos itens já consolidados
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT
+        p_order_id,
+        (item->>'product_id')::BIGINT,
+        item->>'product_name',
+        (item->>'quantity')::NUMERIC,
+        (item->>'unit_price')::NUMERIC
+    FROM jsonb_array_elements(p_final_items) AS item;
+
+    -- 3. Recalcula o subtotal dos itens
+    SELECT SUM(quantity * unit_price) INTO v_subtotal
+    FROM public.order_items
+    WHERE order_id = p_order_id;
+    
+    v_subtotal := COALESCE(v_subtotal, 0);
+
+    -- 4. Calcula o total final (subtotal + entrega dinâmica - desconto)
+    v_final_total := v_subtotal + COALESCE(p_delivery_fee, 0) - COALESCE(p_discount_amount, 0);
+
+    -- 5. Atualiza o pedido para ""pendente"" com os dados finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        total = v_final_total, -- Total final com taxa e desconto aplicados
+        payment_method = p_payment_method,
+        notes = p_notes,
+        created_at = now(),
+        discount_amount = p_discount_amount,
+        coupon_code = p_coupon_code,
+        order_type = p_order_type,
+        delivery_fee = p_delivery_fee -- Salva a taxa de entrega no pedido
+    WHERE id = p_order_id;
+
+    -- 6. Atualiza os dados do cliente
+    UPDATE public.customers
+    SET
+        name = p_customer_name,
+        cep = p_cep,
+        street = p_street,
+        ""number"" = p_number,
+        neighborhood = p_neighborhood,
+        city = p_city,
+        state = p_state,
+        complement = p_complement
+    WHERE id = p_customer_id;
+
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: submit_final_order,"CREATE OR REPLACE FUNCTION public.submit_final_order(p_order_id bigint, p_customer_id bigint, p_customer_name text, p_payment_method text, p_notes text, p_final_items jsonb, p_cep text, p_street text, p_number text, p_neighborhood text, p_city text, p_state text, p_complement text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_order_total NUMERIC;
+    v_delivery_fee NUMERIC;
+BEGIN
+    -- 1. Apaga os itens temporários do pré-pedido
+    DELETE FROM public.order_items WHERE order_id = p_order_id;
+
+    -- 2. Insere os novos itens já consolidados
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT
+        p_order_id,
+        (item->>'product_id')::BIGINT,
+        item->>'product_name',
+        (item->>'quantity')::NUMERIC,
+        (item->>'unit_price')::NUMERIC
+    FROM jsonb_array_elements(p_final_items) AS item;
+
+    -- 3. Recalcula o total final
+    SELECT SUM(quantity * unit_price) INTO v_order_total
+    FROM public.order_items
+    WHERE order_id = p_order_id;
+
+    -- 4. Busca e adiciona a taxa de entrega, se houver
+    SELECT (configs->>'deliveryFee')::NUMERIC INTO v_delivery_fee
+    FROM public.restaurants r
+    JOIN public.orders o ON r.id = o.restaurant_id
+    WHERE o.id = p_order_id;
+    
+    v_order_total := v_order_total + COALESCE(v_delivery_fee, 0);
+
+    -- 5. Atualiza o pedido para ""pendente"" com os dados finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        total = v_order_total,
+        payment_method = p_payment_method,
+        notes = p_notes,
+        created_at = now()
+    WHERE id = p_order_id;
+
+    -- 6. ATUALIZAÇÃO CORRIGIDA: Salva todos os campos de endereço na tabela 'customers'
+    UPDATE public.customers
+    SET
+        name = p_customer_name,
+        cep = p_cep,
+        street = p_street,
+        ""number"" = p_number,
+        neighborhood = p_neighborhood,
+        city = p_city,
+        state = p_state,
+        complement = p_complement
+    WHERE id = p_customer_id;
+
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: submit_final_order,"CREATE OR REPLACE FUNCTION public.submit_final_order(p_order_id bigint, p_customer_id bigint, p_customer_name text, p_payment_method text, p_notes text, p_final_items jsonb, p_cep text, p_street text, p_number text, p_neighborhood text, p_city text, p_state text, p_complement text, p_coupon_code text, p_discount_amount numeric, p_order_type text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_subtotal NUMERIC;
+    v_delivery_fee NUMERIC;
+    v_final_total NUMERIC;
+    v_restaurant_id UUID;
+BEGIN
+    -- Descobre o ID do restaurante a partir do pedido
+    SELECT restaurant_id INTO v_restaurant_id FROM public.orders WHERE id = p_order_id;
+    
+    -- 1. Apaga os itens temporários do pré-pedido
+    DELETE FROM public.order_items WHERE order_id = p_order_id;
+
+    -- 2. Insere os novos itens já consolidados
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT
+        p_order_id,
+        (item->>'product_id')::BIGINT,
+        item->>'product_name',
+        (item->>'quantity')::NUMERIC,
+        (item->>'unit_price')::NUMERIC
+    FROM jsonb_array_elements(p_final_items) AS item;
+
+    -- 3. Recalcula o subtotal dos itens
+    SELECT SUM(quantity * unit_price) INTO v_subtotal
+    FROM public.order_items
+    WHERE order_id = p_order_id;
+    
+    v_subtotal := COALESCE(v_subtotal, 0);
+
+    -- 4. Busca a taxa de entrega (só aplica se for 'delivery')
+    IF p_order_type = 'delivery' THEN
+        SELECT (configs->>'deliveryFee')::NUMERIC INTO v_delivery_fee
+        FROM public.restaurants WHERE id = v_restaurant_id;
+    ELSE
+        v_delivery_fee := 0;
+    END IF;
+    
+    v_delivery_fee := COALESCE(v_delivery_fee, 0);
+
+    -- 5. Calcula o total final (subtotal + entrega - desconto)
+    v_final_total := v_subtotal + v_delivery_fee - COALESCE(p_discount_amount, 0);
+
+    -- 6. Atualiza o pedido para ""pendente"" com os dados finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        total = v_final_total,
+        payment_method = p_payment_method,
+        notes = p_notes,
+        created_at = now(),
+        discount_amount = p_discount_amount,
+        coupon_code = p_coupon_code,
+        order_type = p_order_type, -- SALVA O TIPO DE PEDIDO
+        source = 'cardapio_digital' -- Garante a origem correta
+    WHERE id = p_order_id;
+
+    -- 7. Atualiza os dados do cliente
+    UPDATE public.customers
+    SET
+        name = p_customer_name,
+        cep = p_cep,
+        street = p_street,
+        ""number"" = p_number,
+        neighborhood = p_neighborhood,
+        city = p_city,
+        state = p_state,
+        complement = p_complement
+    WHERE id = p_customer_id;
+
+    -- 8. INCREMENTA O USO DO CUPOM
+    IF p_coupon_code IS NOT NULL THEN
+        UPDATE public.promotions
+        SET uses_count = uses_count + 1
+        WHERE coupon_code = p_coupon_code
+          AND restaurant_id = v_restaurant_id;
+    END IF;
+
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: submit_final_order,"CREATE OR REPLACE FUNCTION public.submit_final_order(p_order_id bigint, p_customer_id bigint, p_customer_name text, p_payment_method text, p_notes text, p_final_items jsonb, p_cep text, p_street text, p_number text, p_neighborhood text, p_city text, p_state text, p_complement text, p_coupon_code text, p_discount_amount numeric)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_subtotal NUMERIC;
+    v_delivery_fee NUMERIC;
+    v_final_total NUMERIC;
+    v_restaurant_id UUID;
+BEGIN
+    -- Descobre o ID do restaurante a partir do pedido
+    SELECT restaurant_id INTO v_restaurant_id FROM public.orders WHERE id = p_order_id;
+    
+    -- 1. Apaga os itens temporários do pré-pedido
+    DELETE FROM public.order_items WHERE order_id = p_order_id;
+
+    -- 2. Insere os novos itens já consolidados
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+    SELECT
+        p_order_id,
+        (item->>'product_id')::BIGINT,
+        item->>'product_name',
+        (item->>'quantity')::NUMERIC,
+        (item->>'unit_price')::NUMERIC
+    FROM jsonb_array_elements(p_final_items) AS item;
+
+    -- 3. Recalcula o subtotal dos itens
+    SELECT SUM(quantity * unit_price) INTO v_subtotal
+    FROM public.order_items
+    WHERE order_id = p_order_id;
+    
+    v_subtotal := COALESCE(v_subtotal, 0);
+
+    -- 4. Busca a taxa de entrega
+    SELECT (configs->>'deliveryFee')::NUMERIC INTO v_delivery_fee
+    FROM public.restaurants WHERE id = v_restaurant_id;
+    
+    v_delivery_fee := COALESCE(v_delivery_fee, 0);
+
+    -- 5. Calcula o total final (subtotal + entrega - desconto)
+    v_final_total := v_subtotal + v_delivery_fee - COALESCE(p_discount_amount, 0);
+
+    -- 6. Atualiza o pedido para ""pendente"" com os dados finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        total = v_final_total,
+        payment_method = p_payment_method,
+        notes = p_notes,
+        created_at = now(),
+        discount_amount = p_discount_amount,
+        coupon_code = p_coupon_code
+    WHERE id = p_order_id;
+
+    -- 7. Atualiza os dados do cliente
+    UPDATE public.customers
+    SET
+        name = p_customer_name,
+        cep = p_cep,
+        street = p_street,
+        ""number"" = p_number,
+        neighborhood = p_neighborhood,
+        city = p_city,
+        state = p_state,
+        complement = p_complement
+    WHERE id = p_customer_id;
+
+    -- 8. INCREMENTA O USO DO CUPOM (NOVA LÓGICA)
+    IF p_coupon_code IS NOT NULL THEN
+        UPDATE public.promotions
+        SET uses_count = uses_count + 1
+        WHERE coupon_code = p_coupon_code
+          AND restaurant_id = v_restaurant_id;
+    END IF;
+
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: submit_order,"CREATE OR REPLACE FUNCTION public.submit_order(p_order_id bigint, p_customer_id bigint, p_customer_name text, p_customer_address text, p_payment_method text, p_notes text, p_total numeric)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Atualiza os dados do cliente (nome e último endereço)
+    UPDATE public.customers
+    SET name = p_customer_name, last_address = p_customer_address
+    WHERE id = p_customer_id;
+
+    -- Atualiza o pedido de 'pre-pedido' para 'pendente' com todos os detalhes finais
+    UPDATE public.orders
+    SET
+        status = 'pendente',
+        payment_method = p_payment_method,
+        notes = p_notes,
+        total = p_total,
+        created_at = now() -- Define a hora de criação para o momento da submissão
+    WHERE id = p_order_id;
+END;
 $function$
 "
 4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(text)
@@ -677,52 +1688,389 @@ AS '$libdir/unaccent', $function$unaccent_init$function$
  PARALLEL SAFE
 AS '$libdir/unaccent', $function$unaccent_lexize$function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: update_appointments_with_client_id,"CREATE OR REPLACE FUNCTION public.update_appointments_with_client_id()
- RETURNS text
+4. FUNÇÕES (RPC),FUNÇÃO: update_availability_for_products_using_ingredient,"CREATE OR REPLACE FUNCTION public.update_availability_for_products_using_ingredient(p_ingredient_id bigint)
+ RETURNS void
  LANGUAGE plpgsql
 AS $function$
 DECLARE
-rec RECORD;
-found_id BIGINT;
-updated_count INT := 0;
+    prod RECORD;
+    is_product_available BOOLEAN;
 BEGIN
--- Percorre cada agendamento na sua tabela que ainda não tem um client_id
-FOR rec IN SELECT id, patient_name FROM public.appointments WHERE client_id IS NULL LOOP
--- Para cada agendamento, procura por um cliente com o nome correspondente
-SELECT c.id INTO found_id
-FROM public.clients c
-WHERE normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(rec.patient_name)
-LIMIT 1; -- Pega apenas o primeiro resultado para evitar erros
+    -- Encontra todos os produtos que usam o ingrediente modificado
+    FOR prod IN 
+        SELECT p.id
+        FROM public.products p
+        JOIN public.product_ingredients pi ON p.id = pi.product_id
+        WHERE pi.ingredient_id = p_ingredient_id AND p.stock_control_type = 'ingredient'
+    LOOP
+        -- Para cada produto, verifica se TODOS os seus ingredientes estão em estoque
+        SELECT NOT EXISTS (
+            SELECT 1
+            FROM public.product_ingredients pi
+            JOIN public.ingredients i ON pi.ingredient_id = i.id
+            WHERE pi.product_id = prod.id AND i.stock_quantity < pi.quantity_used
+        )
+        INTO is_product_available;
 
-    -- Se um cliente for encontrado (found_id não é nulo), atualiza o agendamento
-    IF found_id IS NOT NULL THEN
-        UPDATE public.appointments
-        SET client_id = found_id
-        WHERE id = rec.id;
-        updated_count := updated_count + 1;
+        -- Atualiza a disponibilidade do produto
+        UPDATE public.products
+        SET is_available = is_product_available
+        WHERE id = prod.id;
+    END LOOP;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: update_daily_metrics,"CREATE OR REPLACE FUNCTION public.update_daily_metrics()
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    yesterday_date date := (NOW() - INTERVAL '1 day')::date;
+    r record;
+BEGIN
+    -- Itera sobre cada restaurante no sistema
+    FOR r IN SELECT id FROM public.restaurants
+    LOOP
+        -- Insere ou atualiza as métricas do dia anterior para o restaurante atual
+        INSERT INTO public.daily_restaurant_metrics (
+            restaurant_id,
+            metric_date,
+            total_revenue,
+            total_orders,
+            average_ticket,
+            new_customers,
+            abandoned_carts
+        )
+        SELECT
+            r.id,
+            yesterday_date,
+            COALESCE(SUM(CASE WHEN o.status <> 'pre-pedido' THEN o.total ELSE 0 END), 0),
+            COUNT(DISTINCT CASE WHEN o.status <> 'pre-pedido' THEN o.id END),
+            COALESCE(AVG(CASE WHEN o.status <> 'pre-pedido' THEN o.total END), 0),
+            COUNT(DISTINCT CASE WHEN c.created_at::date = yesterday_date THEN c.id END),
+            COUNT(DISTINCT CASE WHEN o.status = 'pre-pedido' THEN o.id END)
+        FROM public.orders o
+        LEFT JOIN public.customers c ON o.customer_id = c.id AND c.restaurant_id = r.id
+        WHERE o.restaurant_id = r.id
+          AND o.created_at::date = yesterday_date
+        ON CONFLICT (restaurant_id, metric_date)
+        DO UPDATE SET
+            total_revenue = EXCLUDED.total_revenue,
+            total_orders = EXCLUDED.total_orders,
+            average_ticket = EXCLUDED.average_ticket,
+            new_customers = EXCLUDED.new_customers,
+            abandoned_carts = EXCLUDED.abandoned_carts;
+    END LOOP;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: update_order,"CREATE OR REPLACE FUNCTION public.update_order(p_order_id bigint, p_new_address text, p_new_payment_method text, p_new_total numeric, p_new_items order_item_data[])
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_customer_id bigint;
+    item public.order_item_data;
+BEGIN
+    -- 1. Descobrir qual é o ID do cliente associado a este pedido
+    SELECT customer_id INTO v_customer_id FROM public.orders WHERE id = p_order_id;
+
+    -- 2. Atualizar o endereço na tabela de clientes
+    IF v_customer_id IS NOT NULL THEN
+        UPDATE public.customers
+        SET last_address = p_new_address
+        WHERE id = v_customer_id;
     END IF;
-END LOOP;
 
-RETURN 'Atualização concluída. ' || updated_count || ' agendamentos foram vinculados a clientes.';
+    -- 3. Atualizar o pedido principal com o novo total e forma de pagamento
+    UPDATE public.orders
+    SET
+        total = p_new_total,
+        payment_method = p_new_payment_method
+    WHERE id = p_order_id;
+
+    -- 4. Deletar TODOS os itens antigos deste pedido para evitar duplicatas
+    DELETE FROM public.order_items WHERE order_id = p_order_id;
+
+    -- 5. Inserir os novos itens do pedido
+    FOREACH item IN ARRAY p_new_items
+    LOOP
+        INSERT INTO public.order_items (order_id, product_id, product_name, quantity, unit_price)
+        VALUES (p_order_id, item.product_id, item.product_name, item.quantity, item.unit_price);
+    END LOOP;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: update_product_availability_from_stock,"CREATE OR REPLACE FUNCTION public.update_product_availability_from_stock()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Apenas desativa se o controle for por PRODUTO e o estoque for <= 0
+    IF NEW.stock_control_enabled = TRUE AND NEW.stock_control_type = 'product' AND NEW.stock_quantity <= 0 THEN
+        NEW.is_available := FALSE;
+    END IF;
+    RETURN NEW;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: update_product_popularity,"CREATE OR REPLACE FUNCTION public.update_product_popularity()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    UPDATE products 
+    SET popularity = popularity + NEW.quantity
+    WHERE id = NEW.product_id;
+    RETURN NEW;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: upsert_category,"CREATE OR REPLACE FUNCTION public.upsert_category(p_category_id bigint, p_category_name text)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF p_category_id IS NOT NULL THEN
+        -- Atualiza uma categoria existente
+        UPDATE public.categories
+        SET name = p_category_name
+        WHERE id = p_category_id;
+    ELSE
+        -- Insere uma nova categoria, pegando o restaurant_id do usuário logado
+        INSERT INTO public.categories (name, restaurant_id)
+        VALUES (p_category_name, auth.uid()); -- ou a sua função get_my_restaurant_id()
+    END IF;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: upsert_category,"CREATE OR REPLACE FUNCTION public.upsert_category(p_category_id bigint, p_category_name text, p_parent_id bigint)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF p_category_id IS NULL THEN
+        INSERT INTO public.categories (restaurant_id, name, parent_id)
+        VALUES (public.get_my_restaurant_id(), p_category_name, p_parent_id);
+    ELSE
+        UPDATE public.categories
+        SET name = p_category_name, parent_id = p_parent_id
+        WHERE id = p_category_id AND restaurant_id = public.get_my_restaurant_id();
+    END IF;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: upsert_product_with_ingredients,"CREATE OR REPLACE FUNCTION public.upsert_product_with_ingredients(p_product_data jsonb, p_ingredients jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    v_product_id BIGINT;
+    ingredient_item JSONB;
+BEGIN
+    -- Extrai o ID do payload. Pode ser nulo para novos produtos.
+    v_product_id := (p_product_data->>'id')::BIGINT;
+
+    -- Verifica se é uma inserção (id é nulo) ou uma atualização (id tem valor)
+    IF v_product_id IS NULL THEN
+        -- INSERE um novo produto (omitindo a coluna 'id' para o banco gerar)
+        INSERT INTO public.products (name, description, price, category_id, is_available, half_iten, stock_control_enabled, stock_control_type, stock_quantity, image_url, restaurant_id)
+        VALUES (
+            p_product_data->>'name',
+            p_product_data->>'description',
+            (p_product_data->>'price')::NUMERIC,
+            (p_product_data->>'category_id')::BIGINT,
+            (p_product_data->>'is_available')::BOOLEAN,
+            (p_product_data->>'half_iten')::BOOLEAN,
+            (p_product_data->>'stock_control_enabled')::BOOLEAN,
+            p_product_data->>'stock_control_type',
+            (p_product_data->>'stock_quantity')::INTEGER,
+            p_product_data->>'image_url',
+            get_my_restaurant_id()
+        ) RETURNING id INTO v_product_id;
+    ELSE
+        -- ATUALIZA um produto existente
+        UPDATE public.products SET
+            name = p_product_data->>'name',
+            description = p_product_data->>'description',
+            price = (p_product_data->>'price')::NUMERIC,
+            category_id = (p_product_data->>'category_id')::BIGINT,
+            is_available = (p_product_data->>'is_available')::BOOLEAN,
+            half_iten = (p_product_data->>'half_iten')::BOOLEAN,
+            stock_control_enabled = (p_product_data->>'stock_control_enabled')::BOOLEAN,
+            stock_control_type = p_product_data->>'stock_control_type',
+            stock_quantity = (p_product_data->>'stock_quantity')::INTEGER,
+            image_url = COALESCE(p_product_data->>'image_url', products.image_url)
+        WHERE id = v_product_id;
+    END IF;
+
+    -- Gerencia os ingredientes usando o ID do produto (novo ou existente)
+    IF p_product_data->>'stock_control_type' = 'ingredient' THEN
+        DELETE FROM public.product_ingredients WHERE product_id = v_product_id;
+
+        IF jsonb_array_length(p_ingredients) > 0 THEN
+            FOR ingredient_item IN SELECT * FROM jsonb_array_elements(p_ingredients)
+            LOOP
+                INSERT INTO public.product_ingredients (product_id, ingredient_id, quantity_used)
+                VALUES (v_product_id, (ingredient_item->>'ingredient_id')::BIGINT, (ingredient_item->>'quantity_used')::NUMERIC);
+            END LOOP;
+        END IF;
+    END IF;
 
 END;
 $function$
 "
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: appointments,POLÍTICA: Permitir leitura para usuários logados | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable insert for authenticated medical users | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): ((auth.role() = 'authenticated'::text) AND (( SELECT profiles.role
+4. FUNÇÕES (RPC),FUNÇÃO: validate_coupon,"CREATE OR REPLACE FUNCTION public.validate_coupon(p_code text, p_customer_id bigint)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_coupon RECORD;
+    v_has_previous_orders BOOLEAN;
+BEGIN
+    -- 1. Busca o cupom pelo código e restaurante do cliente
+    SELECT * INTO v_coupon
+    FROM public.promotions
+    WHERE coupon_code = upper(trim(p_code))
+      AND restaurant_id = (SELECT restaurant_id FROM public.customers WHERE id = p_customer_id LIMIT 1);
+
+    -- 2. Verifica se o cupom existe
+    IF v_coupon IS NULL THEN
+        RETURN jsonb_build_object('valid', false, 'message', 'Cupom inválido ou não encontrado.');
+    END IF;
+
+    -- 3. Verifica se está ativo
+    IF NOT v_coupon.is_active THEN
+        RETURN jsonb_build_object('valid', false, 'message', 'Este cupom não está mais ativo.');
+    END IF;
+
+    -- 4. Verifica o limite de usos
+    IF v_coupon.max_uses IS NOT NULL AND v_coupon.uses_count >= v_coupon.max_uses THEN
+        RETURN jsonb_build_object('valid', false, 'message', 'Este cupom atingiu o limite de usos.');
+    END IF;
+
+    -- 5. Verifica se é um cupom de ""primeiro pedido""
+    IF v_coupon.coupon_type = 'primeiro_pedido' THEN
+        SELECT EXISTS (
+            SELECT 1
+            FROM public.orders
+            WHERE customer_id = p_customer_id
+              AND status <> 'pre-pedido'
+        ) INTO v_has_previous_orders;
+
+        IF v_has_previous_orders THEN
+            RETURN jsonb_build_object('valid', false, 'message', 'Este cupom é válido apenas para o primeiro pedido.');
+        END IF;
+    END IF;
+
+    -- 6. Se todas as validações passaram
+    RETURN jsonb_build_object('valid', true, 'message', 'Cupom aplicado!', 'coupon', row_to_json(v_coupon));
+END;
+$function$
+"
+5. GATILHOS (TRIGGERS),TABELA: ingredients,GATILHO: on_ingredient_stock_update | EVENTO: UPDATE | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION handle_ingredient_stock_change()
+5. GATILHOS (TRIGGERS),TABELA: order_items,GATILHO: on_order_item_insert_decrement_stock | EVENTO: INSERT | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION decrement_stock()
+5. GATILHOS (TRIGGERS),TABELA: order_items,GATILHO: update_popularity_after_order | EVENTO: INSERT | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION update_product_popularity()
+5. GATILHOS (TRIGGERS),TABELA: products,GATILHO: on_product_change_update_availability | EVENTO: UPDATE | QUANDO: BEFORE | EXECUTA: EXECUTE FUNCTION update_product_availability_from_stock()
+5. GATILHOS (TRIGGERS),TABELA: products,GATILHO: on_product_change_update_availability | EVENTO: INSERT | QUANDO: BEFORE | EXECUTA: EXECUTE FUNCTION update_product_availability_from_stock()
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: addon_groups,POLÍTICA: Allow public read access to addon groups | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: addon_groups,POLÍTICA: Allow management on own restaurant addon groups | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: addons,POLÍTICA: Allow public read access to addons | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: addons,"POLÍTICA: Allow management of addons based on group ownership | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM addon_groups ag
+  WHERE ((ag.id = addons.addon_group_id) AND (ag.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM addon_groups ag
+  WHERE ((ag.id = addons.addon_group_id) AND (ag.restaurant_id = get_my_restaurant_id()))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: atendimento_whats,POLÍTICA: Allow full access on own restaurant conversations | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: categories,"POLÍTICA: Allow public read access to categories | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon, authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: categories,POLÍTICA: Usuários podem gerenciar dados do seu próprio restaurante. | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (get_my_restaurant_id() = restaurant_id) | VERIFICANDO (WITH CHECK): (get_my_restaurant_id() = restaurant_id)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: categories,POLÍTICA: Permitir gerenciamento de categorias do proprio restaurante | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: comandas,"POLÍTICA: Allow management on own comandas | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM table_sessions ts
+  WHERE ((ts.id = comandas.table_session_id) AND (ts.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM table_sessions ts
+  WHERE ((ts.id = comandas.table_session_id) AND (ts.restaurant_id = get_my_restaurant_id()))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: comandas,"POLÍTICA: Allow access to comandas of own restaurant | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM table_sessions ts
+  WHERE ((ts.id = comandas.table_session_id) AND (ts.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM table_sessions ts
+  WHERE ((ts.id = comandas.table_session_id) AND (ts.restaurant_id = get_my_restaurant_id()))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Permitir que anônimos se cadastrem como clientes | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): true
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Allow anonymous read access to customers | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Allow anonymous insert for new customers | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): true
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,"POLÍTICA: Usuários podem LER os clientes do seu restaurante | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = ( SELECT profiles.restaurant_id
    FROM profiles
-  WHERE (profiles.id = auth.uid())) = 'medicos'::text))"
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable update for owning medical users | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((auth.role() = 'authenticated'::text) AND (( SELECT professionals.id
-   FROM professionals
-  WHERE (professionals.user_id = auth.uid())) = professional_id)) | VERIFICANDO (WITH CHECK): N/A"
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,POLÍTICA: Enable read access for all authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,"POLÍTICA: Enable insert for owning professionals | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
-   FROM professionals
-  WHERE (professionals.id = exam_protocols.professional_id)))"
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,"POLÍTICA: Permitir inserção para profissionais donos do protocolo de im | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
-   FROM professionals
-  WHERE (professionals.id = image_exam_protocols.professional_id)))"
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,POLÍTICA: Permitir leitura de protocolos de imagem para usuários autenti | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem criar novos perfis | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem editar perfis | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+  WHERE (profiles.id = auth.uid()))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Usuários podem INSERIR clientes para seu restaurante | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Usuários podem ATUALIZAR clientes do seu restaurante | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: customers,POLÍTICA: Permitir gerenciamento de clientes do proprio restaurante | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: daily_restaurant_metrics,POLÍTICA: Allow users to read their own restaurant metrics | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: ingredients,POLÍTICA: Usuários podem gerenciar ingredientes do seu restaurante | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Allow anonymous delete access to own pre-order items | COMANDO: DELETE | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status)))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,POLÍTICA: Allow anonymous read access to order items | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Permitir leitura dos itens de pedidos do restaurante do usuári | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Usuários podem INSERIR itens de pedidos do seu restaurante | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.restaurant_id = get_my_restaurant_id()))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Permitir leitura de itens de pedidos para usuários do restaura | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Allow anonymous users to manage their cart items | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status)))) | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Allow anonymous read access to own pre-order items | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status)))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Allow anonymous insert access to own pre-order items | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: order_items,"POLÍTICA: Allow anonymous update access to own pre-order items | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): (EXISTS ( SELECT 1
+   FROM orders
+  WHERE ((orders.id = order_items.order_id) AND (orders.status = 'pre-pedido'::order_status)))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Usuários podem INSERIR pedidos para seu restaurante | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Usuários podem ATUALIZAR os pedidos do seu restaurante | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Permitir gerenciamento de pedidos do proprio restaurante | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Permitir leitura de pedidos do proprio restaurante | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,"POLÍTICA: Permitir que anônimos leiam seus carrinhos e pedidos pendentes | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): (status = ANY (ARRAY['pre-pedido'::order_status, 'pendente'::order_status])) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Allow anonymous insert for pre-orders | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (status = 'pre-pedido'::order_status)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: orders,POLÍTICA: Permitir que anônimos criem pré-pedidos | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: anon | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (status = 'pre-pedido'::order_status)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: product_addon_groups,"POLÍTICA: Allow management of product_addon_groups links | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM products p
+  WHERE ((p.id = product_addon_groups.product_id) AND (p.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM products p
+  WHERE ((p.id = product_addon_groups.product_id) AND (p.restaurant_id = get_my_restaurant_id()))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: product_addon_groups,POLÍTICA: Allow public read access to product_addon_groups | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: product_ingredients,"POLÍTICA: Usuários podem gerenciar a composição dos seus produtos | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (EXISTS ( SELECT 1
+   FROM products p
+  WHERE ((p.id = product_ingredients.product_id) AND (p.restaurant_id = get_my_restaurant_id())))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: products,POLÍTICA: Usuários podem gerenciar dados do seu próprio restaurante. | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (get_my_restaurant_id() = restaurant_id) | VERIFICANDO (WITH CHECK): (get_my_restaurant_id() = restaurant_id)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: products,"POLÍTICA: Allow public read access to products | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon, authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: products,POLÍTICA: Allow authenticated users to insert their own products | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: products,POLÍTICA: Permitir gerenciamento de produtos do proprio restaurante | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Usuários podem ver seu próprio perfil. | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.uid() = id) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Usuários podem atualizar seu próprio perfil. | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.uid() = id) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Gerencial pode ver todos os usuários do seu restaurante. | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((get_my_restaurant_id() = restaurant_id) AND (get_my_role() = 'gerencial'::text)) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Gerencial pode gerenciar usuários do seu restaurante. | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((get_my_restaurant_id() = restaurant_id) AND (get_my_role() = 'gerencial'::text)) | VERIFICANDO (WITH CHECK): ((get_my_restaurant_id() = restaurant_id) AND (get_my_role() = 'gerencial'::text))
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Usuários podem criar seu próprio perfil. | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = id)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: promotions,POLÍTICA: Allow management on own restaurant promotions | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: promotions,POLÍTICA: Allow public read access to active promotions | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (is_active = true) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Allow owners to update their own restaurant | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Gerencial pode ver e editar seu próprio restaurante. | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((get_my_restaurant_id() = id) AND (get_my_role() = 'gerencial'::text)) | VERIFICANDO (WITH CHECK): ((get_my_restaurant_id() = id) AND (get_my_role() = 'gerencial'::text))
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Allow owners to read their own restaurant data | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,"POLÍTICA: Allow public read access to restaurants | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: anon, authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Membros do restaurante podem ver os dados. | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (get_my_restaurant_id() = id) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Operacional pode ver os dados do seu restaurante. | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (get_my_restaurant_id() = id) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Usuários podem visualizar os dados do seu restaurante. | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (get_my_restaurant_id() = id) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: restaurants,POLÍTICA: Usuários podem gerenciar dados do seu restaurante. | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((get_my_restaurant_id() = id) AND (get_my_role() = 'gerencial'::text)) | VERIFICANDO (WITH CHECK): ((get_my_restaurant_id() = id) AND (get_my_role() = 'gerencial'::text))
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: table_sessions,POLÍTICA: Allow management on own table sessions | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: table_sessions,POLÍTICA: Allow full access to own restaurant sessions | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: tables,POLÍTICA: Allow management on own restaurant tables | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: tables,POLÍTICA: Allow full access to own restaurant tables | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (restaurant_id = get_my_restaurant_id()) | VERIFICANDO (WITH CHECK): (restaurant_id = get_my_restaurant_id())
