@@ -131,7 +131,7 @@ async function renderSchedule() {
     const container = document.getElementById('scheduleContainer');
     if (!container) return;
     
-    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4 (segundo andar)', 'Consultório 5 (segundo andar)'];
+    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4 (segundo andar)', 'Consultório 5'];
 
     try {
         let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
