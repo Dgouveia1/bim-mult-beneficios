@@ -1,0 +1,16 @@
+/* =================================================================
+   PÁGINA: VENDAS
+   ================================================================= */
+
+   #vendasPage .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+#vendasPage .dependente-form-group {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+}

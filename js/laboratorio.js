@@ -1,4 +1,5 @@
 import { _supabase } from './supabase.js';
+import { logAction } from './logger.js';
 
 const examModal = document.getElementById('examModal');
 const examForm = document.getElementById('examForm');
@@ -85,16 +86,19 @@ async function saveExam(event) {
     const id = examIdInput.value;
 
     try {
-        let error;
         if (id) {
             // Atualiza um exame existente
-            ({ error } = await _supabase.from('exams').update(examData).eq('id', id));
-        } else {
-            // Cria um novo exame
-            ({ error } = await _supabase.from('exams').insert(examData));
-        }
-        if (error) throw error;
+            const { error } = await _supabase.from('exams').update(examData).eq('id', id);
+            if (error) throw error;
+            await logAction('UPDATE_EXAM', { examId: id, examName: examData.name });
 
+        } else {
+            // Cria um novo exame e retorna os dados para o log
+            const { data: newExam, error } = await _supabase.from('exams').insert(examData).select().single();
+            if (error) throw error;
+            await logAction('CREATE_EXAM', { examId: newExam.id, examName: newExam.name });
+        }
+        
         examModal.style.display = 'none';
         await loadLaboratoryData(); // Recarrega a tabela
 

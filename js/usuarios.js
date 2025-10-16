@@ -1,5 +1,6 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
+import { logAction } from './logger.js';
 
 const userModal = document.getElementById('userModal');
 const userForm = document.getElementById('userForm');
@@ -88,8 +89,8 @@ function populateRoleOptions() {
         roleSelect.appendChild(option);
     }
 }
-// Salva o usuário (cria um novo ou atualiza um existente) - VERSÃO SIMPLIFICADA E CORRIGIDA
-// Salva o usuário (cria um novo ou atualiza um existente) - VERSÃO CORRIGIDA
+
+// Salva o usuário (cria um novo ou atualiza um existente)
 async function saveUser(event) {
     event.preventDefault();
     const submitButton = userForm.querySelector('button[type="submit"]');
@@ -98,31 +99,33 @@ async function saveUser(event) {
 
     const id = userIdInput.value;
     
-    // --- CORREÇÃO APLICADA AQUI ---
-    // Usando FormData para ler os valores do formulário de forma mais confiável
     const formData = new FormData(userForm);
     const userData = {
-        full_name: formData.get('full_name'), // Lê o campo com name="full_name"
-        email: formData.get('email'),         // Lê o campo com name="email"
-        password: formData.get('password'),   // Lê o campo com name="password"
-        role: formData.get('role')            // Lê o campo com name="role"
+        full_name: formData.get('full_name'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        role: formData.get('role')
     };
 
     try {
         if (id) {
-            // Lógica de atualização (não muda)
+            // Lógica de atualização
             const { error } = await _supabase
                 .from('profiles')
                 .update({ full_name: userData.full_name, role: userData.role })
                 .eq('id', id);
             if (error) throw error;
+            
+            await logAction('UPDATE_USER', { userId: id, fullName: userData.full_name, role: userData.role });
             alert('Usuário atualizado com sucesso!');
 
         } else {
-            // Lógica de criação (não muda)
+            // Lógica de criação
             if (!userData.password || userData.password.length < 6) {
                 throw new Error('A senha é obrigatória e deve ter no mínimo 6 caracteres.');
             }
+
+            await logAction('CREATE_USER', { email: userData.email, fullName: userData.full_name, role: userData.role });
 
             const { error } = await _supabase.rpc('create_new_user', {
                 p_email: userData.email,

@@ -7,6 +7,7 @@ let scheduleSubscription = null;
 let calendarDate = new Date();
 let isCalendarListenerAttached = false;
 let isPatientSearchListenerAttached = false;
+let allProfessionals = [];
 
 const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c', '#e67e22'];
 
@@ -112,17 +113,55 @@ function setupCalendarEventListeners() {
     isCalendarListenerAttached = true;
 }
 
+async function fetchAndCacheProfessionals() {
+    try {
+        const { data: professionals, error: profError } = await _supabase.from('professionals').select('*');
+        if (profError) throw profError;
+        
+        professionals.forEach((prof, index) => {
+            prof.color = professionalColors[index % professionalColors.length];
+        });
+        allProfessionals = professionals;
+    } catch (error) {
+        console.error("Falha ao buscar profissionais:", error);
+        allProfessionals = [];
+    }
+}
+
 async function loadScheduleView() {
     const container = document.getElementById('scheduleContainer');
     if (!container) return;
 
     unsubscribeSchedule();
     container.innerHTML = 'Carregando agenda...';
+    
+    await fetchAndCacheProfessionals();
     await renderSchedule();
 
     scheduleSubscription = _supabase.channel('public:appointments_agenda')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async () => {
-            await loadAppointments();
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async (payload) => {
+            
+            const changedDate = (payload.new?.appointment_date || payload.old?.appointment_date || '').split('T')[0];
+            const currentDateStr = currentScheduleDate.toISOString().split('T')[0];
+
+            if (changedDate !== currentDateStr) {
+                return; // Ignora alterações de outros dias
+            }
+
+            if (payload.eventType === 'INSERT') {
+                 const { data: newAppt, error } = await _supabase.from('appointments').select('*, professionals(name)').eq('id', payload.new.id).single();
+                 if (!error && newAppt) {
+                    placeAppointmentCard(newAppt);
+                 }
+            } else if (payload.eventType === 'UPDATE') {
+                removeAppointmentCard(payload.old.id);
+                const { data: updatedAppt, error } = await _supabase.from('appointments').select('*, professionals(name)').eq('id', payload.new.id).single();
+                 if (!error && updatedAppt) {
+                    placeAppointmentCard(updatedAppt);
+                 }
+            } else if (payload.eventType === 'DELETE') {
+                removeAppointmentCard(payload.old.id);
+            }
         })
         .subscribe();
 }
@@ -159,53 +198,57 @@ async function renderSchedule() {
     }
 }
 
+function placeAppointmentCard(appointment) {
+    const roomColumn = document.querySelector(`.professional-column[data-room-name="${appointment.room}"]`);
+    if (!roomColumn) return;
+
+    const headerHeight = document.querySelector('.schedule-header')?.offsetHeight || 50;
+    const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
+    const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
+    const duration = Math.max(0.5, (endHour + endMinute / 60) - (startHour + startMinute / 60));
+
+    const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + headerHeight;
+    const height = (duration * 120) - 2;
+
+    const card = document.createElement('div');
+    card.className = 'appointment-card';
+    card.dataset.appointmentId = appointment.id;
+    card.style.top = `${top}px`;
+    card.style.height = `${height}px`;
+
+    const professional = allProfessionals.find(p => p.id === appointment.professional_id);
+    const profColor = professional ? professional.color : '#7f8c8d';
+    const professionalName = appointment.professionals?.name || (professional ? professional.name : 'N/A');
+
+    card.innerHTML = `<div class="professional-flag" style="background-color: ${profColor};"></div><strong>${appointment.patient_name}</strong><small>${professionalName}</small>`;
+    roomColumn.appendChild(card);
+}
+
+function removeAppointmentCard(appointmentId) {
+    const cardToRemove = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
+    if (cardToRemove) {
+        cardToRemove.remove();
+    }
+}
+
 async function loadAppointments() {
     const year = currentScheduleDate.getFullYear();
     const month = String(currentScheduleDate.getMonth() + 1).padStart(2, '0');
     const day = String(currentScheduleDate.getDate()).padStart(2, '0');
     const selectedDate = `${year}-${month}-${day}`;
     
-    const headerHeight = document.querySelector('.schedule-header')?.offsetHeight || 50;
-    
-    try {
-        const { data: professionals, error: profError } = await _supabase.from('professionals').select('*');
-        if (profError) throw profError;
-        
-        professionals.forEach((prof, index) => {
-            prof.color = professionalColors[index % professionalColors.length];
-        });
+    document.querySelectorAll('.appointment-card').forEach(card => card.remove());
 
+    try {
         const { data: appointments, error } = await _supabase.from('appointments')
             .select('*, professionals(name)').eq('appointment_date', selectedDate).order('start_time');
         if (error) throw error;
 
-        document.querySelectorAll('.appointment-card').forEach(card => card.remove());
-
-        if (!appointments) return;
-
-        appointments.forEach(appointment => {
-            const roomColumn = document.querySelector(`.professional-column[data-room-name="${appointment.room}"]`);
-            if (roomColumn) {
-                const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
-                const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
-                const duration = Math.max(0.5, (endHour + endMinute / 60) - (startHour + startMinute / 60));
-
-                const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + headerHeight;
-                const height = (duration * 120) - 2;
-
-                const card = document.createElement('div');
-                card.className = 'appointment-card';
-                card.dataset.appointmentId = appointment.id;
-                card.style.top = `${top}px`;
-                card.style.height = `${height}px`;
-                
-                const professional = professionals.find(p => p.id === appointment.professional_id);
-                const profColor = professional ? professional.color : '#7f8c8d';
-
-                card.innerHTML = `<div class="professional-flag" style="background-color: ${profColor};"></div><strong>${appointment.patient_name}</strong><small>${appointment.professionals.name}</small>`;
-                roomColumn.appendChild(card);
-            }
-        });
+        if (appointments) {
+            appointments.forEach(appointment => {
+                placeAppointmentCard(appointment);
+            });
+        }
         
     } catch(error) {
         console.error('Erro ao carregar agendamentos:', error);
@@ -378,9 +421,6 @@ async function openAppointmentDetails(appointmentId) {
         document.getElementById('detailsAppointmentRoom').value = appointment.room;
 
         const profSelect = document.getElementById('detailsAppointmentProfessional');
-        const { data: allProfessionals, error: profError } = await _supabase.from('professionals').select('*');
-        if (profError) throw profError;
-
         profSelect.innerHTML = '';
         allProfessionals.forEach(prof => {
             const option = document.createElement('option');
@@ -524,4 +564,3 @@ export {
     changeDay,
     unsubscribeSchedule
 };
-

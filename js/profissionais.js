@@ -1,4 +1,5 @@
 import { _supabase } from './supabase.js';
+import { logAction } from './logger.js';
 
 const professionalModal = document.getElementById('professionalModal');
 const professionalForm = document.getElementById('professionalForm');
@@ -81,6 +82,8 @@ async function saveProfessional(event) {
     try {
         const { error } = await _supabase.from('professionals').update(professionalData).eq('id', id);
         if (error) throw error;
+
+        await logAction('UPDATE_PROFESSIONAL', { professionalId: id, name: professionalData.name });
 
         professionalModal.style.display = 'none';
         await loadProfessionalsData(); // Recarrega a tabela

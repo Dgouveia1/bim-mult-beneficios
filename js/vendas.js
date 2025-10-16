@@ -1,0 +1,258 @@
+import { _supabase } from './supabase.js';
+import { validateCPF, validateEmail, validatePhone } from './utils.js';
+import { logAction } from './logger.js';
+
+let dependenteVendaCount = 0;
+
+function addVendaDependenteField(container) {
+    if (dependenteVendaCount >= 6) {
+        alert("É permitido no máximo 6 dependentes.");
+        return;
+    }
+    dependenteVendaCount++;
+    const id = dependenteVendaCount;
+
+    const html = `
+        <div class="dependente-form-group" data-dependente-new-id="${id}">
+            <hr>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4>Novo Dependente ${id}</h4>
+                <button type="button" class="btn btn-danger btn-small remove-dependente-btn">Remover</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Nome</label><input type="text" name="dependente_nome_${id}" required></div>
+                <div class="form-group"><label>Sobrenome</label><input type="text" name="dependente_sobrenome_${id}" required></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${id}" maxlength="14"></div>
+                <div class="form-group"><label>Data de Nascimento</label><input type="text" name="dependente_data_nascimento_${id}" placeholder="dd/mm/aaaa"></div>
+            </div>
+        </div>`;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+async function handleNewSaleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const titularFormData = new FormData(form);
+    const titularFormProps = Object.fromEntries(titularFormData);
+
+    if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
+        alert('O CPF do titular é inválido!');
+        return;
+    }
+    if (titularFormProps.email && !validateEmail(titularFormProps.email)) {
+        alert('O Email do titular é inválido!');
+        return;
+    }
+    if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
+        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        return;
+    }
+
+    const titularData = {
+        nome: titularFormProps.nome,
+        sobrenome: titularFormProps.sobrenome,
+        telefone: titularFormProps.telefone,
+        cpf: titularFormProps.cpf,
+        email: titularFormProps.email,
+        data_nascimento: titularFormProps.data_nascimento,
+        plano: titularFormProps.plano,
+        status: titularFormProps.status,
+        cep: titularFormProps.cep,
+        endereco: titularFormProps.endereco,
+        municipio: titularFormProps.municipio,
+    };
+
+    const dependentesData = [];
+    for (let i = 1; i <= dependenteVendaCount; i++) {
+        const nome = titularFormProps[`dependente_nome_${i}`];
+        if (nome) {
+            const dependente = {
+                nome: nome,
+                sobrenome: titularFormProps[`dependente_sobrenome_${i}`],
+                cpf: titularFormProps[`dependente_cpf_${i}`],
+                data_nascimento: titularFormProps[`dependente_data_nascimento_${i}`],
+            };
+            if (dependente.cpf && !validateCPF(dependente.cpf)) {
+                alert(`O CPF do dependente ${dependente.nome} é inválido!`);
+                return;
+            }
+            dependentesData.push(dependente);
+        }
+    }
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        const { data: newTitular, error: titularError } = await _supabase
+            .from('clients')
+            .insert({
+                ...titularData,
+                data_nascimento: titularData.data_nascimento ? titularData.data_nascimento.split('/').reverse().join('-') : null
+            })
+            .select()
+            .single();
+
+        if (titularError) throw titularError;
+        
+        await logAction('CREATE_SALE', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}` });
+
+        if (dependentesData.length > 0) {
+            const dependentesParaSalvar = dependentesData.map(dep => ({
+                ...dep,
+                titular_id: newTitular.id,
+                data_nascimento: dep.data_nascimento ? dep.data_nascimento.split('/').reverse().join('-') : null
+            }));
+
+            const { error: dependentesError } = await _supabase
+                .from('dependents')
+                .insert(dependentesParaSalvar);
+
+            if (dependentesError) throw dependentesError;
+        }
+
+        alert('Venda registrada com sucesso! Gerando contrato...');
+        await generateContractPDF(titularData, dependentesData);
+        form.reset();
+        document.getElementById('vendasDependentesContainer').innerHTML = '';
+        dependenteVendaCount = 0;
+
+    } catch (error) {
+        alert('Erro ao salvar venda: ' + error.message);
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
+    }
+}
+
+async function generateContractPDF(titular, dependentes) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    let y = 15; // Posição vertical inicial
+
+    const addWrappedText = (text, x, startY, maxWidth, lineHeight) => {
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        pdf.text(lines, x, startY);
+        return startY + (lines.length * lineHeight);
+    };
+
+    // --- TÍTULO ---
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS "BIM MULT BENEFICIOS"', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+    y += 10;
+
+    // --- DADOS DAS PARTES ---
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('CONTRATADA: "BIM MULT BENEFICIOS"', 15, y); y += 5;
+    pdf.text('CNPJ: 37.054.912/0001-56', 15, y); y += 5;
+    pdf.text('Endereço: Av Amadeu bizelli, 1315 – Centro Fernandópolis - SP', 15, y); y += 10;
+
+    pdf.text(`CONTRATANTE (NOME COMPLETO): ${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}`, 15, y); y += 5;
+    pdf.text(`CPF: ${titular.cpf}`, 15, y); y += 5;
+    pdf.text(`ENDEREÇO: ${titular.endereco}, ${titular.municipio} - SP`, 15, y); y += 5;
+    pdf.text(`DATA DE NASC.: ${titular.data_nascimento}`, 15, y); y += 5;
+    pdf.text(`TELEFONE: ${titular.telefone}`, 15, y); y += 10;
+
+    pdf.text('Pelo presente CONTRATO DE PRESTAÇÃO DE SERVIÇOS, as partes acima discriminadas se comprometem às seguintes cláusulas e condições:', 15, y); y += 10;
+
+    // --- CLÁUSULAS ---
+    const clausulas = [
+        { title: 'CLÁUSULA 1ª – DO OBJETO', text: 'O presente contrato tem por objeto a prestação dos serviços descritos e detalhados no Anexo 1 deste instrumento. O Anexo compõe o presente contrato e são parte integrante deste, independentemente de transcrição, declarando-se o (a) CONTRATANTE ciente de seu inteiro teor.' },
+        { title: 'CLÁUSULA 2ª – DA CARÊNCIA PARA UTILIZAÇÃO DOS BENEFÍCIOS:', text: 'O acesso aos benefícios e/ou às coberturas garantidas neste contrato somente terão efeito após o cumprimento dos prazos e condições descritos no Anexo 2. O (a) CONTRATANTE declara-se ciente de que há a possibilidade de necessidade de reiteração no cumprimento do prazo de carência em caso de inadimplemento, conforme prazos e condições dispostas no Anexo do presente contrato.' },
+        { title: 'CLÁUSULA 3ª – DO PRAZO E DO PAGAMENTO', text: 'O presente contrato vigerá pelo prazo de 12 (doze) meses, contados a partir da assinatura do mesmo, sendo tal período renovado automaticamente, por iguais e sucessivos períodos, desde que não haja manifestação expressa de alguma das partes acerca da intenção de não renovação. Os valores a serem cumprido pela parte CONTRATANTE são aqueles discriminados em seu cadastro junto a CONTRATADA, de acordo com o plano, termos e condições e serviços escolhidos pelo cliente no momento da contratação. Essas informações podem ser solicitadas pelo (a) CONTRATANTE a qualquer momento. O atraso em qualquer das parcelas mensais acarretará o acréscimo de multa de 2% (dois por cento) ao mês e juros moratórios diários de 0,33% (zero vírgula trinta e três por cento). O valor do presente contrato será reajustado anualmente, pelo IGP-M da FGV ou, na hipótese de extinção deste, pelo índice que vier a substituí-lo. O(s) pagamento(s) de mensalidade(s) referente(s) a mês(es) posterior(es) ao de uma ou mais mensalidades vencidas não quita(m) eventuais débitos anteriores.' },
+        { title: 'CLÁUSULA 4ª – DA RESCISÃO', text: 'O presente contrato poderá ser rescindido de pleno direito, antes de seu termo final, mediante notificação prévia da parte interessada, por escrito, com antecedência mínima de 30 (trinta) dias. No caso de pedido de rescisão, terá o (a) CONTRATANTE a obrigação de arcar com todos os valores devidos durante o período de aviso prévio de 30 (trinta) dias. No caso de cancelamento deverá ser efetuado por escrito para a BIM MULT BENEFICIOS, na Avenida Amadeu Bizelli, 1315 – Centro Fernandópolis – SP.'},
+        { title: 'CLÁUSULA 5ª – DAS CONDIÇÕES GERAIS', text: 'O (A) CONTRATANTE declara que leu, compreendeu e aceitou o presente Contrato em todos seus termos e condições, de forma livre e independente de qualquer dolo, coação, fraude ou reserva mental. As definições necessárias e as condições específicas para a utilização das coberturas previstas neste contrato está nos respectivos Anexos, que fazem parte integrante do presente contrato.'},
+        { title: 'CLÁUSULA 6ª – DO FORO:', text: 'As partes elegem o foro do domicilio de Fernandópolis para dirimir qualquer controvérsia oriunda do presente contrato. Por estarem justas e acordadas, as Partes assinam este Instrumento em duas vias de igual teor e forma.'}
+    ];
+
+    clausulas.forEach(clausula => {
+        pdf.setFont('helvetica', 'bold');
+        y = addWrappedText(clausula.title, 15, y, 180, 5);
+        y += 2;
+        pdf.setFont('helvetica', 'normal');
+        y = addWrappedText(clausula.text, 15, y, 180, 5);
+        y += 5;
+    });
+
+    // --- DATA E ASSINATURAS ---
+    const today = new Date();
+    pdf.text(`Fernandópolis, ${today.getDate()} / ${today.getMonth() + 1} / ${today.getFullYear()}`, 15, y);
+    y += 20;
+
+    pdf.text('_________________________', 30, y);
+    pdf.text('_________________________', 120, y);
+    y += 5;
+    pdf.text('CONTRATANTE', 45, y);
+    pdf.text('CONTRATADA', 135, y);
+    
+    // --- PÁGINA DE ANEXOS ---
+    pdf.addPage();
+    y = 15;
+    
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+    y += 10;
+    
+    const tableData = [[
+        `${titular.nome} ${titular.sobrenome}`,
+        titular.cpf,
+        titular.data_nascimento,
+        titular.plano
+    ]];
+
+    dependentes.forEach(d => {
+        tableData.push([
+            `${d.nome} ${d.sobrenome}`,
+            d.cpf,
+            d.data_nascimento,
+            `DEPENDENTE ${titular.plano}`
+        ]);
+    });
+
+    pdf.autoTable({
+        startY: y,
+        head: [['Nome', 'CPF', 'Data Nascimento', 'PLANO']],
+        body: tableData,
+        theme: 'striped'
+    });
+    
+    y = pdf.autoTable.previous.finalY + 10;
+    
+    pdf.setFont('helvetica', 'normal');
+    y = addWrappedText('Composto pelos produtos: BIM PLANO FAMILIAR (composto por no máximo 7 (sete) pessoas. Carência – 1 dia útil.', 15, y, 180, 5);
+    y += 5;
+    y = addWrappedText('Inadimplência: O não pagamento da “Parcela Mensal” transcorrido o lapso de quinze (15) dias, computados ininterruptamente a partir da data do vencimento da obrigação, sem que haja sido efetuado o cumprimento da obrigação contratual, será facultado à Empresa – CONTRATADA, suspender as disponibilizações dos “Serviços” que se presta a servir ao(s) Beneficiário(s) inscritos.', 15, y, 180, 5);
+    y += 10;
+    
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('ANEXO 2 - DOS BENEFÍCIOS', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+    y += 10;
+    
+    pdf.setFont('helvetica', 'normal');
+    const anexo2Text = '1. A CONTRATADA terá direito a acesso a uma rede de profissionais de saúde, incluindo médicos de diversas especialidades e odontologia com descontos especiais sobre os honorários, cobrados.\n2. A CONTRATADA também terá acesso a exames laboratoriais e de imagem com descontos previamente estabelecidos, conforme tabela de preços que será disponibilizada pelo CONTRATANTE.\n3. Os descontos aplicáveis serão informados a CONTRATADA no momento da solicitação dos serviços e poderão variar de acordo com a especialidade e o tipo de exame.\n4. A CONTRATADA concorda em seguir os procedimentos necessários para agendamento e realização dos serviços, conforme as orientações do CONTRATANTE.\n5. O CONTRATANTE se reserva o direito de atualizar a lista de médicos e exames disponíveis, bem como os respectivos descontos, mediante aviso prévio a CONTRATADA.';
+    y = addWrappedText(anexo2Text, 15, y, 180, 5);
+
+    pdf.save(`contrato-${titular.nome.toLowerCase().replace(/\s/g, '_')}.pdf`);
+}
+
+function setupVendasPage() {
+    const form = document.getElementById('newSaleForm');
+    if (form.dataset.listenerAttached) return;
+
+    form.addEventListener('submit', handleNewSaleSubmit);
+    
+    document.getElementById('addVendaDependenteBtn').addEventListener('click', () => {
+        addVendaDependenteField(document.getElementById('vendasDependentesContainer'));
+    });
+
+    form.dataset.listenerAttached = 'true';
+}
+
+export { setupVendasPage };
+

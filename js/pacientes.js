@@ -170,30 +170,53 @@ function updateImageExamPreview() {
 async function selectPatient(appointmentId) {
     if (!appointmentId) return;
 
+    // Reinicia o estado da consulta
     selectedExams = [];
     selectedImageExams = [];
     currentUploadedFiles = [];
-    document.querySelectorAll('#consultationWorkspace textarea').forEach(el => el.value = '');
+    document.querySelectorAll('#consultationWorkspace textarea, #consultationWorkspace input').forEach(el => el.value = '');
     renderSelectedExams();
     renderSelectedImageExams();
     renderAttachments();
     
+    // Atualiza a UI para mostrar a área de trabalho da consulta
     document.querySelectorAll('.paciente-espera-item').forEach(item => item.classList.remove('active'));
     document.querySelector(`.paciente-espera-item[data-appointment-id="${appointmentId}"]`)?.classList.add('active');
     consultationWorkspaceDiv.style.display = 'flex';
     noPatientSelectedDiv.style.display = 'none';
 
     try {
+        // Marca o agendamento como "em atendimento"
         await _supabase.from('appointments').update({ status: 'em_atendimento' }).eq('id', appointmentId);
-        const { data: appt, error } = await _supabase.from('appointments').select('*').eq('id', appointmentId).single();
-        if (error) throw error;
         
-        const { data: clientData, error: clientError } = await _supabase.from('clients').select('*').ilike('nome', `%${appt.patient_name.split(' ')[0]}%`).maybeSingle();
-        if (clientError) console.warn("Não foi possível buscar todos os dados do paciente.");
+        // Busca os detalhes do agendamento
+        const { data: appt, error: apptError } = await _supabase.from('appointments').select('*, client_id').eq('id', appointmentId).single();
+        if (apptError) throw apptError;
 
-        currentSelectedPatientData = clientData;
+        let patientDetails = null;
+        
+        // Se o agendamento tem um ID de cliente, busca os dados completos
+        if (appt.client_id) {
+            const { data: titular, error: clientError } = await _supabase.from('clients').select('*, dependents(*)').eq('id', appt.client_id).single();
+            if (clientError) throw clientError;
+
+            // Verifica se o paciente é o titular
+            if (`${titular.nome} ${titular.sobrenome || ''}`.trim() === appt.patient_name) {
+                patientDetails = titular;
+            } else { // Procura nos dependentes
+                const dependent = titular.dependents.find(d => `${d.nome} ${d.sobrenome || ''}`.trim() === appt.patient_name);
+                if (dependent) {
+                    // Adiciona informações do plano do titular aos dados do dependente
+                    patientDetails = { ...dependent, plano: titular.plano, status: titular.status, endereco: titular.endereco };
+                }
+            }
+        }
+
+        // Armazena os dados do paciente e do profissional
+        currentSelectedPatientData = patientDetails;
         currentProfessionalData = await fetchProfessionalData();
 
+        // Preenche os cabeçalhos e a aba de dados do paciente
         document.getElementById('currentPatientName').textContent = appt.patient_name || 'N/A';
         document.getElementById('currentAppointmentId').value = appointmentId;
         
@@ -203,13 +226,15 @@ async function selectPatient(appointmentId) {
             document.getElementById('dadosTelefone').textContent = currentSelectedPatientData.telefone || 'N/A';
             document.getElementById('dadosPlano').textContent = currentSelectedPatientData.plano || 'N/A';
             document.getElementById('dadosEndereco').textContent = currentSelectedPatientData.endereco || 'N/A';
+            document.getElementById('currentPatientPlan').textContent = currentSelectedPatientData.plano || 'N/A';
         }
 
+        // Preenche os campos de impressão e atualiza as pré-visualizações
         populatePrintableFields();
-        // Renderiza as pré-visualizações iniciais
         updateLabExamPreview();
         updateImageExamPreview();
 
+        // Carrega o histórico de consultas e anexos
         await loadPatientHistory(appt.patient_name);
         await loadAttachments(appointmentId);
         await loadProtocols();
@@ -217,6 +242,7 @@ async function selectPatient(appointmentId) {
 
     } catch (error) {
         alert('Erro ao selecionar o paciente: ' + error.message);
+        console.error(error);
     }
 }
 
@@ -604,16 +630,13 @@ async function triggerPrintFromElement(button) {
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgData = await imageToBase64('imagens/padra_impressao.png');
 
-        // --- CORREÇÃO APLICADA AQUI: USA DADOS DO OBJETO EM MEMÓRIA ---
         let patientName = currentSelectedPatientData ? `${currentSelectedPatientData.nome} ${currentSelectedPatientData.sobrenome || ''}`.trim() : '';
         let patientCPF = currentSelectedPatientData?.cpf || '';
         let patientAddress = currentSelectedPatientData?.endereco || '';
 
-        // 2. Se a fonte primária falhou, usa os dados da tela como fallback (plano B)
         if (!patientName) {
             patientName = document.getElementById('currentPatientName')?.textContent || 'N/A';
         }
-        // Os detalhes de CPF e Endereço estão na aba "Dados do Paciente"
         if (!patientCPF) {
             patientCPF = document.getElementById('dadosCPF')?.textContent || 'N/A';
         }
@@ -644,39 +667,69 @@ async function triggerPrintFromElement(button) {
         };
 
         if (type === 'Pedido de Exames Laboratoriais' && examList.length > 0) {
+            // --- PÁGINA 1: PEDIDO DE EXAMES ---
             createPageLayout('PEDIDO DE EXAMES LABORATORIAIS');
-            const examNamesText = examList.map(exam => `- ${exam.name}`).join('\n');
-            const textLines = pdf.splitTextToSize(examNamesText, 170);
-            pdf.text(textLines, 20, 95);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(11);
 
-            // --- CÓDIGO CORRIGIDO PARA O ORÇAMENTO DETALHADO ---
+            const itemsPerColumn = 28; 
+            if (examList.length > itemsPerColumn) {
+                // Duas colunas
+                const midPoint = Math.ceil(examList.length / 2);
+                const firstColumn = examList.slice(0, midPoint).map(exam => `- ${exam.name}`).join('\n');
+                const secondColumn = examList.slice(midPoint).map(exam => `- ${exam.name}`).join('\n');
+                
+                pdf.text(pdf.splitTextToSize(firstColumn, 85), 20, 95);
+                pdf.text(pdf.splitTextToSize(secondColumn, 85), 110, 95);
+
+            } else {
+                // Uma coluna
+                const examNamesText = examList.map(exam => `- ${exam.name}`).join('\n');
+                const textLines = pdf.splitTextToSize(examNamesText, 170);
+                pdf.text(textLines, 20, 95);
+            }
+
+            // --- PÁGINA 2+: ORÇAMENTO ---
             pdf.addPage();
             createPageLayout('ORÇAMENTO');
             
             let totalValue = 0;
-            let yPosition = 95; // Posição inicial para a lista de exames no PDF
+            let yPosition = 95;
+            const pageHeight = pdf.internal.pageSize.height;
+            const bottomMargin = 60; // Espaço para o rodapé
             
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(11);
             
-            examList.forEach(exam => {
+            examList.forEach((exam, index) => {
+                // Adiciona nova página se o conteúdo for longo
+                if (yPosition > pageHeight - bottomMargin) {
+                    pdf.addPage();
+                    createPageLayout('ORÇAMENTO (continuação)');
+                    yPosition = 95; // Reseta a posição Y na nova página
+                }
+
                 const examValue = parseFloat(exam.value || 0);
                 totalValue += examValue;
-                const examText = `- ${exam.name}`;
+                const examText = `- ${exam.name}`; // ALTERADO: Não exibe mais o valor individual
                 
-                // Adiciona o texto do exame ao PDF
                 pdf.text(examText, 20, yPosition);
                 yPosition += 7; // Incrementa a posição vertical para a próxima linha
             });
 
-            // Adiciona uma linha separadora antes do total
+            // Adiciona o valor total no final
+            if (yPosition > pageHeight - bottomMargin) {
+                 pdf.addPage();
+                 createPageLayout('ORÇAMENTO (continuação)');
+                 yPosition = 95;
+            }
             pdf.line(20, yPosition, 190, yPosition); 
             yPosition += 10;
 
-            // Escreve o VALOR TOTAL
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(14);
             pdf.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2).replace('.', ',')}`, 105, yPosition, { align: 'center' });
+
 
         } else {
             createPageLayout(type);
@@ -749,3 +802,5 @@ export {
     removeExam,
     triggerPrintFromElement
 };
+
+

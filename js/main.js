@@ -13,7 +13,7 @@ import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
-import { loadLogsData } from './logs.js'; // Importa a função da nova página de logs
+import { loadLogsData, setupLogsPage } from './logs.js'; // Importa a função de setup da página de logs
 
 
 const newClientModalEl = document.getElementById('newClientModal');
@@ -104,7 +104,7 @@ async function loadPageData(pageName) {
     else if (pageName === 'profissionais') await loadProfessionalsData();
     else if (pageName === 'disparos') await loadMunicipios();
     else if (pageName === 'confirmacoes') await loadConfirmationsData();
-    else if (pageName === 'logs') await loadLogsData(); // << CARREGA DADOS DA PÁGINA DE LOGS
+    else if (pageName === 'logs') setupLogsPage(); // << ALTERADO: Apenas prepara a página de logs
     else if (pageName === 'prontuario') {
         await loadClientsData();
         setupProntuarioPage();
@@ -172,11 +172,12 @@ function setupEventListeners() {
 
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
-        clientsSearchInput.addEventListener('input', () => {
+        clientsSearchInput.addEventListener('input', (e) => {
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
-                filterAndRenderClients();
-            }, 300);
+                const searchTerm = e.target.value;
+                loadClientsData(searchTerm);
+            }, 500); 
         });
     }
 
@@ -190,6 +191,12 @@ function setupEventListeners() {
             await updateConfirmationStatus(appointmentId, isConfirmed);
             checkbox.disabled = false; 
         }
+    });
+
+    document.getElementById('filterLogsBtn')?.addEventListener('click', () => {
+        const startDate = document.getElementById('logStartDate').value;
+        const endDate = document.getElementById('logEndDate').value;
+        loadLogsData(startDate, endDate);
     });
 
     document.body.addEventListener('click', function(event) {

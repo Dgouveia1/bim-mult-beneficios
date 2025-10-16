@@ -53,25 +53,58 @@ function addDependenteField(container, counterVar) {
 
 // --- FUNÇÕES DE LEITURA, RENDERIZAÇÃO E FILTRO ---
 
-async function loadClientsData() {
+async function loadClientsData(searchTerm = null) {
     if (!clientsTableBody) return;
     clientsTableBody.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
     try {
-        const { data: clients, error } = await _supabase
-            .from('clients')
-            .select(`
-                *,
-                dependents ( * )
-            `)
-            .order('created_at', { ascending: false });
+        let finalClients = [];
 
-        if (error) throw error;
+        // Se um termo de busca com pelo menos 3 caracteres for fornecido, executa a busca no servidor
+        if (searchTerm && searchTerm.length >= 3) {
+            const lowerSearchTerm = searchTerm.toLowerCase();
 
+            // Busca por titulares e dependentes que correspondem ao termo de busca
+            const [clientResults, dependentResults] = await Promise.all([
+                _supabase.from('clients').select('id').or(`nome.ilike.%${lowerSearchTerm}%,sobrenome.ilike.%${lowerSearchTerm}%,cpf.ilike.%${lowerSearchTerm}%,telefone.ilike.%${lowerSearchTerm}%`),
+                _supabase.from('dependents').select('titular_id').or(`nome.ilike.%${lowerSearchTerm}%,sobrenome.ilike.%${lowerSearchTerm}%,cpf.ilike.%${lowerSearchTerm}%`)
+            ]);
+
+            if (clientResults.error) throw clientResults.error;
+            if (dependentResults.error) throw dependentResults.error;
+
+            // Combina os IDs dos titulares encontrados
+            const clientIdsFromDirectMatch = clientResults.data.map(c => c.id);
+            const clientIdsFromDependentMatch = dependentResults.data.map(d => d.titular_id);
+            const allMatchingClientIds = [...new Set([...clientIdsFromDirectMatch, ...clientIdsFromDependentMatch])];
+
+            // Busca os dados completos dos clientes correspondentes
+            if (allMatchingClientIds.length > 0) {
+                const { data: clients, error: clientsError } = await _supabase
+                    .from('clients')
+                    .select('*, dependents(*)')
+                    .in('id', allMatchingClientIds)
+                    .order('created_at', { ascending: false });
+                
+                if (clientsError) throw clientsError;
+                finalClients = clients;
+            }
+        } else {
+            // Carregamento inicial: busca os 25 clientes mais recentes
+            const { data: clients, error } = await _supabase
+                .from('clients')
+                .select('*, dependents(*)')
+                .order('created_at', { ascending: false })
+                .limit(25);
+            if (error) throw error;
+            finalClients = clients;
+        }
+
+        // Processa os clientes para a lista de exibição
         const peopleList = [];
-        clients.forEach(client => {
+        finalClients.forEach(client => {
             peopleList.push({
                 titular_id: client.id,
-                nome:  `${client.nome || ''} ${client.sobrenome || ''}`.trim(),
+                nome: `${client.nome || ''} ${client.sobrenome || ''}`.trim(),
                 cpf: client.cpf,
                 telefone: client.telefone,
                 plano: client.plano,
@@ -94,7 +127,7 @@ async function loadClientsData() {
             }
         });
 
-        allPeople = peopleList;
+        allPeople = peopleList; // Atualiza a variável global para compatibilidade
         renderClientsTable(allPeople);
 
     } catch (error) {
