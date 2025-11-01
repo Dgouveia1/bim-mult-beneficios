@@ -227,8 +227,12 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group"><label>Plano</label>
-                                    <select name="plano">
-                                        <option value="BIM FAMILIAR">BIM FAMILIAR</option>
+                                    <select name="plano" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Bim Familiar">Bim Familiar</option>
+                                        <option value="Mult">Mult</option>
+                                        <option value="Convenio">Convênio</option>
+                                        <option value="Particular">Particular</option>
                                     </select>
                                 </div>
                                 <div class="form-group"><label>Status</label>
@@ -244,6 +248,11 @@
                                 <div class="form-group"><label>CEP</label><input type="text" name="cep"></div>
                                 <div class="form-group"><label>Endereço</label><input type="text" name="endereco"></div>
                                 <div class="form-group"><label>Município</label><input type="text" name="municipio"></div>
+                            </div>
+                            <!-- ADIÇÃO: Campo de Observação -->
+                            <div class="form-group">
+                                <label>Observações</label>
+                                <textarea name="observacao" rows="3"></textarea>
                             </div>
                             <hr>
                             <h4>Dependentes</h4>
@@ -811,13 +820,29 @@
                     <div class="form-group"><label>CPF</label><input type="text" name="cpf" maxlength="14" ></div></div>
                     <div class="form-row"><div class="form-group"><label>Email</label><input type="email" name="email"></div>
                     <div class="form-group"><label>Data de Nascimento</label><input type="text" name="data_nascimento" placeholder="dd/mm/aaaa"></div></div>
-                    <div class="form-row"><div class="form-group"><label>Plano</label><input type="text" name="plano"></div>
+                    <div class="form-row"><div class="form-group"><label>Plano</label>
+                        <select name="plano" required>
+                            <option value="">Selecione...</option>
+                            <option value="Bim Familiar">Bim Familiar</option>
+                            <option value="Mult">Mult</option>
+                            <option value="Convenio">Convênio</option>
+                            <option value="Particular">Particular</option>
+                        </select>
+                    </div>
                     <div class="form-group"><label>Status</label><select name="status"><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option><option value="DOACAO">Doação</option></select></div></div>
                     <h4>Endereço</h4>
                     <div class="form-row"><div class="form-group"><label>CEP</label><input type="text" name="cep"></div><div class="form-group"><label>Endereço</label><input type="text" name="endereco"></div>
                     <div class="form-group"><label>Município</label><input type="text" name="municipio"></div></div>
+                    
+                    <!-- ADIÇÃO: Campo de Observação -->
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea name="observacao" rows="3"></textarea>
+                    </div>
+
                     <hr>
                     <h4>Dependentes</h4>
+                    <!-- CORREÇÃO: IDs e Rodapé restaurados para o modal de NOVO CLIENTE -->
                     <div id="dependentesContainer"></div>
                     <button type="button" class="btn btn-secondary" id="addDependenteBtn">Adicionar Dependente</button>
                     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-close-modal="newClientModal">Cancelar</button><button type="submit" class="btn">Salvar</button></div>
@@ -833,15 +858,41 @@
                 <button class="close-btn" data-close-modal="detailsClientModal">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- CORREÇÃO: O formulário de detalhes foi completamente restaurado -->
                 <form id="detailsClientForm">
                     <input type="hidden" id="detailsClientId" name="id">
                     <h4>Dados do Titular</h4>
                     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="details_nome" name="details_nome" required></div><div class="form-group"><label>Sobrenome</label><input type="text" id="details_sobrenome" name="details_sobrenome" required></div></div>
-                    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="details_telefone" name="telefone" maxlength="15"></div><div class="form-group"><label>CPF</label><input type="text" id="details_cpf" name="cpf" maxlength="14" required></div></div>
-                    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="details_email" name="email"></div><div class="form-group"><label>Data de Nascimento</label><input type="text" id="details_data_nascimento" name="details_data_nascimento" placeholder="dd/mm/aaaa"></div></div>
-                    <div class="form-row"><div class="form-group"><label>Plano</label><input type="text" id="details_plano" name="plano"></div><div class="form-group"><label>Status</label><select id="details_status" name="status"><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="details_telefone" name="details_telefone" maxlength="15"></div><div class="form-group"><label>CPF</label><input type="text" id="details_cpf" name="details_cpf" maxlength="14" required></div></div>
+                    <div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="details_email" name="details_email"></div><div class="form-group"><label>Data de Nascimento</label><input type="text" id="details_data_nascimento" name="details_data_nascimento" placeholder="dd/mm/aaaa"></div></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Plano</label>
+                        <select id="details_plano" name="details_plano" required>
+                            <option value="">Selecione...</option>
+                            <option value="Bim Familiar">Bim Familiar</option>
+                            <option value="Mult">Mult</option>
+                            <option value="Convenio">Convênio</option>
+                            <option value="Particular">Particular</option>
+                        </select>
+                        </div>
+                        <div class="form-group"><label>Status</label>
+                            <select id="details_status" name="details_status" required>
+                                <option value="ATIVO">Ativo</option>
+                                <option value="INATIVO">Inativo</option>
+                                <option value="DOACAO">Doação</option>
+                            </select>
+                        </div>
+                    </div> 
                     <h4>Endereço</h4>
-                    <div class="form-row"><div class="form-group"><label>CEP</label><input type="text" id="details_cep" name="cep"></div><div class="form-group"><label>Endereço</label><input type="text" id="details_endereco" name="endereco"></div><div class="form-group"><label>Município</label><input type="text" id="details_municipio" name="municipio"></div></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>CEP</label><input type="text" id="details_cep" name="details_cep"></div>
+                        <div class="form-group"><label>Endereço</label><input type="text" id="details_endereco" name="details_endereco"></div>
+                        <div class="form-group"><label>Município</label><input type="text" id="details_municipio" name="details_municipio"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="details_observacao" name="details_observacao" rows="3"></textarea>
+                    </div>
                     <hr>
                     <h4>Dependentes</h4>
                     <div id="detailsDependentesContainer"></div>
@@ -972,4 +1023,5 @@
     
 </body>
 </html>
+
 

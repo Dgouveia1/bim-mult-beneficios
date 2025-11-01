@@ -101,6 +101,8 @@ async function handleNewSaleSubmit(event) {
         cep: titularFormProps.cep,
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
+        observacao: titularFormProps.observacao,
+
     };
 
     const dependentesData = [];

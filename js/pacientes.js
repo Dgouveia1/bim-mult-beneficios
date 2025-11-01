@@ -1,5 +1,6 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
+import { logAction } from './logger.js'; // Importando logAction
 
 // --- ESTADO DA CONSULTA ---
 let allExams = [];
@@ -186,9 +187,20 @@ async function selectPatient(appointmentId) {
     noPatientSelectedDiv.style.display = 'none';
 
     try {
-        // Marca o agendamento como "em atendimento"
-        await _supabase.from('appointments').update({ status: 'em_atendimento' }).eq('id', appointmentId);
+        // CORREÇÃO 2: Registra o início da consulta
+        const startTime = new Date().toISOString();
+        const { error: updateError } = await _supabase.from('appointments').update({ 
+            status: 'em_atendimento',
+            consultation_start_time: startTime
+        }).eq('id', appointmentId);
         
+        if (updateError) throw updateError;
+        
+        await logAction('START_CONSULTATION', {
+            appointmentId: appointmentId,
+            startTime: startTime
+        });
+
         // Busca os detalhes do agendamento
         const { data: appt, error: apptError } = await _supabase.from('appointments').select('*, client_id').eq('id', appointmentId).single();
         if (apptError) throw apptError;
@@ -574,8 +586,21 @@ async function finalizeConsultation() {
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
     try {
+        // Salva os dados da consulta
         await _supabase.from('consultations').upsert(consultationData, { onConflict: 'appointment_id' });
-        await _supabase.from('appointments').update({ status: 'finalizado' }).eq('id', appointmentId);
+        
+        // CORREÇÃO 3: Registra o término da consulta
+        const endTime = new Date().toISOString();
+        await _supabase.from('appointments').update({ 
+            status: 'finalizado',
+            consultation_end_time: endTime 
+        }).eq('id', appointmentId);
+
+        await logAction('FINISH_CONSULTATION', {
+            appointmentId: appointmentId,
+            endTime: endTime
+        });
+
         alert('Consulta finalizada e salva com sucesso!');
         showInitialScreen();
         loadPatientsData();
@@ -606,6 +631,8 @@ async function triggerPrintFromElement(button) {
         if (selectedOptions.length > 0) {
             if (type === 'Pedido de Exames Laboratoriais') {
                 examList = selectedExams;
+            } else if (type === 'Pedido de Exames de Imagem') {
+                examList = selectedImageExams; // Usar a lista correta
             }
             contentText = selectedOptions.map(opt => `- ${opt.textContent.split(' (R$')[0]}`).join('\n');
             isContentEmpty = false;
@@ -731,7 +758,26 @@ async function triggerPrintFromElement(button) {
             pdf.text(`VALOR TOTAL: R$ ${totalValue.toFixed(2).replace('.', ',')}`, 105, yPosition, { align: 'center' });
 
 
+        } else if (type === 'Pedido de Exames de Imagem' && examList.length > 0) {
+            // Lógica para Exames de Imagem (sem orçamento)
+            createPageLayout('PEDIDO DE EXAMES DE IMAGEM');
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(11);
+            const itemsPerColumn = 28; 
+            if (examList.length > itemsPerColumn) {
+                const midPoint = Math.ceil(examList.length / 2);
+                const firstColumn = examList.slice(0, midPoint).map(exam => `- ${exam.name}`).join('\n');
+                const secondColumn = examList.slice(midPoint).map(exam => `- ${exam.name}`).join('\n');
+                pdf.text(pdf.splitTextToSize(firstColumn, 85), 20, 95);
+                pdf.text(pdf.splitTextToSize(secondColumn, 85), 110, 95);
+            } else {
+                const examNamesText = examList.map(exam => `- ${exam.name}`).join('\n');
+                const textLines = pdf.splitTextToSize(examNamesText, 170);
+                pdf.text(textLines, 20, 95);
+            }
+
         } else {
+            // Lógica para outros documentos (Receita, Atestado, etc.)
             createPageLayout(type);
             const textLines = pdf.splitTextToSize(contentText, 170);
             pdf.text(textLines, 20, 95);
@@ -784,6 +830,11 @@ function setupPacientesEventListeners() {
         const selectedId = document.getElementById('selectedExamsListImg').value;
         if (selectedId) removeImageExam(selectedId);
     });
+    
+    // Adiciona ouvintes para os botões de impressão
+    document.querySelectorAll('.print-btn').forEach(button => {
+        button.addEventListener('click', () => triggerPrintFromElement(button));
+    });
 
     setupExamSearch();
     setupManualExamEntry();
@@ -802,5 +853,3 @@ export {
     removeExam,
     triggerPrintFromElement
 };
-
-

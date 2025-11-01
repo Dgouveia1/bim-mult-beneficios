@@ -243,6 +243,8 @@ async function handleNewClientSubmit(event) {
         cep: titularFormProps.cep,
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
+        observacao: titularFormProps.observacao,
+
     };
     
     const dependentesData = [];
@@ -358,6 +360,7 @@ function populateDetailsForm(client, dependents) {
     document.getElementById('details_cep').value = client.cep || '';
     document.getElementById('details_endereco').value = client.endereco || '';
     document.getElementById('details_municipio').value = client.municipio || '';
+    document.getElementById('details_observacao').value = client.observacao || '';
     
     if (dependents && dependents.length > 0) {
         dependents.forEach(dep => {
@@ -399,32 +402,35 @@ async function handleUpdateClient(event) {
     const formData = new FormData(form);
     const formProps = Object.fromEntries(formData);
     
-    if (formProps.cpf && !validateCPF(formProps.cpf)) {
+    // CORREÇÃO: Validação usando os 'name' corretos
+    if (formProps.details_cpf && !validateCPF(formProps.details_cpf)) {
         alert('O CPF do titular é inválido!');
         return;
     }
-    if (formProps.email && !validateEmail(formProps.email)) {
+    if (formProps.details_email && !validateEmail(formProps.details_email)) {
         alert('O Email do titular é inválido!');
         return;
     }
-     if (formProps.telefone && !validatePhone(formProps.telefone)) {
+     if (formProps.details_telefone && !validatePhone(formProps.details_telefone)) {
         alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
     
     const titularId = formProps.id;
     const titularData = {
+        // CORREÇÃO: Lendo os 'name' corretos do formProps
         nome: formProps.details_nome,
         sobrenome: formProps.details_sobrenome,
-        telefone: formProps.telefone,
-        cpf: formProps.cpf,
-        email: formProps.email,
+        telefone: formProps.details_telefone,
+        cpf: formProps.details_cpf,
+        email: formProps.details_email,
         data_nascimento: formatDateForSupabase(formProps.details_data_nascimento),
-        plano: formProps.plano,
-        status: formProps.status,
-        cep: formProps.cep,
-        endereco: formProps.endereco,
-        municipio: formProps.municipio,
+        plano: formProps.details_plano,
+        status: formProps.details_status,
+        cep: formProps.details_cep,
+        endereco: formProps.details_endereco,
+        municipio: formProps.details_municipio,
+        observacao: formProps.details_observacao
     };
     
     submitButton.disabled = true;

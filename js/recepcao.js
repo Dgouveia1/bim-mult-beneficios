@@ -1,5 +1,6 @@
 import { _supabase } from './supabase.js';
 import { allPeople } from './clientes.js'; // Importamos a lista de pessoas para pegar os detalhes
+import { logAction } from './logger.js'; // Importando logAction
 
 // Variável para guardar a inscrição e poder removê-la depois
 let receptionSubscription = null;
@@ -111,9 +112,21 @@ async function markArrival(appointmentId) {
     }
 
     try {
-        const { error } = await _supabase.from('appointments').update({ status: 'chegou' }).eq('id', appointmentId);
+        // CORREÇÃO 1: Adicionado 'checkin_time' ao fazer o check-in
+        const updateData = { 
+            status: 'chegou', 
+            checkin_time: new Date().toISOString() 
+        };
+
+        const { error } = await _supabase.from('appointments').update(updateData).eq('id', appointmentId);
         if (error) throw error;
         
+        // Log da ação
+        await logAction('CHECK_IN', { 
+            appointmentId: appointmentId, 
+            checkinTime: updateData.checkin_time 
+        });
+
         // Atualiza visualmente o botão imediatamente enquanto espera o realtime
         if(checkinButton) {
             checkinButton.innerHTML = '<i class="fas fa-check"></i> Chegou';
@@ -124,6 +137,7 @@ async function markArrival(appointmentId) {
 
     } catch (error) {
         alert('Não foi possível realizar o check-in.');
+        console.error("Erro no check-in:", error); // Adiciona log de erro
         if(checkinButton) {
             checkinButton.disabled = false;
             checkinButton.innerHTML = '<i class="fas fa-check"></i> Check-in';
@@ -175,6 +189,13 @@ async function savePayment(event) {
             .eq('id', paymentData.appointment_id);
         if (appointmentError) throw appointmentError;
         
+        // Log da ação
+        await logAction('REGISTER_PAYMENT', { 
+            appointmentId: paymentData.appointment_id, 
+            amount: paymentData.amount,
+            method: paymentData.method
+        });
+
         alert('Pagamento registrado com sucesso!');
         document.getElementById('paymentModal').style.display = 'none';
         form.reset();
