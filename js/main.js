@@ -12,6 +12,8 @@ import { loadProfessionalsData, openProfessionalModal, saveProfessional } from '
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
+// CORREÇÃO (Ponto 3): Importa a função de setup da página de vendas
+import { setupVendasPage } from './vendas.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
 import { loadLogsData, setupLogsPage } from './logs.js'; // Importa a função de setup da página de logs
 
@@ -105,8 +107,10 @@ async function loadPageData(pageName) {
     else if (pageName === 'disparos') await loadMunicipios();
     else if (pageName === 'confirmacoes') await loadConfirmationsData();
     else if (pageName === 'logs') setupLogsPage(); // << ALTERADO: Apenas prepara a página de logs
+    // CORREÇÃO (Ponto 3): Chama a função de setup da página de vendas
+    else if (pageName === 'vendas') setupVendasPage();
     else if (pageName === 'prontuario') {
-        await loadClientsData();
+        // CORREÇÃO (Ponto 4): Não carrega mais 'loadClientsData' aqui
         setupProntuarioPage();
     } else if (pageName === 'carteirinha') {
         setupCarteirinhaPage();
@@ -172,11 +176,14 @@ function setupEventListeners() {
 
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
+        // CORREÇÃO (Ponto 2): Mudar de 'input' para 'search' ou 'change' pode ser melhor, 
+        // mas vamos manter 'input' e confiar no debounce.
+        // A lógica de busca real foi movida para loadClientsData
         clientsSearchInput.addEventListener('input', (e) => {
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
                 const searchTerm = e.target.value;
-                loadClientsData(searchTerm);
+                loadClientsData(searchTerm); // A função loadClientsData agora lida com o termo
             }, 500); 
         });
     }
@@ -215,8 +222,11 @@ function setupEventListeners() {
         if (paymentButton) openPaymentModal(paymentButton.dataset.id, paymentButton.dataset.name);
         const appointmentCard = target.closest('.appointment-card[data-appointment-id]');
         if (appointmentCard) openAppointmentDetails(appointmentCard.dataset.appointmentId);
-        const detailsClientButton = target.closest('[data-titular-id]');
+        // CORREÇÃO (Ponto 2): O seletor [data-titular-id] está muito genérico, 
+        // mas vamos assumir que só existe na tabela de clientes.
+        const detailsClientButton = target.closest('#clientsTableBody .btn[data-titular-id]');
         if (detailsClientButton) openDetailsModal(detailsClientButton.dataset.titularId);
+        
         const patientQueueItem = target.closest('.paciente-espera-item');
         if (patientQueueItem) selectPatient(patientQueueItem.dataset.appointmentId);
         const finalizeButton = target.closest('#finalizeConsultationBtn');

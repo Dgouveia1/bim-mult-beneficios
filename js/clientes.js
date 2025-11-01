@@ -18,8 +18,21 @@ function formatDateForSupabase(dateString) {
     if (!dateString || !dateString.includes('/')) return null;
     const parts = dateString.split('/');
     if (parts.length !== 3) return null;
-    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    // Garante que o ano tenha 4 dígitos
+    let year = parts[2];
+    if (year.length === 2) {
+        year = parseInt(year) > 50 ? `19${year}` : `20${year}`; // Ajuste simples para anos de 2 dígitos
+    }
+    return `${year}-${parts[1]}-${parts[0]}`;
 }
+
+function formatDateForInput(dateString) {
+    if (!dateString || !dateString.includes('-')) return '';
+    const parts = dateString.split('-'); // Formato YYYY-MM-DD
+    if (parts.length !== 3) return '';
+    return `${parts[2]}/${parts[1]}/${parts[0]}`; // Formato DD/MM/YYYY
+}
+
 
 // --- FUNÇÕES DE CRIAÇÃO ---
 
@@ -47,6 +60,10 @@ function addDependenteField(container, counterVar) {
                 <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${id}" maxlength="14"></div>
                 <div class="form-group"><label>Telefone</label><input type="text" name="dependente_telefone_${id}" maxlength="15"></div>
             </div>
+            <!-- CORREÇÃO (Ponto 1): Adicionando data de nascimento para dependentes -->
+            <div class="form-row">
+                <div class="form-group"><label>Data de Nascimento</label><input type="text" name="dependente_data_nascimento_${id}" placeholder="dd/mm/aaaa"></div>
+            </div>
         </div>`;
     container.insertAdjacentHTML('beforeend', html);
 }
@@ -62,11 +79,28 @@ async function loadClientsData(searchTerm = null) {
         // Se um termo de busca com pelo menos 3 caracteres for fornecido, executa a busca no servidor
         if (searchTerm && searchTerm.length >= 3) {
             const lowerSearchTerm = searchTerm.toLowerCase();
+            // CORREÇÃO (Ponto 2): Divide o termo de busca em palavras
+            const searchWords = lowerSearchTerm.split(' ').filter(w => w.length > 0);
 
-            // Busca por titulares e dependentes que correspondem ao termo de busca
+            // --- Query de Clientes ---
+            let clientQuery = _supabase.from('clients').select('id');
+            // Constrói um filtro AND para cada palavra no nome/sobrenome
+            const clientNameFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+            // Constrói um filtro OR para CPF/Telefone (usando o termo completo)
+            const clientOrFilters = `and(${clientNameFilter}),cpf.ilike.%${lowerSearchTerm}%,telefone.ilike.%${lowerSearchTerm}%`;
+            clientQuery = clientQuery.or(clientOrFilters);
+
+            // --- Query de Dependentes ---
+            let dependentQuery = _supabase.from('dependents').select('titular_id');
+            const dependentNameFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+            // Constrói um filtro OR para CPF (usando o termo completo)
+            const dependentOrFilters = `and(${dependentNameFilter}),cpf.ilike.%${lowerSearchTerm}%`;
+            dependentQuery = dependentQuery.or(dependentOrFilters);
+            
+            // Executa ambas as queries em paralelo
             const [clientResults, dependentResults] = await Promise.all([
-                _supabase.from('clients').select('id').or(`nome.ilike.%${lowerSearchTerm}%,sobrenome.ilike.%${lowerSearchTerm}%,cpf.ilike.%${lowerSearchTerm}%,telefone.ilike.%${lowerSearchTerm}%`),
-                _supabase.from('dependents').select('titular_id').or(`nome.ilike.%${lowerSearchTerm}%,sobrenome.ilike.%${lowerSearchTerm}%,cpf.ilike.%${lowerSearchTerm}%`)
+                clientQuery,
+                dependentQuery
             ]);
 
             if (clientResults.error) throw clientResults.error;
@@ -118,7 +152,7 @@ async function loadClientsData(searchTerm = null) {
                         titular_id: client.id,
                         nome: `${dep.nome || ''} ${dep.sobrenome || ''}`.trim(),
                         cpf: dep.cpf,
-                        telefone: dep.telefone,
+                        telefone: dep.telefone, // Nota: dependente pode não ter tel, pode vir do titular
                         plano: client.plano,
                         status: client.status,
                         tipo: 'Dependente'
@@ -127,7 +161,7 @@ async function loadClientsData(searchTerm = null) {
             }
         });
 
-        allPeople = peopleList; // Atualiza a variável global para compatibilidade
+        allPeople = peopleList; // Atualiza a variável global
         renderClientsTable(allPeople);
 
     } catch (error) {
@@ -136,12 +170,15 @@ async function loadClientsData(searchTerm = null) {
     }
 }
 
+
 function renderClientsTable(people) {
     if (!clientsTableBody) return;
     clientsTableBody.innerHTML = '';
     
     document.getElementById('resultsCount').textContent = people.length;
-    document.getElementById('totalResults').textContent = allPeople.length;
+    // CORREÇÃO (Ponto 4): A contagem total não é mais relevante da mesma forma
+    // Vamos mostrar o total de resultados *encontrados*
+    document.getElementById('totalResults').textContent = people.length;
 
     if (people.length === 0) {
         clientsTableBody.innerHTML = '<tr><td colspan="6">Nenhuma pessoa encontrada.</td></tr>';
@@ -151,11 +188,11 @@ function renderClientsTable(people) {
     people.forEach(person => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${person.nome || 'N/A'} (${person.tipo})</td>
-            <td>${person.cpf || 'N/A'}</td>
-            <td>${person.telefone || 'N/A'}</td>
-            <td>${person.plano || 'N/A'}</td>
-            <td><span class="status status-${person.status === 'ATIVO' ? 'active' : 'inactive'}">${person.status}</span></td>
+            <td data-label="Nome">${person.nome || 'N/A'} (${person.tipo})</td>
+            <td data-label="CPF">${person.cpf || 'N/A'}</td>
+            <td data-label="Telefone">${person.telefone || 'N/A'}</td>
+            <td data-label="Plano">${person.plano || 'N/A'}</td>
+            <td data-label="Status"><span class="status status-${person.status === 'ATIVO' ? 'active' : 'inactive'}">${person.status}</span></td>
             <td class="actions">
                 <button class="btn btn-secondary btn-small" data-titular-id="${person.titular_id}">Ver Detalhes</button>
             </td>
@@ -164,25 +201,11 @@ function renderClientsTable(people) {
     });
 }
 
+// Esta função agora é local, pois a busca é feita no servidor
 function filterAndRenderClients() {
-    const searchTerm = document.getElementById('clientsSearchInput').value.toLowerCase();
-    
-    if (!searchTerm) {
-        renderClientsTable(allPeople);
-        return;
-    }
-
-    const filteredPeople = allPeople.filter(person => {
-        const nome = person.nome ? person.nome.toLowerCase() : '';
-        const cpf = person.cpf ? person.cpf.toString().replace(/\D/g, '') : '';
-        const telefone = person.telefone ? person.telefone.toString().replace(/\D/g, '') : '';
-
-        return nome.includes(searchTerm) ||
-               cpf.includes(searchTerm) ||
-               telefone.includes(searchTerm);
-    });
-
-    renderClientsTable(filteredPeople);
+    const searchTerm = document.getElementById('clientsSearchInput').value;
+    // Dispara a busca no servidor
+    loadClientsData(searchTerm);
 }
 
 // --- FUNÇÕES DE SUBMISSÃO (CREATE/UPDATE) ---
@@ -195,15 +218,15 @@ async function handleNewClientSubmit(event) {
     const titularFormData = new FormData(form);
     const titularFormProps = Object.fromEntries(titularFormData);
     
-    if (!validateCPF(titularFormProps.cpf)) {
+    if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
         alert('O CPF do titular é inválido!');
         return;
     }
-    if (!validateEmail(titularFormProps.email)) {
+    if (titularFormProps.email && !validateEmail(titularFormProps.email)) {
         alert('O Email do titular é inválido!');
         return;
     }
-     if (!validatePhone(titularFormProps.telefone)) {
+     if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
         alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
@@ -232,6 +255,8 @@ async function handleNewClientSubmit(event) {
             sobrenome: group.querySelector(`[name="dependente_sobrenome_${id}"]`).value,
             cpf: group.querySelector(`[name="dependente_cpf_${id}"]`).value,
             telefone: group.querySelector(`[name="dependente_telefone_${id}"]`).value,
+            // CORREÇÃO (Ponto 1): Capturando data de nascimento
+            data_nascimento: group.querySelector(`[name="dependente_data_nascimento_${id}"]`).value,
         };
 
         if (dependente.cpf && !validateCPF(dependente.cpf)) {
@@ -265,7 +290,12 @@ async function handleNewClientSubmit(event) {
 
         if (dependentesData.length > 0) {
             const dependentesParaSalvar = dependentesData.map(dep => {
-                return { ...dep, titular_id: titularId };
+                return { 
+                    ...dep, 
+                    titular_id: titularId,
+                    // CORREÇÃO (Ponto 1): Formatando data de nascimento do dependente
+                    data_nascimento: formatDateForSupabase(dep.data_nascimento)
+                };
             });
 
             const { error: dependentesError } = await _supabase
@@ -280,7 +310,7 @@ async function handleNewClientSubmit(event) {
         form.reset();
         document.getElementById('dependentesContainer').innerHTML = '';
         dependenteCount = 0;
-        loadClientsData();
+        loadClientsData(); // Recarrega os dados
 
     } catch (error) {
         alert('Erro ao salvar cliente: ' + error.message);
@@ -320,10 +350,9 @@ function populateDetailsForm(client, dependents) {
     document.getElementById('details_telefone').value = client.telefone || '';
     document.getElementById('details_cpf').value = client.cpf || '';
     document.getElementById('details_email').value = client.email || '';
-    if (client.data_nascimento) {
-        const [year, month, day] = client.data_nascimento.split('-');
-        document.getElementById('details_data_nascimento').value = `${day}/${month}/${year}`;
-    }
+    // CORREÇÃO: Formata data do titular
+    document.getElementById('details_data_nascimento').value = formatDateForInput(client.data_nascimento);
+    
     document.getElementById('details_plano').value = client.plano || '';
     document.getElementById('details_status').value = client.status || 'ATIVO';
     document.getElementById('details_cep').value = client.cep || '';
@@ -332,6 +361,9 @@ function populateDetailsForm(client, dependents) {
     
     if (dependents && dependents.length > 0) {
         dependents.forEach(dep => {
+            // CORREÇÃO (Ponto 1): Formata data de nascimento do dependente
+            const dataNascimentoFormatada = formatDateForInput(dep.data_nascimento);
+
             const depHTML = `
                 <div class="dependente-form-group" data-dependente-id="${dep.id}">
                     <hr>
@@ -348,6 +380,10 @@ function populateDetailsForm(client, dependents) {
                         <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${dep.id}" value="${dep.cpf || ''}" maxlength="14"></div>
                         <div class="form-group"><label>Telefone</label><input type="text" name="dependente_telefone_${dep.id}" value="${dep.telefone || ''}" maxlength="15"></div>
                     </div>
+                    <!-- CORREÇÃO (Ponto 1): Adiciona campo de data de nascimento preenchido -->
+                    <div class="form-row">
+                         <div class="form-group"><label>Data de Nascimento</label><input type="text" name="dependente_data_nascimento_${dep.id}" value="${dataNascimentoFormatada}" placeholder="dd/mm/aaaa"></div>
+                    </div>
                 </div>`;
             detailsDependentesContainer.insertAdjacentHTML('beforeend', depHTML);
         });
@@ -363,15 +399,15 @@ async function handleUpdateClient(event) {
     const formData = new FormData(form);
     const formProps = Object.fromEntries(formData);
     
-    if (!validateCPF(formProps.cpf)) {
+    if (formProps.cpf && !validateCPF(formProps.cpf)) {
         alert('O CPF do titular é inválido!');
         return;
     }
-    if (!validateEmail(formProps.email)) {
+    if (formProps.email && !validateEmail(formProps.email)) {
         alert('O Email do titular é inválido!');
         return;
     }
-     if (!validatePhone(formProps.telefone)) {
+     if (formProps.telefone && !validatePhone(formProps.telefone)) {
         alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
@@ -415,6 +451,7 @@ async function handleUpdateClient(event) {
             }
             
             let dependente = {};
+            // CORREÇÃO (Ponto 1): Captura data de nascimento em ambos os casos (novo e existente)
             if (id) {
                 dependente = {
                     id: id,
@@ -423,6 +460,7 @@ async function handleUpdateClient(event) {
                     sobrenome: group.querySelector(`[name="dependente_sobrenome_${id}"]`).value,
                     cpf: group.querySelector(`[name="dependente_cpf_${id}"]`).value,
                     telefone: group.querySelector(`[name="dependente_telefone_${id}"]`).value,
+                    data_nascimento: formatDateForSupabase(group.querySelector(`[name="dependente_data_nascimento_${id}"]`).value),
                 };
                  if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
                  if (dependente.telefone && !validatePhone(dependente.telefone)) { throw new Error(`Telefone do dependente ${dependente.nome} é inválido.`); }
@@ -434,6 +472,7 @@ async function handleUpdateClient(event) {
                     sobrenome: group.querySelector(`[name="dependente_sobrenome_${newId}"]`).value,
                     cpf: group.querySelector(`[name="dependente_cpf_${newId}"]`).value,
                     telefone: group.querySelector(`[name="dependente_telefone_${newId}"]`).value,
+                    data_nascimento: formatDateForSupabase(group.querySelector(`[name="dependente_data_nascimento_${newId}"]`).value),
                 };
                  if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
                  if (dependente.telefone && !validatePhone(dependente.telefone)) { throw new Error(`Telefone do dependente ${dependente.nome} é inválido.`); }
@@ -462,7 +501,7 @@ async function handleUpdateClient(event) {
 
         alert('Cliente atualizado com sucesso!');
         closeModal(detailsClientModal);
-        loadClientsData();
+        loadClientsData(); // Recarrega os dados
 
     } catch (error) {
         alert('Erro ao atualizar cliente: ' + error.message);
@@ -484,7 +523,7 @@ function closeModal(modalElement) {
 // --- FUNÇÃO DE EXPORTAÇÃO ---
 function exportToExcel() {
     if (allPeople.length === 0) {
-        alert("Não há dados para exportar.");
+        alert("Não há dados para exportar (baseado na busca/filtro atual).");
         return;
     }
     const dataToExport = allPeople.map(person => ({
@@ -503,4 +542,3 @@ function exportToExcel() {
 
 // --- EXPORTAÇÕES ---
 export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople };
-

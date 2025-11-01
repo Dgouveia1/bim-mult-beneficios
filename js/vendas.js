@@ -4,6 +4,43 @@ import { logAction } from './logger.js';
 
 let dependenteVendaCount = 0;
 
+/**
+ * Converte uma URL de imagem para o formato Base64.
+ * Essencial para embutir a imagem no PDF.
+ */
+function imageToBase64(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            resolve(dataURL);
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
+/**
+ * Formata uma data do tipo "dd/mm/aaaa" para "aaaa-mm-dd" (padrão Supabase)
+ */
+function formatDateForSupabase(dateString) {
+    if (!dateString || !dateString.includes('/')) return null;
+    const parts = dateString.split('/');
+    if (parts.length !== 3) return null;
+    let year = parts[2];
+    if (year.length === 2) {
+        year = parseInt(year) > 50 ? `19${year}` : `20${year}`;
+    }
+    return `${year}-${parts[1]}-${parts[0]}`;
+}
+
+
 function addVendaDependenteField(container) {
     if (dependenteVendaCount >= 6) {
         alert("É permitido no máximo 6 dependentes.");
@@ -92,7 +129,7 @@ async function handleNewSaleSubmit(event) {
             .from('clients')
             .insert({
                 ...titularData,
-                data_nascimento: titularData.data_nascimento ? titularData.data_nascimento.split('/').reverse().join('-') : null
+                data_nascimento: formatDateForSupabase(titularData.data_nascimento)
             })
             .select()
             .single();
@@ -105,7 +142,7 @@ async function handleNewSaleSubmit(event) {
             const dependentesParaSalvar = dependentesData.map(dep => ({
                 ...dep,
                 titular_id: newTitular.id,
-                data_nascimento: dep.data_nascimento ? dep.data_nascimento.split('/').reverse().join('-') : null
+                data_nascimento: formatDateForSupabase(dep.data_nascimento)
             }));
 
             const { error: dependentesError } = await _supabase
@@ -116,7 +153,8 @@ async function handleNewSaleSubmit(event) {
         }
 
         alert('Venda registrada com sucesso! Gerando contrato...');
-        await generateContractPDF(titularData, dependentesData);
+        // Passa o objeto 'titular' completo e os dependentes
+        await generateContractPDF(newTitular, dependentesData);
         form.reset();
         document.getElementById('vendasDependentesContainer').innerHTML = '';
         dependenteVendaCount = 0;
@@ -129,120 +167,190 @@ async function handleNewSaleSubmit(event) {
     }
 }
 
+/**
+ * CORREÇÃO: Função de geração de PDF atualizada para melhor formatação
+ * e inclusão de assinaturas.
+ */
 async function generateContractPDF(titular, dependentes) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'mm', 'a4');
-    let y = 15; // Posição vertical inicial
+    const margin = 20;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const usableWidth = pageWidth - (margin * 2);
+    let y = margin; // Posição vertical inicial
 
-    const addWrappedText = (text, x, startY, maxWidth, lineHeight) => {
+    // --- Helper para texto justificado ---
+    const addWrappedText = (text, x, startY, maxWidth, lineHeight, isJustified = false) => {
         const lines = pdf.splitTextToSize(text, maxWidth);
-        pdf.text(lines, x, startY);
+        if (isJustified) {
+             pdf.text(lines, x, startY, { align: 'justify', maxWidth: maxWidth });
+        } else {
+             pdf.text(lines, x, startY);
+        }
         return startY + (lines.length * lineHeight);
     };
 
-    // --- TÍTULO ---
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS "BIM MULT BENEFICIOS"', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-    y += 10;
+    try {
+        // --- 1. ADICIONAR LOGO ---
+        // Usando a logo dos arquivos. Ajuste o caminho se necessário.
+        const logoBase64 = await imageToBase64('Logo_para_Marca_d_Água_MULTSAÚDE_Símbolo_(Laranja).png');
+        pdf.addImage(logoBase64, 'PNG', margin, y, 30, 30); // Logo de 30x30mm
+        y += 40; // Espaço após a logo
 
-    // --- DADOS DAS PARTES ---
-    pdf.setFontSize(10);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('CONTRATADA: "BIM MULT BENEFICIOS"', 15, y); y += 5;
-    pdf.text('CNPJ: 37.054.912/0001-56', 15, y); y += 5;
-    pdf.text('Endereço: Av Amadeu bizelli, 1315 – Centro Fernandópolis - SP', 15, y); y += 10;
-
-    pdf.text(`CONTRATANTE (NOME COMPLETO): ${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}`, 15, y); y += 5;
-    pdf.text(`CPF: ${titular.cpf}`, 15, y); y += 5;
-    pdf.text(`ENDEREÇO: ${titular.endereco}, ${titular.municipio} - SP`, 15, y); y += 5;
-    pdf.text(`DATA DE NASC.: ${titular.data_nascimento}`, 15, y); y += 5;
-    pdf.text(`TELEFONE: ${titular.telefone}`, 15, y); y += 10;
-
-    pdf.text('Pelo presente CONTRATO DE PRESTAÇÃO DE SERVIÇOS, as partes acima discriminadas se comprometem às seguintes cláusulas e condições:', 15, y); y += 10;
-
-    // --- CLÁUSULAS ---
-    const clausulas = [
-        { title: 'CLÁUSULA 1ª – DO OBJETO', text: 'O presente contrato tem por objeto a prestação dos serviços descritos e detalhados no Anexo 1 deste instrumento. O Anexo compõe o presente contrato e são parte integrante deste, independentemente de transcrição, declarando-se o (a) CONTRATANTE ciente de seu inteiro teor.' },
-        { title: 'CLÁUSULA 2ª – DA CARÊNCIA PARA UTILIZAÇÃO DOS BENEFÍCIOS:', text: 'O acesso aos benefícios e/ou às coberturas garantidas neste contrato somente terão efeito após o cumprimento dos prazos e condições descritos no Anexo 2. O (a) CONTRATANTE declara-se ciente de que há a possibilidade de necessidade de reiteração no cumprimento do prazo de carência em caso de inadimplemento, conforme prazos e condições dispostas no Anexo do presente contrato.' },
-        { title: 'CLÁUSULA 3ª – DO PRAZO E DO PAGAMENTO', text: 'O presente contrato vigerá pelo prazo de 12 (doze) meses, contados a partir da assinatura do mesmo, sendo tal período renovado automaticamente, por iguais e sucessivos períodos, desde que não haja manifestação expressa de alguma das partes acerca da intenção de não renovação. Os valores a serem cumprido pela parte CONTRATANTE são aqueles discriminados em seu cadastro junto a CONTRATADA, de acordo com o plano, termos e condições e serviços escolhidos pelo cliente no momento da contratação. Essas informações podem ser solicitadas pelo (a) CONTRATANTE a qualquer momento. O atraso em qualquer das parcelas mensais acarretará o acréscimo de multa de 2% (dois por cento) ao mês e juros moratórios diários de 0,33% (zero vírgula trinta e três por cento). O valor do presente contrato será reajustado anualmente, pelo IGP-M da FGV ou, na hipótese de extinção deste, pelo índice que vier a substituí-lo. O(s) pagamento(s) de mensalidade(s) referente(s) a mês(es) posterior(es) ao de uma ou mais mensalidades vencidas não quita(m) eventuais débitos anteriores.' },
-        { title: 'CLÁUSULA 4ª – DA RESCISÃO', text: 'O presente contrato poderá ser rescindido de pleno direito, antes de seu termo final, mediante notificação prévia da parte interessada, por escrito, com antecedência mínima de 30 (trinta) dias. No caso de pedido de rescisão, terá o (a) CONTRATANTE a obrigação de arcar com todos os valores devidos durante o período de aviso prévio de 30 (trinta) dias. No caso de cancelamento deverá ser efetuado por escrito para a BIM MULT BENEFICIOS, na Avenida Amadeu Bizelli, 1315 – Centro Fernandópolis – SP.'},
-        { title: 'CLÁUSULA 5ª – DAS CONDIÇÕES GERAIS', text: 'O (A) CONTRATANTE declara que leu, compreendeu e aceitou o presente Contrato em todos seus termos e condições, de forma livre e independente de qualquer dolo, coação, fraude ou reserva mental. As definições necessárias e as condições específicas para a utilização das coberturas previstas neste contrato está nos respectivos Anexos, que fazem parte integrante do presente contrato.'},
-        { title: 'CLÁUSULA 6ª – DO FORO:', text: 'As partes elegem o foro do domicilio de Fernandópolis para dirimir qualquer controvérsia oriunda do presente contrato. Por estarem justas e acordadas, as Partes assinam este Instrumento em duas vias de igual teor e forma.'}
-    ];
-
-    clausulas.forEach(clausula => {
+        // --- 2. TÍTULO ---
+        pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        y = addWrappedText(clausula.title, 15, y, 180, 5);
-        y += 2;
+        pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS "BIM MULT BENEFICIOS"', pageWidth / 2, y, { align: 'center' });
+        y += 15;
+
+        // --- 3. DADOS DAS PARTES ---
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('CONTRATADA:', margin, y);
         pdf.setFont('helvetica', 'normal');
-        y = addWrappedText(clausula.text, 15, y, 180, 5);
+        y = addWrappedText(
+            'BIM MULT BENEFICIOS, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 37.054.912/0001-56, com sede na Av. Amadeu Bizelli, 1315 – Centro, Fernandópolis - SP, CEP 15600-000.',
+            margin, y + 5, usableWidth, 5, true
+        );
+        y += 10;
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('CONTRATANTE:', margin, y);
+        pdf.setFont('helvetica', 'normal');
+        y = addWrappedText(
+            `${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}, inscrito(a) no CPF sob o nº ${titular.cpf}, data de nasc. ${titular.data_nascimento ? titular.data_nascimento.split('-').reverse().join('/') : 'N/A'}, residente e domiciliado(a) em ${titular.endereco || 'N/A'}, ${titular.municipio || 'N/A'} - SP, Telefone: ${titular.telefone || 'N/A'}.`,
+            margin, y + 5, usableWidth, 5, true
+        );
+        y += 10;
+
+        y = addWrappedText(
+            'Pelo presente CONTRATO DE PRESTAÇÃO DE SERVIÇOS, as partes acima qualificadas têm, entre si, justo e contratado o que se segue:',
+            margin, y, usableWidth, 5, true
+        );
+        y += 10;
+
+        // --- 4. CLÁUSULAS ---
+        const clausulas = [
+            { title: 'CLÁUSULA 1ª – DO OBJETO', text: 'O presente contrato tem por objeto a prestação dos serviços descritos e detalhados no Anexo 1 deste instrumento. O Anexo compõe o presente contrato e são parte integrante deste, independentemente de transcrição, declarando-se o (a) CONTRATANTE ciente de seu inteiro teor.' },
+            { title: 'CLÁUSULA 2ª – DA CARÊNCIA PARA UTILIZAÇÃO DOS BENEFÍCIOS:', text: 'O acesso aos benefícios e/ou às coberturas garantidas neste contrato somente terão efeito após o cumprimento dos prazos e condições descritos no Anexo 2. O (a) CONTRATANTE declara-se ciente de que há a possibilidade de necessidade de reiteração no cumprimento do prazo de carência em caso de inadimplemento, conforme prazos e condições dispostas no Anexo do presente contrato.' },
+            { title: 'CLÁUSULA 3ª – DO PRAZO E DO PAGAMENTO', text: 'O presente contrato vigerá pelo prazo de 12 (doze) meses, contados a partir da assinatura do mesmo, sendo tal período renovado automaticamente, por iguais e sucessivos períodos, desde que não haja manifestação expressa de alguma das partes acerca da intenção de não renovação. Os valores a serem cumprido pela parte CONTRATANTE são aqueles discriminados em seu cadastro junto a CONTRATADA, de acordo com o plano, termos e condições e serviços escolhidos pelo cliente no momento da contratação. Essas informações podem ser solicitadas pelo (a) CONTRATANTE a qualquer momento. O atraso em qualquer das parcelas mensais acarretará o acréscimo de multa de 2% (dois por cento) ao mês e juros moratórios diários de 0,33% (zero vírgula trinta e três por cento). O valor do presente contrato será reajustado anualmente, pelo IGP-M da FGV ou, na hipótese de extinção deste, pelo índice que vier a substituí-lo. O(s) pagamento(s) de mensalidade(s) referente(s) a mês(es) posterior(es) ao de uma ou mais mensalidades vencidas não quita(m) eventuais débitos anteriores.' },
+            { title: 'CLÁUSULA 4ª – DA RESCISÃO', text: 'O presente contrato poderá ser rescindido de pleno direito, antes de seu termo final, mediante notificação prévia da parte interessada, por escrito, com antecedência mínima de 30 (trinta) dias. No caso de pedido de rescisão, terá o (a) CONTRATANTE a obrigação de arcar com todos os valores devidos durante o período de aviso prévio de 30 (trinta) dias. No caso de cancelamento deverá ser efetuado por escrito para a BIM MULT BENEFICIOS, na Avenida Amadeu Bizelli, 1315 – Centro Fernandópolis – SP.'},
+            { title: 'CLÁUSULA 5ª – DAS CONDIÇÕES GERAIS', text: 'O (A) CONTRATANTE declara que leu, compreendeu e aceitou o presente Contrato em todos seus termos e condições, de forma livre e independente de qualquer dolo, coação, fraude ou reserva mental. As definições necessárias e as condições específicas para a utilização das coberturas previstas neste contrato está nos respectivos Anexos, que fazem parte integrante do presente contrato.'},
+            { title: 'CLÁUSULA 6ª – DO FORO:', text: 'As partes elegem o foro do domicilio de Fernandópolis para dirimir qualquer controvérsia oriunda do presente contrato. Por estarem justas e acordadas, as Partes assinam este Instrumento em duas vias de igual teor e forma.'}
+        ];
+
+        pdf.setFontSize(10);
+        clausulas.forEach(clausula => {
+            if (y > 250) { // Verifica se precisa de nova página
+                pdf.addPage();
+                y = margin;
+            }
+            pdf.setFont('helvetica', 'bold');
+            y = addWrappedText(clausula.title, margin, y, usableWidth, 5);
+            y += 2;
+            pdf.setFont('helvetica', 'normal');
+            y = addWrappedText(clausula.text, margin, y, usableWidth, 5, true); // Justificado
+            y += 7;
+        });
+
+        if (y > 220) { // Pula para nova página se tiver pouco espaço para assinaturas
+            pdf.addPage();
+            y = margin;
+        }
+
+        // --- 5. DATA E LOCAL ---
+        const today = new Date();
+        pdf.text(`Fernandópolis - SP, ${today.toLocaleDateString('pt-BR')}`, pageWidth / 2, y + 10, { align: 'center' });
+        y += 25;
+
+        // --- 6. ASSINATURAS ---
+        pdf.text('________________________________________', margin, y);
+        pdf.text('________________________________________', pageWidth / 2 + 10, y);
         y += 5;
-    });
 
-    // --- DATA E ASSINATURAS ---
-    const today = new Date();
-    pdf.text(`Fernandópolis, ${today.getDate()} / ${today.getMonth() + 1} / ${today.getFullYear()}`, 15, y);
-    y += 20;
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('CONTRATANTE', margin, y);
+        pdf.text('CONTRATADA', pageWidth / 2 + 10, y);
+        y += 5;
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}`, margin, y);
+        pdf.text('BIM MULT BENEFICIOS', pageWidth / 2 + 10, y);
+        y += 5;
+        
+        pdf.text(`CPF: ${titular.cpf}`, margin, y);
+        pdf.text('CNPJ: 37.054.912/0001-56', pageWidth / 2 + 10, y);
+        y += 10;
 
-    pdf.text('_________________________', 30, y);
-    pdf.text('_________________________', 120, y);
-    y += 5;
-    pdf.text('CONTRATANTE', 45, y);
-    pdf.text('CONTRATADA', 135, y);
-    
-    // --- PÁGINA DE ANEXOS ---
-    pdf.addPage();
-    y = 15;
-    
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-    y += 10;
-    
-    const tableData = [[
-        `${titular.nome} ${titular.sobrenome}`,
-        titular.cpf,
-        titular.data_nascimento,
-        titular.plano
-    ]];
 
-    dependentes.forEach(d => {
-        tableData.push([
-            `${d.nome} ${d.sobrenome}`,
-            d.cpf,
-            d.data_nascimento,
-            `DEPENDENTE ${titular.plano}`
-        ]);
-    });
+        // --- 7. PÁGINA DE ANEXOS ---
+        pdf.addPage();
+        y = margin;
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS E BENEFICIÁRIOS', pageWidth / 2, y, { align: 'center' });
+        y += 15;
+        
+        const tableData = [[
+            `${titular.nome} ${titular.sobrenome}`,
+            titular.cpf,
+            titular.data_nascimento ? titular.data_nascimento.split('-').reverse().join('/') : 'N/A',
+            titular.plano,
+            'TITULAR'
+        ]];
 
-    pdf.autoTable({
-        startY: y,
-        head: [['Nome', 'CPF', 'Data Nascimento', 'PLANO']],
-        body: tableData,
-        theme: 'striped'
-    });
-    
-    y = pdf.autoTable.previous.finalY + 10;
-    
-    pdf.setFont('helvetica', 'normal');
-    y = addWrappedText('Composto pelos produtos: BIM PLANO FAMILIAR (composto por no máximo 7 (sete) pessoas. Carência – 1 dia útil.', 15, y, 180, 5);
-    y += 5;
-    y = addWrappedText('Inadimplência: O não pagamento da “Parcela Mensal” transcorrido o lapso de quinze (15) dias, computados ininterruptamente a partir da data do vencimento da obrigação, sem que haja sido efetuado o cumprimento da obrigação contratual, será facultado à Empresa – CONTRATADA, suspender as disponibilizações dos “Serviços” que se presta a servir ao(s) Beneficiário(s) inscritos.', 15, y, 180, 5);
-    y += 10;
-    
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('ANEXO 2 - DOS BENEFÍCIOS', pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-    y += 10;
-    
-    pdf.setFont('helvetica', 'normal');
-    const anexo2Text = '1. A CONTRATADA terá direito a acesso a uma rede de profissionais de saúde, incluindo médicos de diversas especialidades e odontologia com descontos especiais sobre os honorários, cobrados.\n2. A CONTRATADA também terá acesso a exames laboratoriais e de imagem com descontos previamente estabelecidos, conforme tabela de preços que será disponibilizada pelo CONTRATANTE.\n3. Os descontos aplicáveis serão informados a CONTRATADA no momento da solicitação dos serviços e poderão variar de acordo com a especialidade e o tipo de exame.\n4. A CONTRATADA concorda em seguir os procedimentos necessários para agendamento e realização dos serviços, conforme as orientações do CONTRATANTE.\n5. O CONTRATANTE se reserva o direito de atualizar a lista de médicos e exames disponíveis, bem como os respectivos descontos, mediante aviso prévio a CONTRATADA.';
-    y = addWrappedText(anexo2Text, 15, y, 180, 5);
+        dependentes.forEach(d => {
+            tableData.push([
+                `${d.nome} ${d.sobrenome}`,
+                d.cpf || 'N/A',
+                d.data_nascimento || 'N/A', // Vem como dd/mm/aaaa do form
+                titular.plano,
+                'DEPENDENTE'
+            ]);
+        });
 
-    pdf.save(`contrato-${titular.nome.toLowerCase().replace(/\s/g, '_')}.pdf`);
+        pdf.autoTable({
+            startY: y,
+            head: [['Nome', 'CPF', 'Data Nascimento', 'Plano', 'Parentesco']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [30, 77, 107] } // Azul escuro (var(--secondary-dark))
+        });
+        
+        y = pdf.autoTable.previous.finalY + 10;
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        y = addWrappedText('Composto pelos produtos: BIM PLANO FAMILIAR (composto por no máximo 7 (sete) pessoas. Carência – 1 dia útil.', margin, y, usableWidth, 5, true);
+        y += 5;
+        y = addWrappedText('Inadimplência: O não pagamento da “Parcela Mensal” transcorrido o lapso de quinze (15) dias, computados ininterruptamente a partir da data do vencimento da obrigação, sem que haja sido efetuado o cumprimento da obrigação contratual, será facultado à Empresa – CONTRATADA, suspender as disponibilizações dos “Serviços” que se presta a servir ao(s) Beneficiário(s) inscritos.', margin, y, usableWidth, 5, true);
+        y += 10;
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.text('ANEXO 2 - DOS BENEFÍCIOS', pageWidth / 2, y, { align: 'center' });
+        y += 10;
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        const anexo2Text = '1. A CONTRATADA terá direito a acesso a uma rede de profissionais de saúde, incluindo médicos de diversas especialidades e odontologia com descontos especiais sobre os honorários, cobrados.\n2. A CONTRATADA também terá acesso a exames laboratoriais e de imagem com descontos previamente estabelecidos, conforme tabela de preços que será disponibilizada pelo CONTRATANTE.\n3. Os descontos aplicáveis serão informados a CONTRATADA no momento da solicitação dos serviços e poderão variar de acordo com a especialidade e o tipo de exame.\n4. A CONTRATADA concorda em seguir os procedimentos necessários para agendamento e realização dos serviços, conforme as orientações do CONTRATANTE.\n5. O CONTRATANTE se reserva o direito de atualizar a lista de médicos e exames disponíveis, bem como os respectivos descontos, mediante aviso prévio a CONTRATADA.';
+        y = addWrappedText(anexo2Text, margin, y, usableWidth, 5, true);
+
+        // --- 8. SALVAR O PDF ---
+        pdf.save(`contrato-${titular.nome.toLowerCase().replace(/\s/g, '_')}.pdf`);
+
+    } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+        alert("Não foi possível gerar o PDF. Verifique se a imagem da logo está acessível.");
+    }
 }
 
 function setupVendasPage() {
     const form = document.getElementById('newSaleForm');
+    if (!form) return;
+    
+    // Verifica se os listeners já foram anexados
     if (form.dataset.listenerAttached) return;
 
     form.addEventListener('submit', handleNewSaleSubmit);

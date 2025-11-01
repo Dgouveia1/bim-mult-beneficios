@@ -1,10 +1,11 @@
 import { _supabase } from './supabase.js';
-import { allPeople } from './clientes.js';
+// CORREÇÃO (Ponto 4): Remove a dependência do 'allPeople'
+// import { allPeople } from './clientes.js';
 
 const historyContainer = document.getElementById('prontuarioHistoryContainer');
 const patientInfoContainer = document.getElementById('prontuarioPatientInfo');
 
-// NOVA FUNÇÃO: Isola a lógica de carregar o histórico de um paciente específico
+// Esta função recebe um objeto de paciente e carrega seu histórico
 async function loadHistoryForPatient(patientData) {
     try {
         console.log('[PRONTUÁRIO] Carregando histórico para:', patientData);
@@ -18,6 +19,8 @@ async function loadHistoryForPatient(patientData) {
         historyContainer.innerHTML = '<p>Carregando histórico...</p>';
         
         console.log(`[PRONTUÁRIO] Buscando agendamentos para o NOME: ${patientData.nome}`);
+        
+        // Busca agendamentos pelo nome exato do paciente
         const { data: patientAppointments, error: apptError } = await _supabase.from('appointments')
             .select('id, appointment_date, start_time, professional_id, professionals(name)')
             .eq('patient_name', patientData.nome)
@@ -43,7 +46,7 @@ async function loadHistoryForPatient(patientData) {
             return;
         }
 
-        // Renderiza o histórico (lógica original movida para cá)
+        // Renderiza o histórico
         history.forEach(consultation => {
             const correspondingAppointment = patientAppointments.find(appt => appt.id === consultation.appointment_id);
             const professionalName = correspondingAppointment?.professionals?.name || 'N/A';
@@ -69,9 +72,9 @@ async function loadHistoryForPatient(patientData) {
                 <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
                 <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
                     <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
-                    <p><strong>Laudo:</strong> ${consultation.laudo_texto || 'N/A'}</p>
                     <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
-                    <p><strong>Pedidos de Exames:</strong> ${consultation.pedido_exames && consultation.pedido_exames !== '[]' ? JSON.parse(consultation.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
+                    <p><strong>Pedidos de Exames Lab:</strong> ${consultation.pedido_exames && consultation.pedido_exames !== '[]' ? JSON.parse(consultation.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
+                    <p><strong>Pedidos de Exames Imagem:</strong> ${consultation.pedido_exames_imagem && consultation.pedido_exames_imagem !== '[]' ? JSON.parse(consultation.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
                     ${attachmentsHtml}
                 </div>`;
             item.querySelector('.details-link').addEventListener('click', (e) => {
@@ -90,16 +93,9 @@ async function loadHistoryForPatient(patientData) {
     }
 }
 
-// FUNÇÃO PRINCIPAL ATUALIZADA
+// CORREÇÃO (Ponto 4): Função de busca reescrita para consultar o Supabase
 async function searchAndLoadPatientHistory(patientNameQuery) {
     console.log(`[PRONTUÁRIO] Buscando por: "${patientNameQuery}"`);
-
-    // VERIFICAÇÃO DE SEGURANÇA: Checa se a lista 'allPeople' está vazia.
-    if (!allPeople || allPeople.length === 0) {
-        historyContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Carregando base de dados, tente novamente em alguns segundos...</p>';
-        patientInfoContainer.style.display = 'none';
-        return;
-    }
 
     if (!patientNameQuery || patientNameQuery.length < 3) {
         historyContainer.innerHTML = '<p>Digite ao menos 3 caracteres para buscar.</p>';
@@ -110,35 +106,80 @@ async function searchAndLoadPatientHistory(patientNameQuery) {
     historyContainer.innerHTML = '<p>Buscando paciente...</p>';
     patientInfoContainer.style.display = 'none';
 
-    const matchingPatients = allPeople.filter(p => p.nome && p.nome.toLowerCase().includes(patientNameQuery.toLowerCase()));
+    const lowerSearchTerm = patientNameQuery.toLowerCase();
+    const searchWords = lowerSearchTerm.split(' ').filter(w => w.length > 0);
+            
+    try {
+        // Constrói os filtros
+        const nameAndFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+        const orFilters = `and(${nameAndFilter}),cpf.ilike.%${lowerSearchTerm}%`;
 
-    if (matchingPatients.length === 0) {
-        historyContainer.innerHTML = '<p>Nenhum paciente encontrado com este nome.</p>';
-        return;
+        // Busca titulares e dependentes em paralelo
+        const [titularesRes, dependentesRes] = await Promise.all([
+            _supabase.from('clients').select('id, nome, sobrenome, cpf, plano').or(orFilters),
+            // Busca dependentes e traz o plano do titular
+            _supabase.from('dependents').select('id, nome, sobrenome, cpf, clients!inner(plano, nome, sobrenome)').or(orFilters)
+        ]);
+
+        if (titularesRes.error) throw titularesRes.error;
+        if (dependentesRes.error) throw dependentesRes.error;
+
+        // Formata e combina os resultados
+        const matchingPatients = [
+            ...titularesRes.data.map(t => ({
+                nome: `${t.nome} ${t.sobrenome || ''}`.trim(),
+                cpf: t.cpf,
+                plano: t.plano,
+                tipo: 'Titular'
+            })),
+            ...dependentesRes.data.map(d => ({
+                nome: `${d.nome} ${d.sobrenome || ''}`.trim(),
+                cpf: d.cpf,
+                plano: d.clients.plano, // Pega o plano do titular
+                tipo: `Dependente de ${d.clients.nome} ${d.clients.sobrenome || ''}`.trim()
+            }))
+        ];
+        
+        // Remove duplicados (caso um titular e dependente tenham nomes parecidos)
+        const uniquePatients = Array.from(new Map(matchingPatients.map(p => [`${p.nome}-${p.cpf}`, p])).values());
+
+
+        if (uniquePatients.length === 0) {
+            historyContainer.innerHTML = '<p>Nenhum paciente encontrado com este nome.</p>';
+            return;
+        }
+
+        if (uniquePatients.length === 1) {
+            // Se só achou 1, carrega o histórico dele
+            loadHistoryForPatient(uniquePatients[0]);
+            return;
+        }
+
+        // Se achou múltiplos, mostra a lista para seleção
+        historyContainer.innerHTML = '<h4>Múltiplos pacientes encontrados. Selecione um:</h4>';
+        uniquePatients.forEach(patient => {
+            const patientDiv = document.createElement('div');
+            patientDiv.className = 'paciente-selecao-item';
+            patientDiv.textContent = `${patient.nome} (CPF: ${patient.cpf || 'N/A'}) - [${patient.tipo}]`;
+            // Passa o objeto 'patient' completo para a função
+            patientDiv.onclick = () => loadHistoryForPatient(patient);
+            historyContainer.appendChild(patientDiv);
+        });
+
+    } catch (error) {
+         console.error('[PRONTUÁRIO] Erro ao buscar pacientes:', error);
+         historyContainer.innerHTML = `<p style="color:red;">Erro ao buscar pacientes: ${error.message}</p>`;
     }
-
-    if (matchingPatients.length === 1) {
-        loadHistoryForPatient(matchingPatients[0]);
-        return;
-    }
-
-    historyContainer.innerHTML = '<h4>Múltiplos pacientes encontrados. Selecione um:</h4>';
-    matchingPatients.forEach(patient => {
-        const patientDiv = document.createElement('div');
-        patientDiv.className = 'paciente-selecao-item';
-        patientDiv.style.padding = '10px';
-        patientDiv.style.border = '1px solid #ddd';
-        patientDiv.style.borderRadius = '5px';
-        patientDiv.style.marginBottom = '5px';
-        patientDiv.style.cursor = 'pointer';
-        patientDiv.textContent = `${patient.nome} (CPF: ${patient.cpf || 'N/A'})`;
-        patientDiv.onclick = () => loadHistoryForPatient(patient);
-        historyContainer.appendChild(patientDiv);
-    });
 }
 
 function setupProntuarioPage() {
     const searchInput = document.getElementById('prontuarioSearchInput');
+    
+    // Limpa o campo e o histórico ao carregar a página
+    searchInput.value = '';
+    historyContainer.innerHTML = '<p>Busque por um paciente para ver seu histórico de consultas.</p>';
+    patientInfoContainer.style.display = 'none';
+    
     let debounceTimer;
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);
