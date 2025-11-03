@@ -152,7 +152,7 @@ async function loadClientsData(searchTerm = null) {
                         titular_id: client.id,
                         nome: `${dep.nome || ''} ${dep.sobrenome || ''}`.trim(),
                         cpf: dep.cpf,
-                        telefone: dep.telefone, // Nota: dependente pode não ter tel, pode vir do titular
+                        telefone: dep.telefone || client.telefone, // Pega o tel do dependente, se não tiver, usa o do titular
                         plano: client.plano,
                         status: client.status,
                         tipo: 'Dependente'
@@ -187,14 +187,33 @@ function renderClientsTable(people) {
 
     people.forEach(person => {
         const row = document.createElement('tr');
+        
+        // --- LÓGICA DO BOTÃO WHATSAPP ---
+        const phone = person.telefone;
+        const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
+        let whatsappButton = '';
+
+        // Verifica se o telefone limpo tem 10 (fixo+ddd) ou 11 (celular+ddd) dígitos
+        if (cleanedPhone && (cleanedPhone.length === 10 || cleanedPhone.length === 11)) {
+            const whatsappLink = `https://wa.me/55${cleanedPhone}`;
+            // Adiciona um botão verde (btn-success) com o ícone do WhatsApp
+            whatsappButton = `
+                <a href="${whatsappLink}" target="_blank" class="btn btn-success btn-small whatsapp-btn" title="Abrir WhatsApp" style="padding: 8px 10px; font-size: 14px; line-height: 1;">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            `;
+        }
+        // --- FIM DA LÓGICA WHATSAPP ---
+
         row.innerHTML = `
             <td data-label="Nome">${person.nome || 'N/A'} (${person.tipo})</td>
             <td data-label="CPF">${person.cpf || 'N/A'}</td>
             <td data-label="Telefone">${person.telefone || 'N/A'}</td>
             <td data-label="Plano">${person.plano || 'N/A'}</td>
             <td data-label="Status"><span class="status status-${person.status === 'ATIVO' ? 'active' : 'inactive'}">${person.status}</span></td>
-            <td class="actions">
+            <td class="actions" style="display: flex; gap: 8px; align-items: center;">
                 <button class="btn btn-secondary btn-small" data-titular-id="${person.titular_id}">Ver Detalhes</button>
+                ${whatsappButton} <!-- Botão do WhatsApp inserido aqui -->
             </td>
         `;
         clientsTableBody.appendChild(row);
