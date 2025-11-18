@@ -6,6 +6,15 @@ import { showToast } from './utils.js';
 // Variável para guardar a inscrição e poder removê-la depois
 let receptionSubscription = null;
 
+// Lista de salas (deve ser consistente com o index.html e agenda.js)
+const ROOMS_LIST = [
+    'Consultório 1', 
+    'Consultório 2', 
+    'Consultório 3 (Dentista)', 
+    'Consultório 4', 
+    'Consultório 5'
+];
+
 // Função para remover a inscrição anterior e evitar duplicatas
 function unsubscribeReception() {
     if (receptionSubscription) {
@@ -31,75 +40,175 @@ async function loadReceptionQueue() {
     receptionSubscription = _supabase.channel('public:appointments')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, (payload) => {
             console.log('🏥 [RECEPTION] Mudança detectada nos agendamentos!', payload);
-            // Ao detectar qualquer mudança, simplesmente renderiza a fila novamente
-            renderReceptionQueue();
+            
+            // Verifica se a mudança é no dia de hoje
+            const changedDate = (payload.new?.appointment_date || payload.old?.appointment_date || '').split('T')[0];
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (changedDate === today) {
+                // Ao detectar qualquer mudança no dia de HOJE, renderiza a fila novamente
+                renderReceptionQueue();
+            }
         })
         .subscribe();
     
     console.log('🏥 [RECEPTION] Inscrição de tempo real ativada.');
 }
 
-// Criamos uma função separada para a lógica de renderização
+// Função de utilitário para criar o HTML do card do paciente
+function createPatientCard(appt) {
+    let statusClass = 'pending'; // Padrão (agendado)
+    let statusText = appt.status.replace('_', ' ').toUpperCase();
+
+    if (appt.status === 'chegou') {
+        statusClass = 'active'; // Azul (aguardando)
+    } else if (appt.status === 'em_atendimento') {
+        statusClass = 'info'; // Laranja (em atendimento)
+        statusText = "EM ATENDIMENTO";
+    } else if (appt.status === 'finalizado') {
+        statusClass = 'confirmed'; // Verde (finalizado)
+    } else if (appt.status === 'cancelado') {
+        statusClass = 'cancelled'; // Vermelho
+    }
+
+    const isCheckinDisabled = appt.status !== 'agendado' && appt.status !== 'confirmado';
+    const isPaymentDisabled = appt.payment_status === 'pago' || appt.status === 'cancelado';
+    const paymentButtonText = appt.payment_status === 'pago' ? 'Pago' : 'Registrar Pagamento';
+
+    return `
+        <div class="patient-card" data-appointment-id="${appt.id}">
+            <div class="patient-card-header">
+                <h4>${appt.patient_name}</h4>
+                <span>Agendado para: ${appt.start_time.substring(0, 5)}</span>
+            </div>
+            <div class="patient-card-body">
+                <p><strong>Profissional:</strong> ${appt.professionals.name}</p>
+                <p><strong>Status:</strong> <span class="status status-${statusClass}">${statusText}</span></p>
+                ${appt.procedure ? `<p><strong>Observações:</strong> ${appt.procedure}</p>` : ''}
+            </div>
+            <div class="patient-card-actions">
+                <button class="btn btn-secondary checkin-btn" data-id="${appt.id}" ${isCheckinDisabled ? 'disabled' : ''}>
+                    <i class="fas fa-check"></i> Check-in
+                </button>
+                <button class="btn btn-success payment-btn" data-id="${appt.id}" data-name="${appt.patient_name}" ${isPaymentDisabled ? 'disabled' : ''}>
+                    ${paymentButtonText}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Função separada para a lógica de renderização
 async function renderReceptionQueue() {
     const queueContainer = document.getElementById('receptionQueue');
     if (!queueContainer) return;
 
-    queueContainer.innerHTML = '<p>Carregando agendamentos do dia...</p>';
-    const today = new Date().toISOString().split('T')[0];
+    queueContainer.innerHTML = ''; // Limpa o container
+    
+    // 1. Cria a estrutura de colunas
+    let columnsHtml = '';
+    // REMOVIDA a coluna "Aguardando Chegada"
 
+    // Adiciona as colunas das salas
+    ROOMS_LIST.forEach(room => {
+        const roomId = room.replace(/[\s()]+/g, '-'); // Cria um ID único
+        columnsHtml += `
+            <div class="reception-column" data-room-name="${room}">
+                <div class="reception-column-header">
+                    <h3>${room}</h3>
+                    <span class="room-status livre" id="status-${roomId}">Livre</span>
+                </div>
+                <div class="reception-column-body" id="column-${roomId}">
+                    <p id="empty-msg-${roomId}" style="display: none; text-align: center; color: var(--gray-medium);">Sala vazia.</p>
+                </div>
+            </div>
+        `;
+    });
+    queueContainer.innerHTML = columnsHtml;
+
+
+    // 2. Busca os agendamentos do dia
+    const today = new Date().toISOString().split('T')[0];
     try {
-        console.log("🏥 [RECEPTION] Buscando dados do Supabase..."); // LOG DE DEBUG
+        console.log("🏥 [RECEPTION] Buscando dados do Supabase...");
         const { data: appointments, error } = await _supabase
             .from('appointments')
             .select(`*, professionals ( name )`)
             .eq('appointment_date', today)
+            .not('status', 'eq', 'finalizado') // Ignora pacientes finalizados
+            .not('status', 'eq', 'cancelado') // Ignora pacientes cancelados
             .order('start_time');
 
-        // Se houver um erro na busca, ele será capturado pelo 'catch' abaixo
         if (error) throw error; 
 
-        console.log("🏥 [RECEPTION] Dados recebidos com sucesso. Renderizando..."); // LOG DE DEBUG
-        queueContainer.innerHTML = '';
+        console.log("🏥 [RECEPTION] Dados recebidos. Distribuindo pacientes...");
+        
         if (appointments.length === 0) {
-            queueContainer.innerHTML = '<p>Nenhum paciente agendado para hoje.</p>';
-            return;
+            console.log("🏥 [RECEPTION] Nenhum paciente agendado para hoje.");
         }
 
+        // 3. Distribui os pacientes nas colunas
         appointments.forEach(appt => {
-            const card = document.createElement('div');
-            card.className = 'patient-card';
-            card.dataset.appointmentId = appt.id;
-
-            let statusClass = 'pending';
-            if (appt.status === 'chegou') statusClass = 'active';
-            if (appt.status === 'em_atendimento') statusClass = 'info';
-            if (appt.status === 'finalizado') statusClass = 'confirmed';
-
-            card.innerHTML = `
-                <div class="patient-card-header">
-                    <h4>${appt.patient_name}</h4>
-                    <span>Agendado para: ${appt.start_time.substring(0, 5)}</span>
-                </div>
-                <div class="patient-card-body">
-                    <p><strong>Profissional:</strong> ${appt.professionals.name}</p>
-                    <p><strong>Status:</strong> <span class="status status-${statusClass}">${appt.status.replace('_', ' ').toUpperCase()}</span></p>
-                    ${appt.procedure ? `<p><strong>Observações:</strong> ${appt.procedure}</p>` : ''}
-                </div>
-                <div class="patient-card-actions">
-                    <button class="btn btn-secondary checkin-btn" data-id="${appt.id}" ${appt.status !== 'agendado' ? 'disabled' : ''}>
-                        <i class="fas fa-check"></i> Check-in
-                    </button>
-                    <button class="btn btn-success payment-btn" data-id="${appt.id}" data-name="${appt.patient_name}" ${appt.payment_status === 'pago' ? 'disabled' : ''}>
-                        ${appt.payment_status === 'pago' ? 'Pago' : 'Registrar Pagamento'}
-                    </button>
-                </div>
-            `;
-            queueContainer.appendChild(card);
+            const cardHtml = createPatientCard(appt);
+            
+            // --- LÓGICA MODIFICADA ---
+            // Se o agendamento tem uma sala definida, coloca na coluna da sala.
+            // Isso agora inclui 'agendado', 'confirmado', 'chegou' e 'em_atendimento'
+            if (appt.room) {
+                const roomId = appt.room.replace(/[\s()]+/g, '-');
+                const roomColumn = document.getElementById(`column-${roomId}`);
+                if (roomColumn) {
+                    roomColumn.innerHTML += cardHtml;
+                } else {
+                     console.warn(`Sala "${appt.room}" do agendamento ${appt.id} não encontrada no layout.`);
+                }
+            } else {
+                // Pacientes sem sala definida não serão exibidos nas colunas de sala
+                 console.warn(`Agendamento ${appt.id} (${appt.patient_name}) está sem sala definida.`);
+            }
         });
+
+        // 4. Atualiza o status de cada sala
+        const allColumns = document.querySelectorAll('.reception-column');
+        allColumns.forEach(column => {
+            const roomName = column.dataset.roomName;
+            const roomId = roomName.replace(/[\s()]+/g, '-');
+            const columnBody = document.getElementById(`column-${roomId}`);
+            const statusIndicator = document.getElementById(`status-${roomId}`);
+            
+            // Procura por pacientes "Em Atendimento" (status-info)
+            const isOccupied = columnBody.querySelector('.status-info') !== null;
+            
+            if (statusIndicator) {
+                 if (isOccupied) {
+                    statusIndicator.textContent = 'Em Atendimento';
+                    statusIndicator.className = 'room-status ocupada';
+                } else {
+                    // Se não estiver ocupada, verificamos se há alguém esperando NAQUELA SALA
+                    const isWaiting = columnBody.querySelector('.status-active') !== null; // status-active = 'chegou'
+                    if (isWaiting) {
+                         statusIndicator.textContent = 'Aguardando';
+                         statusIndicator.className = 'room-status ocupada'; // Usar a cor laranja
+                    } else {
+                        statusIndicator.textContent = 'Livre';
+                        statusIndicator.className = 'room-status livre';
+                    }
+                }
+            }
+            
+            // Mostra mensagem de "vazio" se a coluna não tiver cards
+            const emptyMsg = document.getElementById(`empty-msg-${roomId}`);
+            if (emptyMsg) {
+                 const cardCount = columnBody.querySelectorAll('.patient-card').length;
+                 // REMOVIDA A LÓGICA DE CONTAGEM DO "Aguardando"
+                 emptyMsg.style.display = cardCount === 0 ? 'block' : 'none';
+            }
+        });
+
 
     } catch (error) {
         console.error('❌ [RECEPTION] ERRO CRÍTICO AO BUSCAR DADOS:', error); 
-        queueContainer.innerHTML = `<p style="color:red;">Erro ao carregar a fila de agendamentos. Verifique o console (F12).</p>`;
+        queueContainer.innerHTML = `<p style="color:red;">Erro ao carregar a fila de agendamentos: ${error.message}</p>`;
     }
 }
 
@@ -119,7 +228,13 @@ async function markArrival(appointmentId) {
             checkin_time: new Date().toISOString() 
         };
 
-        const { error } = await _supabase.from('appointments').update(updateData).eq('id', appointmentId);
+        const { data: appointment, error } = await _supabase
+            .from('appointments')
+            .update(updateData)
+            .eq('id', appointmentId)
+            .select() // Pede ao Supabase para retornar o registro atualizado
+            .single(); 
+            
         if (error) throw error;
         
         // Log da ação
@@ -128,13 +243,12 @@ async function markArrival(appointmentId) {
             checkinTime: updateData.checkin_time 
         });
 
-        // Atualiza visualmente o botão imediatamente enquanto espera o realtime
-        if(checkinButton) {
-            checkinButton.innerHTML = '<i class="fas fa-check"></i> Chegou';
-            checkinButton.classList.remove('btn-secondary');
-            checkinButton.classList.add('btn-success');
-        }   
-        // Não precisamos mais chamar loadReceptionQueue() aqui, a inscrição em tempo real fará isso.
+        // A inscrição em tempo real (loadReceptionQueue) cuidará de mover o card.
+        // Não precisamos fazer nada manualmente aqui.
+        
+        // Apenas mostramos um toast de sucesso
+        showToast(`Check-in de ${appointment.patient_name} realizado!`);
+
 
     } catch (error) {
         showToast('Não foi possível realizar o check-in.');
@@ -200,7 +314,7 @@ async function savePayment(event) {
         showToast('Pagamento registrado com sucesso!');
         document.getElementById('paymentModal').style.display = 'none';
         form.reset();
-        // Não precisa recarregar a fila aqui, o realtime fará isso.
+        // A inscrição em tempo real (loadReceptionQueue) cuidará de atualizar o botão.
 
     } catch (error) {
         showToast('Erro ao salvar pagamento: ' + error.message);

@@ -1,9 +1,72 @@
 /* =================================================================
-   PÁGINA: RECEPÇÃO
+   PÁGINA: RECEPÇÃO (Layout de Colunas por Sala)
    ================================================================= */
 
-.reception-queue { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+   .reception-queue { 
+    display: flex; /* Muda de grid para flex para alinhar colunas */
     gap: 20px; 
+    overflow-x: auto; /* Permite rolagem horizontal se as colunas não couberem */
+    padding-bottom: 20px; /* Espaço para a barra de rolagem */
+    min-height: calc(100vh - 150px); /* Garante que a área ocupe a altura */
 } 
+
+.reception-column {
+    flex: 1 0 320px; /* Cada coluna terá no mínimo 320px e crescerá se houver espaço */
+    max-width: 400px;
+    background-color: var(--gray-light);
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.reception-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #d4d4d4;
+    background-color: var(--white);
+    border-radius: 12px 12px 0 0;
+}
+
+.reception-column-header h3 {
+    font-size: 18px;
+    color: var(--secondary-dark);
+    margin: 0;
+}
+
+.room-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.room-status.livre {
+    background-color: var(--confirmed-color);
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+.room-status.ocupada {
+    background-color: var(--pending-color); /* Laranja para "Em Atendimento" */
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
+}
+
+.reception-column-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto; /* Permite rolagem dentro da coluna se houver muitos pacientes */
+    flex-grow: 1; /* Faz esta área crescer para ocupar o espaço */
+}
+
+/* Ajustes nos cards de paciente para o novo layout */
+.reception-column-body .patient-card {
+    margin-bottom: 0; /* Remove a margem que existia no layout de grid */
+}

@@ -27,16 +27,18 @@
 #prontuarioPage .search-container {
     position: relative;
     max-width: 500px;
-    margin: 0 auto 30px auto; /* Centraliza horizontalmente e adiciona margem inferior */
+    margin: 0 auto 30px auto; 
 }
 
 #prontuarioPage .search-container input {
+        
     width: 100%;
     padding: 12px 40px 12px 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 15px;
     transition: all 0.2s ease;
+    left: unset;
 }
 
 #prontuarioPage .search-container input:focus {
