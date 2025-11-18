@@ -12,6 +12,7 @@
 @import url('components/_search.css');
 @import url('components/_modals.css');
 @import url("components/carteirinha.css");
+@import url("components/_notifications.css");
 
 
 /* Importa estilos específicos de cada página */
@@ -28,3 +29,4 @@
 @import url('pages/_carteirinha.css');
 @import url('pages/_logs.css');
 @import url('pages/_vendas.css');
+@import url('pages/_profissionais.css');

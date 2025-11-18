@@ -1,9 +1,42 @@
 import { _supabase } from './supabase.js';
-// CORREÇÃO (Ponto 4): Remove a dependência do 'allPeople'
-// import { allPeople } from './clientes.js';
+import { getCurrentUserProfile } from './auth.js'; // Importa a função de autenticação
 
 const historyContainer = document.getElementById('prontuarioHistoryContainer');
 const patientInfoContainer = document.getElementById('prontuarioPatientInfo');
+
+let currentViewOnlyProfessionalId = null; // Guarda o ID do profissional (da tabela 'professionals') que está logado
+
+// Nova função para buscar o ID do profissional logado
+async function fetchCurrentProfessionalId() {
+    try {
+        const user = getCurrentUserProfile();
+        if (!user) {
+             console.log("[PRONTUÁRIO] Usuário não logado.");
+             return;
+        }
+
+        // Apenas 'medicos' podem ter um ID de profissional
+        if (user.role === 'medicos') {
+            const { data: professional, error } = await _supabase
+                .from('professionals')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+            
+            if (error) throw error;
+            
+            if (professional) {
+                currentViewOnlyProfessionalId = professional.id;
+                console.log(`[PRONTUÁRIO] Visualizador identificado. ID Profissional: ${currentViewOnlyProfessionalId}`);
+            }
+        } else {
+            console.log(`[PRONTUÁRIO] Usuário logado é ${user.role}, não é um profissional de saúde. Acesso será restrito.`);
+        }
+    } catch (error) {
+        console.error("[PRONTUÁRIO] Erro ao buscar ID do profissional logado:", error);
+    }
+}
+
 
 // Esta função recebe um objeto de paciente e carrega seu histórico
 async function loadHistoryForPatient(patientData) {
@@ -62,28 +95,61 @@ async function loadHistoryForPatient(patientData) {
                 attachmentsHtml += '</ul>';
             }
 
+            // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
+            const creatorProfId = consultation.professional_id;
+            const viewerProfId = currentViewOnlyProfessionalId; // ID do profissional logado
+            const isOwner = (creatorProfId === viewerProfId);
+            
             const item = document.createElement('div');
             item.className = 'historico-item card';
+
+            let sensitiveDetailsHtml = '';
+
+            if (isOwner) {
+                // 1. O usuário é o dono, mostra tudo
+                sensitiveDetailsHtml = `
+                    <p><strong>Queixa Principal:</strong> ${consultation.queixa_principal || 'N/A'}</p>
+                    <p><strong>Conduta:</strong> ${consultation.conduta || 'N/A'}</p>
+                    <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
+                    <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
+                        <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
+                        <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
+                        <p><strong>Pedidos de Exames Lab:</strong> ${consultation.pedido_exames && consultation.pedido_exames !== '[]' ? JSON.parse(consultation.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
+                        <p><strong>Pedidos de Exames Imagem:</strong> ${consultation.pedido_exames_imagem && consultation.pedido_exames_imagem !== '[]' ? JSON.parse(consultation.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
+                        ${attachmentsHtml}
+                    </div>
+                `;
+            } else {
+                // 2. O usuário NÃO é o dono, mostra mensagem de restrição
+                sensitiveDetailsHtml = `
+                    <p><strong>Queixa Principal:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
+                    <p><strong>Conduta:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
+                    <p style="color: var(--cancelled-color); font-style: italic; background-color: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <i class="fas fa-lock"></i> O acesso aos detalhes completos (exame físico, receitas, etc.) é restrito ao profissional que realizou a consulta.
+                    </p>
+                `;
+            }
+
+            // Renderiza o item com a informação (completa ou restrita)
             item.innerHTML = `
                 <p><strong>Data:</strong> ${consultationDate}</p>
                 <p><strong>Profissional:</strong> ${professionalName}</p>
-                <p><strong>Queixa Principal:</strong> ${consultation.queixa_principal || 'N/A'}</p>
-                <p><strong>Conduta:</strong> ${consultation.conduta || 'N/A'}</p>
-                <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
-                <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
-                    <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
-                    <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
-                    <p><strong>Pedidos de Exames Lab:</strong> ${consultation.pedido_exames && consultation.pedido_exames !== '[]' ? JSON.parse(consultation.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
-                    <p><strong>Pedidos de Exames Imagem:</strong> ${consultation.pedido_exames_imagem && consultation.pedido_exames_imagem !== '[]' ? JSON.parse(consultation.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
-                    ${attachmentsHtml}
-                </div>`;
-            item.querySelector('.details-link').addEventListener('click', (e) => {
-                const fullDetails = e.target.nextElementSibling;
-                if (fullDetails) {
-                    fullDetails.style.display = fullDetails.style.display === 'none' ? 'block' : 'none';
-                    e.target.textContent = fullDetails.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
-                }
-            });
+                ${sensitiveDetailsHtml}
+            `;
+            
+            // Adiciona o listener de clique SOMENTE se o link "Ver Detalhes" existir
+            const detailsLink = item.querySelector('.details-link');
+            if (detailsLink) {
+                detailsLink.addEventListener('click', (e) => {
+                    const fullDetails = e.target.nextElementSibling;
+                    if (fullDetails) {
+                        fullDetails.style.display = fullDetails.style.display === 'none' ? 'block' : 'none';
+                        e.target.textContent = fullDetails.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
+                    }
+                });
+            }
+            // --- FIM DA LÓGICA DE SEGURANÇA ---
+
             historyContainer.appendChild(item);
         });
 
@@ -93,7 +159,6 @@ async function loadHistoryForPatient(patientData) {
     }
 }
 
-// CORREÇÃO (Ponto 4): Função de busca reescrita para consultar o Supabase
 async function searchAndLoadPatientHistory(patientNameQuery) {
     console.log(`[PRONTUÁRIO] Buscando por: "${patientNameQuery}"`);
 
@@ -172,7 +237,10 @@ async function searchAndLoadPatientHistory(patientNameQuery) {
     }
 }
 
-function setupProntuarioPage() {
+async function setupProntuarioPage() {
+    // Busca o ID do profissional logado ANTES de configurar os listeners
+    await fetchCurrentProfessionalId();
+    
     const searchInput = document.getElementById('prontuarioSearchInput');
     
     // Limpa o campo e o histórico ao carregar a página

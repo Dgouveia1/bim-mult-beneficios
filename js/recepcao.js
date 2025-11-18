@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { allPeople } from './clientes.js'; // Importamos a lista de pessoas para pegar os detalhes
 import { logAction } from './logger.js'; // Importando logAction
+import { showToast } from './utils.js';
 
 // Variável para guardar a inscrição e poder removê-la depois
 let receptionSubscription = null;
@@ -136,7 +137,7 @@ async function markArrival(appointmentId) {
         // Não precisamos mais chamar loadReceptionQueue() aqui, a inscrição em tempo real fará isso.
 
     } catch (error) {
-        alert('Não foi possível realizar o check-in.');
+        showToast('Não foi possível realizar o check-in.');
         console.error("Erro no check-in:", error); // Adiciona log de erro
         if(checkinButton) {
             checkinButton.disabled = false;
@@ -196,13 +197,13 @@ async function savePayment(event) {
             method: paymentData.method
         });
 
-        alert('Pagamento registrado com sucesso!');
+        showToast('Pagamento registrado com sucesso!');
         document.getElementById('paymentModal').style.display = 'none';
         form.reset();
         // Não precisa recarregar a fila aqui, o realtime fará isso.
 
     } catch (error) {
-        alert('Erro ao salvar pagamento: ' + error.message);
+        showToast('Erro ao salvar pagamento: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Salvar Pagamento';

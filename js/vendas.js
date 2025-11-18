@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 let dependenteVendaCount = 0;
 
@@ -43,7 +44,7 @@ function formatDateForSupabase(dateString) {
 
 function addVendaDependenteField(container) {
     if (dependenteVendaCount >= 6) {
-        alert("É permitido no máximo 6 dependentes.");
+        showToast("É permitido no máximo 6 dependentes.");
         return;
     }
     dependenteVendaCount++;
@@ -77,15 +78,15 @@ async function handleNewSaleSubmit(event) {
     const titularFormProps = Object.fromEntries(titularFormData);
 
     if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
-        alert('O CPF do titular é inválido!');
+        showToast('O CPF do titular é inválido!');
         return;
     }
     if (titularFormProps.email && !validateEmail(titularFormProps.email)) {
-        alert('O Email do titular é inválido!');
+        showToast('O Email do titular é inválido!');
         return;
     }
     if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
-        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
 
@@ -116,7 +117,7 @@ async function handleNewSaleSubmit(event) {
                 data_nascimento: titularFormProps[`dependente_data_nascimento_${i}`],
             };
             if (dependente.cpf && !validateCPF(dependente.cpf)) {
-                alert(`O CPF do dependente ${dependente.nome} é inválido!`);
+                showToast(`O CPF do dependente ${dependente.nome} é inválido!`);
                 return;
             }
             dependentesData.push(dependente);
@@ -154,7 +155,7 @@ async function handleNewSaleSubmit(event) {
             if (dependentesError) throw dependentesError;
         }
 
-        alert('Venda registrada com sucesso! Gerando contrato...');
+        showToast('Venda registrada com sucesso! Gerando contrato...');
         // Passa o objeto 'titular' completo e os dependentes
         await generateContractPDF(newTitular, dependentesData);
         form.reset();
@@ -162,7 +163,7 @@ async function handleNewSaleSubmit(event) {
         dependenteVendaCount = 0;
 
     } catch (error) {
-        alert('Erro ao salvar venda: ' + error.message);
+        showToast('Erro ao salvar venda: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
@@ -344,7 +345,7 @@ async function generateContractPDF(titular, dependentes) {
 
     } catch (error) {
         console.error("Erro ao gerar PDF:", error);
-        alert("Não foi possível gerar o PDF. Verifique se a imagem da logo está acessível.");
+        showToast("Não foi possível gerar o PDF. Verifique se a imagem da logo está acessível.");
     }
 }
 

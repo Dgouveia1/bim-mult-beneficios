@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
-import { logAction } from './logger.js'; // Importando logAction
+import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 // --- ESTADO DA CONSULTA ---
 let allExams = [];
@@ -9,7 +10,7 @@ let selectedImageExams = [];
 let patientsSubscription = null;
 let currentUploadedFiles = [];
 let currentSelectedPatientData = null;
-let currentProfessionalData = null;
+let currentProfessionalData = null; // Esta variável guardará os dados do profissional logado
 
 // --- ELEMENTOS DO DOM (CACHE) ---
 const consultationWorkspaceDiv = document.getElementById('consultationWorkspace');
@@ -41,7 +42,8 @@ async function fetchProfessionalData() {
     const user = getCurrentUserProfile();
     if (!user) return null;
     try {
-        const { data, error } = await _supabase.from('professionals').select('name, "CRM"').eq('user_id', user.id).single();
+        // ALTERAÇÃO: Adicionado 'id' ao select
+        const { data, error } = await _supabase.from('professionals').select('id, name, "CRM"').eq('user_id', user.id).single();
         if (error) throw error;
         return data;
     } catch (error) {
@@ -226,7 +228,7 @@ async function selectPatient(appointmentId) {
 
         // Armazena os dados do paciente e do profissional
         currentSelectedPatientData = patientDetails;
-        currentProfessionalData = await fetchProfessionalData();
+        currentProfessionalData = await fetchProfessionalData(); // Agora contém o 'id'
 
         // Preenche os cabeçalhos e a aba de dados do paciente
         document.getElementById('currentPatientName').textContent = appt.patient_name || 'N/A';
@@ -253,7 +255,7 @@ async function selectPatient(appointmentId) {
         await loadImageProtocols();
 
     } catch (error) {
-        alert('Erro ao selecionar o paciente: ' + error.message);
+        showToast('Erro ao selecionar o paciente: ' + error.message);
         console.error(error);
     }
 }
@@ -298,10 +300,12 @@ async function loadPatientHistory(patientName) {
             historyContainer.innerHTML = '<p>Nenhuma consulta finalizada encontrada.</p>';
             return;
         }
+        
         consultations.forEach(consult => {
             const appointment = appointments.find(a => a.id === consult.appointment_id);
-            const item = document.createElement('div');
-            item.className = 'historico-item card';
+            const professionalName = appointment?.professionals?.name || 'N/A';
+            const consultationDate = new Date(appointment.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR');
+
             let attachmentsHtml = '';
             if (consult.anexos && consult.anexos.length > 0) {
                 attachmentsHtml += '<p><strong>Anexos:</strong></p><ul>';
@@ -311,24 +315,59 @@ async function loadPatientHistory(patientName) {
                 });
                 attachmentsHtml += '</ul>';
             }
+
+            // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
+            const creatorProfId = consult.professional_id;
+            const viewerProfId = currentProfessionalData?.id; // ID do profissional logado
+            const isOwner = (creatorProfId === viewerProfId);
+
+            const item = document.createElement('div');
+            item.className = 'historico-item card';
+            
+            let sensitiveDetailsHtml = '';
+
+            if (isOwner) {
+                // 1. O usuário é o dono, mostra tudo
+                sensitiveDetailsHtml = `
+                    <p><strong>Queixa Principal:</strong> ${consult.queixa_principal || 'N/A'}</p>
+                    <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
+                    <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
+                        <p><strong>Exame Físico:</strong> ${consult.exame_fisico || 'N/A'}</p>
+                        <p><strong>Conduta:</strong> ${consult.conduta || 'N/A'}</p>
+                        <p><strong>Receituário:</strong> ${consult.receituario || 'N/A'}</p>
+                        <p><strong>Pedidos de Exames Lab:</strong> ${consult.pedido_exames && consult.pedido_exames !== '[]' ? JSON.parse(consult.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
+                        <p><strong>Pedidos de Exames Imagem:</strong> ${consult.pedido_exames_imagem && consult.pedido_exames_imagem !== '[]' ? JSON.parse(consult.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
+                        ${attachmentsHtml}
+                    </div>
+                `;
+            } else {
+                // 2. O usuário NÃO é o dono, mostra mensagem de restrição
+                sensitiveDetailsHtml = `
+                    <p><strong>Queixa Principal:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
+                    <p style="color: var(--cancelled-color); font-style: italic; background-color: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <i class="fas fa-lock"></i> O acesso aos detalhes completos (exame físico, conduta, receitas, etc.) é restrito ao profissional que realizou a consulta.
+                    </p>
+                `;
+            }
+
+            // Renderiza o item com a informação (completa ou restrita)
             item.innerHTML = `
-                <p><strong>Data:</strong> ${new Date(appointment.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
-                <p><strong>Profissional:</strong> ${appointment.professionals?.name || 'N/A'}</p>
-                <p><strong>Queixa Principal:</strong> ${consult.queixa_principal || 'N/A'}</p>
-                <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
-                <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
-                    <p><strong>Exame Físico:</strong> ${consult.exame_fisico || 'N/A'}</p>
-                    <p><strong>Conduta:</strong> ${consult.conduta || 'N/A'}</p>
-                    <p><strong>Receituário:</strong> ${consult.receituario || 'N/A'}</p>
-                    <p><strong>Pedidos de Exames Lab:</strong> ${consult.pedido_exames && JSON.parse(consult.pedido_exames).length > 0 ? JSON.parse(consult.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
-                    <p><strong>Pedidos de Exames Imagem:</strong> ${consult.pedido_exames_imagem && JSON.parse(consult.pedido_exames_imagem).length > 0 ? JSON.parse(consult.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
-                    ${attachmentsHtml}
-                </div>`;
-            item.querySelector('.details-link').addEventListener('click', (e) => {
-                const details = e.target.nextElementSibling;
-                details.style.display = details.style.display === 'none' ? 'block' : 'none';
-                e.target.textContent = details.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
-            });
+                <p><strong>Data:</strong> ${consultationDate}</p>
+                <p><strong>Profissional:</strong> ${professionalName}</p>
+                ${sensitiveDetailsHtml}
+            `;
+
+            // Adiciona o listener de clique SOMENTE se o link "Ver Detalhes" existir
+            const detailsLink = item.querySelector('.details-link');
+            if (detailsLink) {
+                detailsLink.addEventListener('click', (e) => {
+                    const details = e.target.nextElementSibling;
+                    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                    e.target.textContent = details.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
+                });
+            }
+            // --- FIM DA LÓGICA DE SEGURANÇA ---
+            
             historyContainer.appendChild(item);
         });
     } catch (error) {
@@ -435,27 +474,27 @@ function removeImageExam(examId) {
     renderSelectedImageExams();
 }
 async function saveProtocol() {
-    if (selectedExams.length === 0) return alert('Selecione exames para salvar.');
+    if (selectedExams.length === 0) return showToast('Selecione exames para salvar.');
     const protocolName = prompt('Digite um nome para o protocolo:');
     if (!protocolName) return;
     const currentUser = getCurrentUserProfile();
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
-    if (!professional) return alert('Erro: Perfil profissional não encontrado.');
+    if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
     try {
         await _supabase.from('exam_protocols').insert({ protocol_name: protocolName, professional_id: professional.id, exams: JSON.stringify(selectedExams) });
-        alert('Protocolo salvo com sucesso!');
+        showToast('Protocolo salvo com sucesso!');
         await loadProtocols();
     } catch (e) {
-        alert('Erro ao salvar protocolo: ' + e.message);
+        showToast('Erro ao salvar protocolo: ' + e.message);
     }
 }
 async function saveImageProtocol() {
-    if (selectedImageExams.length === 0) return alert('Selecione exames de imagem para salvar no protocolo.');
+    if (selectedImageExams.length === 0) return showToast('Selecione exames de imagem para salvar no protocolo.');
     const protocolName = prompt('Digite um nome para o protocolo de imagem:');
     if (!protocolName) return;
     const currentUser = getCurrentUserProfile();
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
-    if (!professional) return alert('Erro: Perfil profissional não encontrado.');
+    if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
     try {
         const { error } = await _supabase.from('image_exam_protocols').insert({ 
             created_at: new Date().toISOString(),
@@ -464,10 +503,10 @@ async function saveImageProtocol() {
             exams: JSON.stringify(selectedImageExams)
         });
         if (error) throw error;
-        alert('Protocolo de imagem salvo com sucesso!');
+        showToast('Protocolo de imagem salvo com sucesso!');
         await loadImageProtocols();
     } catch (e) {
-        alert('Erro ao salvar protocolo de imagem: ' + e.message);
+        showToast('Erro ao salvar protocolo de imagem: ' + e.message);
         console.error(e);
     }
 }
@@ -567,7 +606,7 @@ async function finalizeConsultation() {
     const submitButton = document.getElementById('finalizeConsultationBtn');
     const currentUser = getCurrentUserProfile();
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
-    if (!professional) return alert('Erro: Perfil profissional não encontrado.');
+    if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
     
     const consultationData = {
         appointment_id: appointmentId,
@@ -601,11 +640,11 @@ async function finalizeConsultation() {
             endTime: endTime
         });
 
-        alert('Consulta finalizada e salva com sucesso!');
+        showToast('Consulta finalizada e salva com sucesso!');
         showInitialScreen();
         loadPatientsData();
     } catch (error) {
-        alert('Erro ao salvar a consulta: ' + error.message);
+        showToast('Erro ao salvar a consulta: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Finalizar e Salvar Consulta';
@@ -619,7 +658,7 @@ async function triggerPrintFromElement(button) {
     const contentElement = document.getElementById(contentId);
 
     if (!type || !contentElement) {
-        return alert('Não foi possível identificar o documento para gerar o PDF.');
+        return showToast('Não foi possível identificar o documento para gerar o PDF.');
     }
 
     let contentText = '';
@@ -645,7 +684,7 @@ async function triggerPrintFromElement(button) {
     }
 
     if (isContentEmpty) {
-        return alert(`O campo "${type}" está vazio.`);
+        return showToast(`O campo "${type}" está vazio.`);
     }
 
     const originalButtonText = button.innerHTML;
@@ -788,7 +827,7 @@ async function triggerPrintFromElement(button) {
 
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
-        alert('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
+        showToast('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
     } finally {
         button.disabled = false;
         button.innerHTML = originalButtonText;

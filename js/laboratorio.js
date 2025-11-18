@@ -1,5 +1,6 @@
 import { _supabase } from './supabase.js';
 import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 const examModal = document.getElementById('examModal');
 const examForm = document.getElementById('examForm');
@@ -56,7 +57,7 @@ async function openExamModal(id = null) {
         examModalTitle.textContent = 'Editar Exame';
         const { data: exam, error } = await _supabase.from('exams').select('*').eq('id', id).single();
         if (error) {
-            alert('Não foi possível carregar os dados do exame.');
+            showToast('Não foi possível carregar os dados do exame.');
             return;
         }
         examIdInput.value = exam.id;
@@ -103,7 +104,7 @@ async function saveExam(event) {
         await loadLaboratoryData(); // Recarrega a tabela
 
     } catch (error) {
-        alert('Erro ao salvar o exame: ' + error.message);
+        showToast('Erro ao salvar o exame: ' + error.message);
     } finally {
         submitButton.disabled = false;
     }

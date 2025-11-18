@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
 import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 const userModal = document.getElementById('userModal');
 const userForm = document.getElementById('userForm');
@@ -50,7 +51,7 @@ async function openUserModal(id = null) {
         userPasswordInput.placeholder = "Deixe em branco para não alterar";
 
         const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', id).single();
-        if (error) return alert('Erro ao carregar dados do usuário.');
+        if (error) return showToast('Erro ao carregar dados do usuário.');
 
         userIdInput.value = profile.id;
         document.getElementById('userName').value = profile.full_name;
@@ -117,7 +118,7 @@ async function saveUser(event) {
             if (error) throw error;
             
             await logAction('UPDATE_USER', { userId: id, fullName: userData.full_name, role: userData.role });
-            alert('Usuário atualizado com sucesso!');
+            showToast('Usuário atualizado com sucesso!');
 
         } else {
             // Lógica de criação
@@ -136,14 +137,14 @@ async function saveUser(event) {
                 
             if (error) throw error;
             
-            alert('Usuário criado com sucesso!');
+            showToast('Usuário criado com sucesso!');
         }
 
         userModal.style.display = 'none';
         await loadUsersData();
 
     } catch (error) {
-        alert('Erro ao salvar usuário: ' + error.message);
+        showToast('Erro ao salvar usuário: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Salvar';

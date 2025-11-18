@@ -1,4 +1,5 @@
 import { _supabase } from './supabase.js';
+import { showToast } from './utils.js';
 
 let searchTimeout = null;
 
@@ -239,7 +240,7 @@ async function generateCards(selectedMember) {
 
             } catch (error) {
                 console.error('Erro ao gerar PDF da carteirinha:', error);
-                alert('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
+                showToast('Ocorreu um erro ao gerar o PDF. Verifique o console para mais detalhes.');
             } finally {
                 button.disabled = false;
                 button.innerHTML = originalButtonContent;

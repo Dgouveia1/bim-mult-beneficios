@@ -2,20 +2,29 @@ import { _supabase } from './supabase.js';
 import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
-import { fetchAddressByCEP } from './utils.js';
+// ATUALIZADO: Importa showConfirm
+import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
 import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients  } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
-import { loadProfessionalsData, openProfessionalModal, saveProfessional } from './profissionais.js';
+// Importa as novas funções de disponibilidade
+import { 
+    loadProfessionalsData, 
+    openProfessionalModal, 
+    saveProfessional,
+    openMyAvailabilityModal,
+    saveProfessionalEvent,
+    loadMyEvents,
+    deleteProfessionalEvent
+} from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
-// CORREÇÃO (Ponto 3): Importa a função de setup da página de vendas
 import { setupVendasPage } from './vendas.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
-import { loadLogsData, setupLogsPage } from './logs.js'; // Importa a função de setup da página de logs
+import { loadLogsData, setupLogsPage } from './logs.js';
 
 
 const newClientModalEl = document.getElementById('newClientModal');
@@ -85,7 +94,7 @@ async function loadHomePageData() {
     if (quoteElement) {
         const quotes = [
             "Suba o primeiro degrau com fé. Não é necessário que você veja toda a escada. Apenas dê o primeiro passo.",
-            "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
+            "O sucesso é a soma de pequenos esforços repetidos dia á dia.",
             "A persistência realiza o impossível.",
             "Não espere por uma crise para descobrir o que é importante em sua vida.",
             "Comece onde você está. Use o que você tem. Faça o que você pode."
@@ -150,15 +159,39 @@ function setupEventListeners() {
     document.getElementById('newAppointmentBtn')?.addEventListener('click', openNewAppointmentModal);
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
+
+    // --- CORREÇÃO 1: Botão de Disponibilidade (agora no Dashboard) ---
+    // O comentário foi atualizado para refletir a mudança. O ID único agora funciona.
+    document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
+        const user = getCurrentUserProfile();
+        if (user && user.role === 'medicos') {
+            openMyAvailabilityModal();
+        } else {
+            // ATUALIZADO: Substitui alert() por showToast()
+            showToast('Esta função é restrita a profissionais (médicos).', 'error');
+        }
+    });
+
+    // --- Formulários ---
     document.getElementById('newClientForm')?.addEventListener('submit', handleNewClientSubmit);
     document.getElementById('detailsClientForm')?.addEventListener('submit', handleUpdateClient);
     document.getElementById('appointmentForm')?.addEventListener('submit', saveAppointment);
     document.getElementById('appointmentDetailsForm')?.addEventListener('submit', updateAppointment);
+
+    // --- CORREÇÃO ADICIONADA ---
+    // Adiciona o "ouvinte" de clique para o botão de excluir
     document.getElementById('deleteAppointmentBtn')?.addEventListener('click', deleteAppointment);
+    // --- FIM DA CORREÇÃO ---
+
     document.getElementById('paymentForm')?.addEventListener('submit', savePayment);
     document.getElementById('examForm')?.addEventListener('submit', saveExam);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
+    
+    // --- NOVO: Formulário de Eventos do Profissional ---
+    document.getElementById('professionalEventForm')?.addEventListener('submit', saveProfessionalEvent);
+
+    // --- Botões de Adicionar Dependente ---
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
             const container = document.getElementById('dependentesContainer');
             addDependenteField(container, 'dependenteCount');
@@ -167,6 +200,7 @@ function setupEventListeners() {
             const container = document.getElementById('detailsDependentesContainer');
             addDependenteField(container, 'dependenteDetailsCount');
         });
+    
     document.body.addEventListener('submit', function(event) {
         if (event.target.id === 'exportForm') {
             event.preventDefault();
@@ -206,54 +240,81 @@ function setupEventListeners() {
         loadLogsData(startDate, endDate);
     });
 
-    document.body.addEventListener('click', function(event) {
+    // --- NOVO: Listeners do Modal de Disponibilidade ---
+    const eventDateInput = document.getElementById('eventDate');
+    if (eventDateInput) {
+        eventDateInput.addEventListener('change', (e) => {
+            const professionalId = document.getElementById('eventProfessionalId').value;
+            if (professionalId) {
+                loadMyEvents(professionalId, e.target.value);
+            }
+        });
+    }
+
+    const myEventsListContainer = document.getElementById('myEventsListContainer');
+    if (myEventsListContainer) {
+        myEventsListContainer.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('.event-item-delete');
+            if (deleteButton) {
+                const eventId = deleteButton.dataset.eventId;
+                deleteProfessionalEvent(eventId);
+            }
+        });
+    }
+
+    // --- Listener Global de Cliques (delegation) ---
+    // ATUALIZADO: O listener agora é 'async' para suportar 'await showConfirm'
+    document.body.addEventListener('click', async function(event) {
         const target = event.target;
+        // Fechar modais
         if (target.closest('.close-btn') || target.closest('[data-close-modal]')) {
             const modal = target.closest('.modal');
             if(modal) modal.style.display = 'none';
         }
+        // Botões de Ação em Tabelas
         const editUserButton = target.closest('.edit-user-btn');
         if (editUserButton) openUserModal(editUserButton.dataset.id);
+
         const editExamButton = target.closest('.edit-exam-btn');
         if (editExamButton) openExamModal(editExamButton.dataset.id);
+        
         const checkinButton = target.closest('.checkin-btn');
         if (checkinButton) markArrival(checkinButton.dataset.id);
+        
         const paymentButton = target.closest('.payment-btn');
         if (paymentButton) openPaymentModal(paymentButton.dataset.id, paymentButton.dataset.name);
+        
         const appointmentCard = target.closest('.appointment-card[data-appointment-id]');
         if (appointmentCard) openAppointmentDetails(appointmentCard.dataset.appointmentId);
-        // CORREÇÃO (Ponto 2): O seletor [data-titular-id] está muito genérico, 
-        // mas vamos assumir que só existe na tabela de clientes.
+        
         const detailsClientButton = target.closest('#clientsTableBody .btn[data-titular-id]');
         if (detailsClientButton) openDetailsModal(detailsClientButton.dataset.titularId);
         
         const patientQueueItem = target.closest('.paciente-espera-item');
         if (patientQueueItem) selectPatient(patientQueueItem.dataset.appointmentId);
+
         const finalizeButton = target.closest('#finalizeConsultationBtn');
         if (finalizeButton) finalizeConsultation();
-        const printExamsButton = target.closest('#printExamsBtn');
+        
         const printGenericButton = target.closest('.print-btn');
-        if (printExamsButton) printExamDocuments();
         if (printGenericButton) {
             import('./pacientes.js').then(mod => mod.triggerPrintFromElement(printGenericButton)).catch(err => console.error(err));
         }
-        const removeExamButton = target.closest('.remove-item-btn');
-        if (removeExamButton) removeExam(parseInt(removeExamButton.dataset.examId));
-        const tabButton = target.closest('.atendimento-botoes .btn');
-        if (tabButton) {
-            document.querySelectorAll('.atendimento-botoes .btn, .aba-conteudo').forEach(el => el.classList.remove('active'));
-            tabButton.classList.add('active');
-            document.getElementById(`aba${tabButton.dataset.aba.charAt(0).toUpperCase() + tabButton.dataset.aba.slice(1)}`).classList.add('active');
-        }
+
+        // ... (outros botões de clique) ...
+        
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
+        
         const removeDependenteButton = target.closest('.remove-dependente-btn');
         if (removeDependenteButton) {
             const dependentGroup = removeDependenteButton.closest('.dependente-form-group');
             const dependentId = dependentGroup.dataset.dependenteId;
     
             if (dependentId) {
-                if (confirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.')) {
+                // ATUALIZADO: Substitui confirm() por showConfirm()
+                const confirmed = await showConfirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.');
+                if (confirmed) {
                     dependentGroup.style.display = 'none';
                     const deleteInput = document.createElement('input');
                     deleteInput.type = 'hidden';
@@ -262,6 +323,7 @@ function setupEventListeners() {
                     dependentGroup.appendChild(deleteInput);
                 }
             } else {
+                // Se for um dependente novo (sem ID), apenas remove
                 dependentGroup.remove();
             }
         }
@@ -286,7 +348,8 @@ async function initializeDashboard(user) {
 
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
-        alert('Erro crítico: Perfil do usuário não encontrado.');
+        // ATUALIZADO: Substitui alert() por showToast()
+        showToast('Erro crítico: Perfil do usuário não encontrado.', 'error');
         return handleLogout();
     }
     

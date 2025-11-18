@@ -2,6 +2,7 @@ import { _supabase } from './supabase.js';
 import { initializeDashboard } from './main.js';
 import { showLoginScreen } from './ui.js';
 import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 let currentUserProfile = null;
 
@@ -24,7 +25,7 @@ async function handleLogin(event) {
         await logAction('LOGIN', { email: email });
         await initializeDashboard(data.user);
     } catch (error) {
-        alert('Credenciais inválidas.');
+        showToast('Credenciais inválidas.');
     }
 }
 
@@ -40,6 +41,35 @@ function getCurrentUserProfile() {
 }
 
 function setupPermissions(role) {
+    // Mapeia roles para as classes CSS que elas podem ver
+    const rolePermissions = {
+        superadmin: ['admin-only', 'medicos-only'], // Superadmin vê tudo
+        admin: ['admin-only', 'medicos-only'], // Admin vê tudo (ajuste conforme necessário)
+        recepcao: [], // Recepção não vê classes especiais
+        medicos: ['medicos-only'], // Médicos veem apenas 'medicos-only'
+        financeiro: ['admin-only'] // Financeiro vê 'admin-only' (ajuste se necessário)
+    };
+
+    // 1. Esconde todos os elementos com classes de permissão
+    document.querySelectorAll('.admin-only, .medicos-only').forEach(el => {
+        el.style.display = 'none';
+    });
+
+    // 2. Mostra elementos que o role atual tem permissão para ver
+    const allowedClasses = rolePermissions[role] || [];
+    allowedClasses.forEach(className => {
+        document.querySelectorAll(`.${className}`).forEach(el => {
+            // Usa 'flex' ou 'block' dependendo do elemento para manter o layout
+            // Botões (como o de disponibilidade) são 'flex' no CSS base
+            if (el.tagName === 'BUTTON' || el.style.display === 'flex') {
+                el.style.display = 'flex';
+            } else {
+                el.style.display = 'block'; // Padrão para links de menu e divs
+            }
+        });
+    });
+
+    // 3. Lógica específica de MENU (sidebar) - mantida como estava
     const allMenuItems = {
         'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true,
         'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true,
@@ -65,4 +95,3 @@ function setupPermissions(role) {
 }
 
 export { handleLogin, handleLogout, setupPermissions, getCurrentUserProfile, setCurrentUserProfile };
-

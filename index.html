@@ -39,7 +39,8 @@
                     <div class="logo-subtitle">Sistema Interno</div>
                 </div>
                 
-                <a href="#" class="menu-item active" data-page="home" id="menu-dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                <!-- ALTERAÇÃO: "Dashboard" para "Home" -->
+                <a href="#" class="menu-item active" data-page="home" id="menu-dashboard"><i class="fas fa-home"></i> Home</a>
                 
                 <div class="menu-item" id="menu-cartao"><i class="fas fa-id-card"></i> Cartão Bim</div>
                 <div class="submenu" id="submenu-cartao">
@@ -83,8 +84,18 @@
                         <h2 id="homeGreeting" class="home-greeting"></h2>
                         <p id="homeDate" class="home-date"></p>
                     </div>
-                
+                    
+                    <!-- ALTERAÇÃO: O botão foi removido daqui e transformado em um card abaixo -->
+
                     <div class="home-widgets-grid">
+                        
+                        <!-- ALTERAÇÃO: Novo Card de Disponibilidade -->
+                        <div class="widget-card widget-card-action medicos-only" id="manageMyAvailabilityBtn" style="display: none;">
+                            <i class="fas fa-calendar-times widget-icon" style="color: #e74c3c;"></i> <!-- Cor vermelha para "bloqueio" -->
+                            <h3 class="widget-title">Gerenciar Disponibilidade</h3>
+                            <p class="widget-content">Clique aqui para bloquear horários ou gerenciar sua agenda de profissional.</p>
+                        </div>
+
                         <div class="widget-card" id="weatherWidget">
                             <i class="fas fa-sun widget-icon"></i>
                             <h3 class="widget-title">Previsão do Tempo (Fernandópolis-SP)</h3>
@@ -491,7 +502,9 @@
                 <div class="page-content" id="profissionaisPage">
                     <div class="content-header">
                         <h2 class="page-title">Gestão de Profissionais</h2>
-                        </div>
+                        
+                        <!-- CORREÇÃO 1: Botão de disponibilidade removido desta página -->
+                    </div>
                     <div class="card">
                         <div class="table-container">
                             <table id="professionalsTable">
@@ -504,11 +517,13 @@
                                     </tr>
                                 </thead>
                                 <tbody id="professionalsTableBody">
-                                    </tbody>
+                                    <!-- Conteúdo carregado por JS -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="page-content" id="produtosPage">
                     <div class="content-header"><h2 class="page-title">Produtos</h2></div>
@@ -683,6 +698,16 @@
                             <label for="appointmentTime">Hora</label>
                             <input type="time" id="appointmentTime" name="time" required>
                         </div>
+                        <!-- CORREÇÃO 2: Dropdown de duração adicionado -->
+                        <div class="form-group">
+                            <label for="appointmentDuration">Duração</label>
+                            <select id="appointmentDuration" name="duration" required>
+                                <option value="15">15 min</option>
+                                <option value="30" selected>30 min</option>
+                                <option value="45">45 min</option>
+                                <option value="60">60 min</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="appointmentRoom">Consultório</label>
                             <select id="appointmentRoom" name="room" required>
@@ -690,8 +715,9 @@
                                 <option value="Consultório 1">Consultório 1</option>
                                 <option value="Consultório 2">Consultório 2</option>
                                 <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
-                                <option value="Consultório 4 (segundo andar)">Consultório 4 (segundo andar)</option>
-                                <option value="Consultório 5">Consultório 5 (segundo andar)</option>
+                                <!-- ALTERAÇÃO: Removido "(segundo andar)" -->
+                                <option value="Consultório 4">Consultório 4</option>
+                                <option value="Consultório 5">Consultório 5</option>
                             </select>
                         </div>
                     </div>
@@ -732,6 +758,16 @@
                             <label for="detailsAppointmentTime">Hora</label>
                             <input type="time" id="detailsAppointmentTime" name="time" required>
                         </div>
+                        <!-- CORREÇÃO 2: Dropdown de duração adicionado ao modal de detalhes -->
+                        <div class="form-group">
+                            <label for="detailsAppointmentDuration">Duração</label>
+                            <select id="detailsAppointmentDuration" name="duration" required>
+                                <option value="15">15 min</option>
+                                <option value="30">30 min</option>
+                                <option value="45">45 min</option>
+                                <option value="60">60 min</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -745,8 +781,9 @@
                                 <option value="Consultório 1">Consultório 1</option>
                                 <option value="Consultório 2">Consultório 2</option>
                                 <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
-                                <option value="Consultório 4">Consultório 4 (segundo andar)</option>
-                                <option value="Consultório 5">Consultório 5 (segundo andar)</option>
+                                <!-- ALTERAÇÃO: Removido "(segundo andar)" e corrigido o value -->
+                                <option value="Consultório 4">Consultório 4</option>
+                                <option value="Consultório 5">Consultório 5</option>
                             </select>
                         </div>
                     </div>
@@ -1008,12 +1045,68 @@
                 <div id="printPreviewContent">
                     </div>
             </div>
+
+            <!-- CORREÇÃO: O modal de disponibilidade estava ANINHADO AQUI DENTRO. -->
+            <!-- Movido para fora do modal de impressão. -->
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-close-modal="printPreviewModal">Fechar</button>
                 <button type="button" class="btn btn-success" id="confirmPrintBtn"><i class="fas fa-print"></i> Imprimir</button>
             </div>
         </div>
     </div>
+
+    <!-- CORREÇÃO: Modal de disponibilidade movido para cá, no nível correto. -->
+    <div class="modal" id="professionalEventModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2>Gerenciar Disponibilidade</h2>
+                <button class="close-btn" data-close-modal="professionalEventModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="professionalEventForm">
+                    <input type="hidden" id="eventProfessionalId">
+                    <h4>Novo Bloqueio de Agenda</h4>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="eventTitle">Título do Evento</label>
+                            <input type="text" id="eventTitle" name="title" placeholder="Ex: Compromisso Pessoal, Almoço" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="eventDate">Data</label>
+                            <input type="date" id="eventDate" name="date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventStartTime">Hora de Início</label>
+                            <input type="time" id="eventStartTime" name="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventEndTime">Hora de Fim</label>
+                            <input type="time" id="eventEndTime" name="endTime" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding-top: 10px; padding-bottom: 20px;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Adicionar Bloqueio
+                        </button>
+                    </div>
+                </form>
+                
+                <hr style="margin: 20px 0;">
+
+                <h4>Bloqueios para a Data Selecionada</h4>
+                <div class="events-list-container" id="myEventsListContainer">
+                    <!-- Eventos carregados pelo JS aparecerão aqui -->
+                    <p>Selecione uma data para ver seus bloqueios.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -1023,5 +1116,3 @@
     
 </body>
 </html>
-
-

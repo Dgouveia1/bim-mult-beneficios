@@ -1,6 +1,8 @@
 import { _supabase } from './supabase.js';
 import { openModal } from './clientes.js';
 import { logAction } from './logger.js';
+// ATUALIZADO: Importa showConfirm
+import { showToast, showConfirm } from './utils.js';
 
 let currentScheduleDate = new Date();
 let scheduleSubscription = null;
@@ -8,8 +10,112 @@ let calendarDate = new Date();
 let isCalendarListenerAttached = false;
 let isPatientSearchListenerAttached = false;
 let allProfessionals = [];
-
 const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#1abc9c', '#e67e22'];
+
+
+// =================================================================
+// MODIFICAÇÃO: saveAppointment
+// =================================================================
+async function saveAppointment(event) {
+    event.preventDefault();
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const appointmentData = {
+        patient_name: document.getElementById('appointmentPatientName').value,
+        client_id: document.getElementById('appointmentClientId').value,
+        procedure: form.procedure.value,
+        appointment_date: form.date.value,
+        start_time: form.time.value,
+        professional_id: form.professionalId.value,
+        room: form.room.value,
+    };
+
+    if (!appointmentData.patient_name || !appointmentData.client_id) {
+        showToast('Por favor, selecione um paciente válido da lista.');
+        return;
+    }
+    
+    if (!appointmentData.professional_id) {
+        showToast('Por favor, selecione um profissional.');
+        return;
+    }
+
+    // CORREÇÃO 2: Captura a duração do novo dropdown
+    const durationInMinutes = parseInt(form.duration.value, 10);
+    if (isNaN(durationInMinutes) || durationInMinutes <= 0) {
+         showToast('Por favor, selecione uma duração válida.');
+         return;
+    }
+
+    const [hour, minute] = appointmentData.start_time.split(':').map(Number);
+    const endTimeObject = new Date();
+    // CORREÇÃO 2: Usa a duração selecionada ao invés de 30 min fixo
+    endTimeObject.setHours(hour, minute + durationInMinutes, 0, 0);
+    // Formata para "HH:MM:SS"
+    appointmentData.end_time = endTimeObject.toTimeString().split(' ')[0];
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+    try {
+        // =================================================================
+        // NOVA VERIFICAÇÃO: Conflito de Disponibilidade do Profissional
+        // =================================================================
+        const { data: professionalEvents, error: eventCheckError } = await _supabase
+            .from('professional_events')
+            .select('id, title')
+            .eq('professional_id', appointmentData.professional_id)
+            .eq('event_date', appointmentData.appointment_date)
+            .lt('start_time', appointmentData.end_time) // Evento começa ANTES do agendamento terminar
+            .gt('end_time', appointmentData.start_time);  // Evento termina DEPOIS do agendamento começar
+
+        if (eventCheckError) throw eventCheckError;
+
+        if (professionalEvents && professionalEvents.length > 0) {
+            // Se encontrou um evento, bloqueia o agendamento
+            throw new Error(`Conflito de agenda! O profissional não está disponível neste horário (Motivo: ${professionalEvents[0].title}).`);
+        }
+
+        // =================================================================
+        // VERIFICAÇÃO EXISTENTE: Conflito de Sala
+        // =================================================================
+        const { data: conflictingAppointments, error: checkError } = await _supabase
+            .from('appointments')
+            .select('id')
+            .eq('appointment_date', appointmentData.appointment_date)
+            .eq('room', appointmentData.room)
+            .lt('start_time', appointmentData.end_time)
+            .gt('end_time', appointmentData.start_time);
+            
+        if (checkError) throw checkError;
+
+        if (conflictingAppointments && conflictingAppointments.length > 0) {
+            throw new Error(`Conflito de agendamento! O consultório já está reservado neste horário.`);
+        }
+
+        // Se passou em ambas as verificações, salva o agendamento
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+        const { error: insertError } = await _supabase.from('appointments').insert(appointmentData);
+        if (insertError) throw insertError;
+
+        await logAction('CREATE_APPOINTMENT', { patient: appointmentData.patient_name, date: appointmentData.appointment_date, time: appointmentData.start_time, room: appointmentData.room });
+        showToast('Agendamento salvo com sucesso!');
+        closeAppointmentModal();
+        
+    } catch (error) {
+        showToast(error.message); // Exibe a mensagem de erro (do conflito de sala OU do profissional)
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Agendar';
+    }
+}
+
+
+// =================================================================
+// FUNÇÕES PREVIAMENTE EXISTENTES (COM MODIFICAÇÕES ABAIXO)
+// =================================================================
 
 function unsubscribeSchedule() {
     if (scheduleSubscription) {
@@ -170,7 +276,7 @@ async function renderSchedule() {
     const container = document.getElementById('scheduleContainer');
     if (!container) return;
     
-    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4 (segundo andar)', 'Consultório 5'];
+    const rooms = ['Consultório 1', 'Consultório 2', 'Consultório 3 (Dentista)', 'Consultório 4', 'Consultório 5'];
 
     try {
         let html = '<div class="time-column"><div class="schedule-header">Hora</div>';
@@ -205,7 +311,7 @@ function placeAppointmentCard(appointment) {
     const headerHeight = document.querySelector('.schedule-header')?.offsetHeight || 50;
     const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
     const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
-    const duration = Math.max(0.5, (endHour + endMinute / 60) - (startHour + startMinute / 60));
+    const duration = Math.max(0.25, (endHour + endMinute / 60) - (startHour + startMinute / 60));
 
     const top = ((startHour - 7) * 120) + (startMinute / 30 * 60) + headerHeight;
     const height = (duration * 120) - 2;
@@ -356,6 +462,9 @@ async function openNewAppointmentModal() {
     const form = document.getElementById('appointmentForm');
     form.reset();
     document.getElementById('patientSearchResults').innerHTML = '';
+    
+    // CORREÇÃO 2: Define 30 min como padrão ao abrir
+    document.getElementById('appointmentDuration').value = '30';
 
     const professionalSelect = document.getElementById('appointmentProfessional');
     professionalSelect.innerHTML = '<option value="">Carregando...</option>';
@@ -420,6 +529,25 @@ async function openAppointmentDetails(appointmentId) {
         document.getElementById('detailsAppointmentTime').value = appointment.start_time.substring(0, 5);
         document.getElementById('detailsAppointmentRoom').value = appointment.room;
 
+        // --- CORREÇÃO 2: Cálculo de Duração ao abrir detalhes ---
+        const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
+        const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
+        
+        const startDate = new Date(0, 0, 0, startHour, startMinute, 0);
+        const endDate = new Date(0, 0, 0, endHour, endMinute, 0);
+        
+        let diffInMinutes = (endDate.getTime() - startDate.getTime()) / 60000;
+        
+        // Arredonda para os valores do dropdown
+        if (diffInMinutes <= 15) diffInMinutes = 15;
+        else if (diffInMinutes <= 30) diffInMinutes = 30;
+        else if (diffInMinutes <= 45) diffInMinutes = 45;
+        else if (diffInMinutes <= 60) diffInMinutes = 60;
+        else diffInMinutes = 30; // Padrão se for um valor estranho
+
+        document.getElementById('detailsAppointmentDuration').value = diffInMinutes;
+        // --- FIM DA CORREÇÃO ---
+
         const profSelect = document.getElementById('detailsAppointmentProfessional');
         profSelect.innerHTML = '';
         allProfessionals.forEach(prof => {
@@ -433,66 +561,13 @@ async function openAppointmentDetails(appointmentId) {
         modal.style.display = 'flex';
 
     } catch (error) {
-        alert('Erro ao carregar detalhes do agendamento: ' + error.message);
+        showToast('Erro ao carregar detalhes do agendamento: ' + error.message);
     }
 }
 
 function closeAppointmentDetailsModal() {
     const modal = document.getElementById('appointmentDetailsModal');
     if (modal) modal.style.display = 'none';
-}
-
-async function saveAppointment(event) {
-    event.preventDefault();
-    const form = event.target;
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    const appointmentData = {
-        patient_name: document.getElementById('appointmentPatientName').value,
-        client_id: document.getElementById('appointmentClientId').value,
-        procedure: form.procedure.value,
-        appointment_date: form.date.value,
-        start_time: form.time.value,
-        professional_id: form.professionalId.value,
-        room: form.room.value,
-    };
-
-    if (!appointmentData.patient_name || !appointmentData.client_id) {
-        alert('Por favor, selecione um paciente válido da lista.');
-        return;
-    }
-
-    const [hour, minute] = appointmentData.start_time.split(':').map(Number);
-    const endTimeObject = new Date();
-    endTimeObject.setHours(hour, minute + 30, 0, 0);
-    appointmentData.end_time = endTimeObject.toTimeString().split(' ')[0];
-
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-
-    try {
-        const { data: conflictingAppointments, error: checkError } = await _supabase.from('appointments').select('id').eq('appointment_date', appointmentData.appointment_date).eq('room', appointmentData.room).lt('start_time', appointmentData.end_time).gt('end_time', appointmentData.start_time);
-        if (checkError) throw checkError;
-
-        if (conflictingAppointments && conflictingAppointments.length > 0) {
-            throw new Error(`Conflito de agendamento! O consultório já está reservado neste horário.`);
-        }
-
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-
-        const { error: insertError } = await _supabase.from('appointments').insert(appointmentData);
-        if (insertError) throw insertError;
-
-        await logAction('CREATE_APPOINTMENT', { patient: appointmentData.patient_name, date: appointmentData.appointment_date, time: appointmentData.start_time, room: appointmentData.room });
-        alert('Agendamento salvo com sucesso!');
-        closeAppointmentModal();
-        
-    } catch (error) {
-        alert(error.message);
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Agendar';
-    }
 }
 
 async function updateAppointment(event) {
@@ -508,24 +583,46 @@ async function updateAppointment(event) {
         room: form.room.value,
     };
     
+    // CORREÇÃO 2: Pega a duração do dropdown de detalhes
+    const durationInMinutes = parseInt(form.duration.value, 10);
     const [hour, minute] = updatedData.start_time.split(':').map(Number);
     const endTime = new Date();
-    endTime.setHours(hour, minute + 30, 0, 0);
+    // CORREÇÃO 2: Usa a duração selecionada
+    endTime.setHours(hour, minute + durationInMinutes, 0, 0);
     updatedData.end_time = endTime.toTimeString().split(' ')[0];
     
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
     try {
+        // =================================================================
+        // NOVA VERIFICAÇÃO: Conflito de Disponibilidade do Profissional (na ATUALIZAÇÃO)
+        // =================================================================
+        const { data: professionalEvents, error: eventCheckError } = await _supabase
+            .from('professional_events')
+            .select('id, title')
+            .eq('professional_id', updatedData.professional_id)
+            .eq('event_date', updatedData.appointment_date)
+            .lt('start_time', updatedData.end_time)
+            .gt('end_time', updatedData.start_time);
+
+        if (eventCheckError) throw eventCheckError;
+
+        if (professionalEvents && professionalEvents.length > 0) {
+            throw new Error(`Conflito de agenda! O profissional não está disponível neste horário (Motivo: ${professionalEvents[0].title}).`);
+        }
+        
+        // (Aqui você também deve re-verificar o conflito de SALA, se desejar)
+
         const { error } = await _supabase.from('appointments').update(updatedData).eq('id', appointmentId);
         if (error) throw error;
 
         await logAction('UPDATE_APPOINTMENT', { appointmentId: appointmentId, changes: updatedData });
-        alert('Agendamento atualizado com sucesso!');
+        showToast('Agendamento atualizado com sucesso!');
         closeAppointmentDetailsModal();
 
     } catch (error) {
-        alert('Erro ao atualizar o agendamento: ' + error.message);
+        showToast('Erro ao atualizar o agendamento: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Salvar Alterações';
@@ -534,7 +631,10 @@ async function updateAppointment(event) {
 
 async function deleteAppointment() {
     const appointmentId = document.getElementById('detailsAppointmentId').value;
-    if (!confirm('Tem certeza que deseja excluir este agendamento?')) return;
+    
+    // ATUALIZADO: Substitui confirm() por showConfirm()
+    const confirmed = await showConfirm('Tem certeza que deseja excluir este agendamento?');
+    if (!confirmed) return;
 
     try {
         const { data: apptToDelete, error: fetchError } = await _supabase.from('appointments').select('*').eq('id', appointmentId).single();
@@ -543,12 +643,18 @@ async function deleteAppointment() {
         const { error } = await _supabase.from('appointments').delete().eq('id', appointmentId);
         if (error) throw error;
         
+        // <<< MODIFICAÇÃO ADICIONADA >>>
+        // Remove o card da UI imediatamente para refletir a exclusão em tempo real,
+        // sem depender que a inscrição do Supabase (listener) o capture.
+        removeAppointmentCard(appointmentId);
+        // <<< FIM DA MODIFICAÇÃO >>>
+
         await logAction('DELETE_APPOINTPOINTMENT', { appointmentId: appointmentId, patient: apptToDelete.patient_name, date: apptToDelete.appointment_date });
-        alert('Agendamento excluído com sucesso!');
+        showToast('Agendamento excluído com sucesso!');
         closeAppointmentDetailsModal();
 
     } catch (error) {
-        alert('Erro ao excluir agendamento: ' + error.message);
+        showToast('Erro ao excluir agendamento: ' + error.message);
     }
 }
 

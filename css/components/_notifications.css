@@ -1,0 +1,122 @@
+/* =================================================================
+   COMPONENTE: NOTIFICAÇÕES (TOAST)
+   ================================================================= */
+
+   #notificationContainer {
+    position: fixed;
+    top: 20px; /* MUDADO */
+    left: 50%; /* MUDADO */
+    transform: translateX(-50%); /* MUDADO para centralizar */
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* MUDADO */
+    gap: 10px;
+    width: 90%;
+    max-width: 450px;
+}
+
+.toast-notification {
+    background-color: var(--white);
+    color: var(--secondary-dark);
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-left: 5px solid var(--secondary-color); /* Padrão info */
+    opacity: 0;
+    transition: all 0.4s ease-in-out;
+    animation: slideInFromTop 0.5s ease forwards; /* MUDADO */
+    width: 100%;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.toast-notification i {
+    font-size: 20px;
+}
+
+/* Modificadores de Tipo */
+.toast-notification.success {
+    border-left-color: var(--confirmed-color);
+    color: var(--confirmed-color);
+}
+
+.toast-notification.error {
+    border-left-color: var(--cancelled-color);
+    color: var(--cancelled-color);
+}
+
+.toast-notification.info {
+    border-left-color: var(--info-color);
+    color: var(--info-color);
+}
+
+/* =================================================================
+   NOVO: COMPONENTE: CONFIRMAÇÃO (ESTILO TOAST)
+   ================================================================= */
+
+.confirm-notification {
+    background-color: var(--white);
+    color: var(--secondary-dark);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    border-top: 5px solid var(--info-color); /* Borda azul (info) */
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    animation: slideInFromTop 0.4s ease forwards;
+    width: 100%;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.confirm-message {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 500;
+}
+
+.confirm-message i {
+    font-size: 22px;
+    color: var(--info-color);
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirm-buttons .btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+
+/* Animações */
+@keyframes slideInFromTop { /* MUDADO */
+    from {
+        opacity: 0;
+        transform: translateY(-100%); /* MUDADO */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%); /* MUDADO */
+    }
+}

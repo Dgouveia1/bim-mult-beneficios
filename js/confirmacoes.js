@@ -92,7 +92,7 @@ async function updateConfirmationStatus(appointmentId, isConfirmed) {
 
     } catch (error) {
         console.error('Erro ao atualizar confirmação:', error);
-        alert('Não foi possível salvar a confirmação. Tente novamente.');
+        showToast('Não foi possível salvar a confirmação. Tente novamente.');
     }
 }
 

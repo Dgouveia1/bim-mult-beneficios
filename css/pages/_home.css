@@ -1,5 +1,5 @@
 /* =================================================================
-   PÁGINA: HOME (Dashboard Principal)
+   PÁGINA: HOME
    ================================================================= */
 
    .home-header {
@@ -9,6 +9,11 @@
     border-radius: 12px;
     margin-bottom: 25px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Espaçamento entre o texto e o botão */
 }
 
 .home-greeting {
@@ -64,4 +69,16 @@
 
 #quoteWidget .widget-icon {
     color: #9b59b6; /* Roxo para Citação */
+}
+
+/* Card de Ação Clicável */
+.widget-card-action {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.widget-card-action:hover {
+    background: var(--gray-light); /* Um leve destaque no hover */
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
 }

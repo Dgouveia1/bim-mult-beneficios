@@ -79,3 +79,94 @@ export async function fetchAddressByCEP(cep, formPrefix) {
         console.error("Erro ao buscar CEP:", error);
     }
 }
+
+/**
+ * Exibe uma notificação toast personalizada.
+ * @param {string} message - A mensagem a ser exibida.
+ * @param {string} [type='info'] - O tipo de notificação ('success', 'error', 'info').
+ */
+export function showToast(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    
+    let iconClass = 'fa-info-circle'; // Padrão
+    if (type === 'success') {
+        iconClass = 'fa-check-circle';
+    } else if (type === 'error') {
+        iconClass = 'fa-times-circle';
+    }
+
+    toast.innerHTML = `<i class="fas ${iconClass}"></i> <span>${message}</span>`;
+    
+    container.appendChild(toast);
+
+    // Remove o toast após 4 segundos
+    setTimeout(() => {
+        // Inicia o fade-out
+        toast.style.opacity = '0';
+        // MUDADO: Em vez de deslizar para a direita, desliza para cima para sair
+        toast.style.transform = 'translateY(-100px)'; 
+        
+        // Remove completamente do DOM após a animação
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.parentElement.removeChild(toast);
+            }
+        }, 500); // Tempo igual à transição no CSS
+    }, 4000);
+}
+
+
+/**
+ * Exibe uma notificação de confirmação personalizada no topo da tela.
+ * Retorna uma promessa que resolve como 'true' (Sim) ou 'false' (Não).
+ * @param {string} message - A pergunta de confirmação.
+ * @returns {Promise<boolean>}
+ */
+export function showConfirm(message) {
+    return new Promise((resolve) => {
+        const container = document.getElementById('notificationContainer');
+        if (!container) {
+            resolve(false); // Retorna falso se o container não existir
+            return;
+        }
+
+        // Cria o elemento de confirmação
+        const confirmDialog = document.createElement('div');
+        confirmDialog.className = 'confirm-notification';
+        
+        confirmDialog.innerHTML = `
+            <div class="confirm-message">
+                <i class="fas fa-question-circle"></i>
+                <span>${message}</span>
+            </div>
+            <div class="confirm-buttons">
+                <button class="btn btn-secondary btn-small" id="confirmBtnNao">Não</button>
+                <button class="btn btn-success btn-small" id="confirmBtnSim">Sim</button>
+            </div>
+        `;
+        
+        container.appendChild(confirmDialog);
+
+        const btnSim = document.getElementById('confirmBtnSim');
+        const btnNao = document.getElementById('confirmBtnNao');
+
+        const closeDialog = (result) => {
+            confirmDialog.style.opacity = '0';
+            confirmDialog.style.transform = 'translateY(-100px)';
+            setTimeout(() => {
+                if (confirmDialog.parentElement) {
+                    confirmDialog.parentElement.removeChild(confirmDialog);
+                }
+                resolve(result); // Resolve a promessa com o resultado
+            }, 300); // Espera a animação de saída
+        };
+
+        // Adiciona ouvintes de clique
+        btnSim.addEventListener('click', () => closeDialog(true));
+        btnNao.addEventListener('click', () => closeDialog(false));
+    });
+}

@@ -1,6 +1,7 @@
 import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
+import { showToast } from './utils.js';
 
 // --- ELEMENTOS DO DOM ---
 const clientsTableBody = document.getElementById('clientsTableBody');
@@ -38,7 +39,7 @@ function formatDateForInput(dateString) {
 
 function addDependenteField(container, counterVar) {
     if (window[counterVar] >= 6) {
-        alert("É permitido no máximo 6 dependentes.");
+        showToast("É permitido no máximo 6 dependentes.");
         return;
     }
     window[counterVar]++;
@@ -238,15 +239,15 @@ async function handleNewClientSubmit(event) {
     const titularFormProps = Object.fromEntries(titularFormData);
     
     if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
-        alert('O CPF do titular é inválido!');
+        showToast('O CPF do titular é inválido!');
         return;
     }
     if (titularFormProps.email && !validateEmail(titularFormProps.email)) {
-        alert('O Email do titular é inválido!');
+        showToast('O Email do titular é inválido!');
         return;
     }
      if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
-        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
 
@@ -281,11 +282,11 @@ async function handleNewClientSubmit(event) {
         };
 
         if (dependente.cpf && !validateCPF(dependente.cpf)) {
-            alert(`O CPF do dependente ${dependente.nome} é inválido!`);
+            showToast(`O CPF do dependente ${dependente.nome} é inválido!`);
             return;
         }
         if (dependente.telefone && !validatePhone(dependente.telefone)) {
-            alert(`O Telefone do dependente ${dependente.nome} parece inválido!`);
+            showToast(`O Telefone do dependente ${dependente.nome} parece inválido!`);
             return;
         }
         dependentesData.push(dependente);
@@ -326,7 +327,7 @@ async function handleNewClientSubmit(event) {
             if (dependentesError) throw dependentesError;
         }
 
-        alert('Cliente e dependentes cadastrados com sucesso!');
+        showToast('Cliente e dependentes cadastrados com sucesso!');
         closeModal(newClientModal);
         form.reset();
         document.getElementById('dependentesContainer').innerHTML = '';
@@ -334,7 +335,7 @@ async function handleNewClientSubmit(event) {
         loadClientsData(); // Recarrega os dados
 
     } catch (error) {
-        alert('Erro ao salvar cliente: ' + error.message);
+        showToast('Erro ao salvar cliente: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Salvar';
@@ -360,7 +361,7 @@ async function openDetailsModal(clientId) {
         populateDetailsForm(client, dependents);
         openModal(detailsClientModal);
     } catch (error) {
-        alert('Não foi possível carregar os detalhes do cliente.');
+        showToast('Não foi possível carregar os detalhes do cliente.');
     }
 }
 
@@ -423,15 +424,15 @@ async function handleUpdateClient(event) {
     
     // CORREÇÃO: Validação usando os 'name' corretos
     if (formProps.details_cpf && !validateCPF(formProps.details_cpf)) {
-        alert('O CPF do titular é inválido!');
+        showToast('O CPF do titular é inválido!');
         return;
     }
     if (formProps.details_email && !validateEmail(formProps.details_email)) {
-        alert('O Email do titular é inválido!');
+        showToast('O Email do titular é inválido!');
         return;
     }
      if (formProps.details_telefone && !validatePhone(formProps.details_telefone)) {
-        alert('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
+        showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
     
@@ -524,12 +525,12 @@ async function handleUpdateClient(event) {
             });
         }
 
-        alert('Cliente atualizado com sucesso!');
+        showToast('Cliente atualizado com sucesso!');
         closeModal(detailsClientModal);
         loadClientsData(); // Recarrega os dados
 
     } catch (error) {
-        alert('Erro ao atualizar cliente: ' + error.message);
+        showToast('Erro ao atualizar cliente: ' + error.message);
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = 'Salvar Alterações';
@@ -548,7 +549,7 @@ function closeModal(modalElement) {
 // --- FUNÇÃO DE EXPORTAÇÃO ---
 function exportToExcel() {
     if (allPeople.length === 0) {
-        alert("Não há dados para exportar (baseado na busca/filtro atual).");
+        showToast("Não há dados para exportar (baseado na busca/filtro atual).");
         return;
     }
     const dataToExport = allPeople.map(person => ({
