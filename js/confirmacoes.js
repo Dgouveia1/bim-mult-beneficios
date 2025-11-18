@@ -1,5 +1,6 @@
 import { _supabase } from './supabase.js';
-import { allPeople, loadClientsData } from './clientes.js';
+// ATUALIZAÇÃO: Não precisamos mais importar 'clientes.js'
+import { showToast } from './utils.js';
 
 /**
  * Carrega e exibe os agendamentos dos próximos 5 dias para confirmação.
@@ -11,9 +12,7 @@ async function loadConfirmationsData() {
     tableBody.innerHTML = '<tr><td colspan="6">Carregando agendamentos...</td></tr>';
 
     try {
-        if (allPeople.length === 0) {
-            await loadClientsData();
-        }
+        // CORREÇÃO: Removemos o 'loadClientsData(null, true)'
 
         const today = new Date();
         const fiveDaysLater = new Date();
@@ -22,6 +21,11 @@ async function loadConfirmationsData() {
         const startDate = today.toISOString().split('T')[0];
         const endDate = fiveDaysLater.toISOString().split('T')[0];
 
+        // CORREÇÃO: A sintaxe do select foi alterada para resolver o erro de relação.
+        // Usamos "clients:clients!inner!client_id(...)" para dizer:
+        // 1. "clients:" -> Queremos que o resultado venha no objeto `appt.clients`
+        // 2. "clients"   -> A tabela de destino é a 'clients'
+        // 3. "!inner!client_id" -> Use a coluna 'client_id' da tabela 'appointments' para fazer um INNER JOIN.
         const { data: appointments, error } = await _supabase
             .from('appointments')
             .select(`
@@ -31,7 +35,13 @@ async function loadConfirmationsData() {
                 start_time,
                 procedure,
                 confirmacao, 
-                professionals ( name )
+                professionals ( name ),
+                clients:clients!inner!client_id ( 
+                    nome, 
+                    sobrenome, 
+                    telefone, 
+                    dependents ( nome, sobrenome, telefone )
+                )
             `)
             .gte('appointment_date', startDate)
             .lte('appointment_date', endDate)
@@ -48,8 +58,53 @@ async function loadConfirmationsData() {
         tableBody.innerHTML = '';
 
         appointments.forEach(appt => {
-            const person = allPeople.find(p => p.nome.toLowerCase() === appt.patient_name.toLowerCase());
-            const telefone = person ? person.telefone : 'Não encontrado';
+            
+            // --- INÍCIO: LÓGICA DE BUSCA DE TELEFONE (NOVA E EFICIENTE) ---
+            let telefone = 'Não encontrado';
+            const titular = appt.clients; // Objeto 'clients' (titular) vindo da query
+
+            if (titular) {
+                const titularFullName = `${titular.nome || ''} ${titular.sobrenome || ''}`.trim();
+
+                // 1. Verifica se o paciente é o próprio titular
+                if (titularFullName.toLowerCase() === appt.patient_name.toLowerCase()) {
+                    telefone = titular.telefone;
+                } 
+                // 2. Se não for o titular, procura nos dependentes
+                else if (titular.dependents && titular.dependents.length > 0) {
+                    const dependent = titular.dependents.find(d => 
+                        `${d.nome || ''} ${d.sobrenome || ''}`.trim().toLowerCase() === appt.patient_name.toLowerCase()
+                    );
+                    
+                    if (dependent) {
+                        // Usa o telefone do dependente, ou o do titular como fallback
+                        telefone = dependent.telefone || titular.telefone;
+                    } else {
+                        // Fallback: Nome não bateu com titular nem dependentes (pode ser dado antigo)
+                        telefone = titular.telefone; 
+                    }
+                }
+                // 3. Se o titular não tem dependentes, usa o telefone do titular
+                else {
+                     telefone = titular.telefone;
+                }
+            }
+            telefone = telefone || 'Não encontrado'; // Garante que 'null' ou 'undefined' sejam tratados
+            // --- FIM: LÓGICA DE BUSCA DE TELEFONE ---
+
+
+            // --- INÍCIO: LÓGICA DO BOTÃO WHATSAPP ---
+            const cleanedPhone = (telefone || '').replace(/\D/g, '');
+            let whatsappButton = '';
+            if (cleanedPhone && (cleanedPhone.length === 10 || cleanedPhone.length === 11)) {
+                const whatsappLink = `https://wa.me/55${cleanedPhone}`;
+                whatsappButton = `
+                    <a href="${whatsappLink}" target="_blank" class="btn btn-success btn-small whatsapp-btn" title="Abrir WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                `;
+            }
+            // --- FIM: LÓGICA DO BOTÃO WHATSAPP ---
 
             const row = document.createElement('tr');
             
@@ -63,8 +118,11 @@ async function loadConfirmationsData() {
                 <td data-label="Data/Hora">${date} às ${time}</td>
                 <td data-label="Profissional">${appt.professionals.name}</td>
                 <td data-label="Observações">${appt.procedure || ''}</td>
-                <td data-label="Confirmado" class="confirmation-cell">
-                    <input type="checkbox" class="confirmation-checkbox" data-appointment-id="${appt.id}" ${isChecked}>
+                <td data-label="Ações" class="confirmation-cell">
+                    <div style="display: inline-flex; gap: 15px; align-items: center;">
+                        <input type="checkbox" class="confirmation-checkbox" data-appointment-id="${appt.id}" ${isChecked} title="Confirmado">
+                        ${whatsappButton}
+                    </div>
                 </td>
             `;
             tableBody.appendChild(row);
