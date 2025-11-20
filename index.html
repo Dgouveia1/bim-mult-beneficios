@@ -41,7 +41,11 @@
                 
                 <!-- ALTERAÇÃO: "Dashboard" para "Home" -->
                 <a href="#" class="menu-item active" data-page="home" id="menu-dashboard"><i class="fas fa-home"></i> Home</a>
-                
+                <div class="admin-only">
+                    <a href="#" class="menu-item" data-page="dashboard" id="menu-dashboard-analytics" style="display: none;">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </div>
                 <div class="menu-item" id="menu-cartao"><i class="fas fa-id-card"></i> Cartão Bim</div>
                 <div class="submenu" id="submenu-cartao">
                     <a href="#" class="submenu-item" data-page="clientes">Clientes</a>
@@ -66,7 +70,7 @@
                         <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
                         <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
                         <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
-                        <a href="#" class="submenu-item" data-page="disparos">Disparos</a>
+                        <a href="#" class="submenu-item" data-page="dashboard">Dashboard</a>
                         <a href="#" class="submenu-item" data-page="usuarios">Usuários</a>
                         <a href="#" class="submenu-item" data-page="logs">Logs do Sistema</a>
 
@@ -85,11 +89,8 @@
                         <p id="homeDate" class="home-date"></p>
                     </div>
                     
-                    <!-- ALTERAÇÃO: O botão foi removido daqui e transformado em um card abaixo -->
-
                     <div class="home-widgets-grid">
                         
-                        <!-- ALTERAÇÃO: Novo Card de Disponibilidade -->
                         <div class="widget-card widget-card-action medicos-only" id="manageMyAvailabilityBtn" style="display: none;">
                             <i class="fas fa-calendar-times widget-icon" style="color: #e74c3c;"></i> <!-- Cor vermelha para "bloqueio" -->
                             <h3 class="widget-title">Gerenciar Disponibilidade</h3>
@@ -109,6 +110,7 @@
                         </div>
                     </div>
                 </div>
+
 
                 <div class="page-content" id="clientesPage">
                     <div class="clients-page">
@@ -530,68 +532,206 @@
                     <div class="content-header"><h2 class="page-title">Financeiro</h2></div>
                 </div>
 
-                <div class="page-content" id="disparosPage">
-                    <div class="content-header">
-                        <h2 class="page-title">Exportar Contatos para CSV</h2>
+ <!-- === PÁGINA DO DASHBOARD (NOVA) === -->
+<div class="page-content" id="dashboardPage">
+    <div class="dashboard-wrapper">
+        <header>
+            <h1>Metricas Bim Benefícios</h1>
+            <p>Visão Geral de Performance e Projeções</p>
+        </header>
+
+        <section class="dashboard-filters">
+            <span class="filter-title">Filtrar por Plano:</span>
+            <div class="checkbox-group">
+                <input type="checkbox" id="dash-bim-familiar" name="dash-plan" value="Bim Familiar" checked>
+                <label for="dash-bim-familiar">BIM FAMILIAR</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="dash-multsaude" name="dash-plan" value="Mult" checked>
+                <label for="dash-multsaude">MULTSAÚDE</label>
+            </div>
+            <button id="filter-dashboard-btn" class="btn btn-primary btn-small" style="margin-left: 15px;">Filtrar</button>
+            <div class="export-buttons">
+                <button id="export-geral-btn" class="btn btn-secondary btn-small">Relatório Geral</button>
+                <button id="export-churn-btn" class="btn btn-secondary btn-small">Relatório Churn</button>
+            </div>
+        </section>
+
+        <!-- Faturamento -->
+        <h2 class="section-title">Faturamento</h2>
+        <section class="financial-grid">
+            <div class="kpi-card">
+                <span class="card-title">Faturamento Bruto</span>
+                <h2 id="faturamento-bruto-valor">--</h2>
+                <p id="faturamento-bruto-comp">vs mês anterior</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Faturamento Líquido</span>
+                <h2 id="faturamento-liquido-valor">--</h2>
+                <p id="faturamento-liquido-comp">vs mês anterior</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Expectativa de Faturamento</span>
+                <h2 id="expectativa-faturamento-valor">--</h2>
+                <p>Projeção do mês atual</p>
+            </div>
+        </section>
+
+        <!-- Overview Clínica -->
+        <h2 class="section-title">Overview Clínica</h2>
+        <section class="overview-grid">
+            <div class="kpi-card">
+                <span class="card-title">Consultas Hoje</span>
+                <h2 id="consultas-hoje">--</h2>
+                <p>Total de hoje</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Consultas na Semana</span>
+                <h2 id="consultas-semana-valor">--</h2>
+                <p id="consultas-semana-comp">vs semana passada</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Consultas no Mês</span>
+                <h2 id="consultas-mes-valor">--</h2>
+                <p id="consultas-mes-comp">vs mês passado</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Taxa de Ocupação</span>
+                <h2 id="ocupacao-salas-valor">--</h2>
+                <p id="ocupacao-salas-comp">vs mês passado</p>
+            </div>
+        </section>
+
+        <!-- Overview Cartão -->
+        <h2 class="section-title">Overview Cartão</h2>
+        <section class="overview-grid">
+            <div class="kpi-card">
+                <span class="card-title">Total de Titulares Ativos</span>
+                <h2 id="titulares-ativos">--</h2>
+                <p>Posição atual</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Novos Titulares (Semana)</span>
+                <h2 id="novos-titulares-semana-valor">--</h2>
+                <p id="novos-titulares-semana-comp">vs semana passada</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Novos Titulares (Mês)</span>
+                <h2 id="novos-titulares-mes-valor">--</h2>
+                <p id="novos-titulares-mes-comp">vs mês passado</p>
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Status dos Titulares</span>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span>Ativos:</span>
+                        <span class="status-value" id="status-ativos">--</span>
                     </div>
-                    <div class="card">
-                        <form id="exportForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="filterPlano">Plano</label>
-                                    <select id="filterPlano">
-                                        <option value="">Ambos (Todos)</option>
-                                        <option value="Bim">Bim</option>
-                                        <option value="Mult">Mult</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="filterStatus">Status do Cliente</label>
-                                    <select id="filterStatus">
-                                        <option value="">Todos</option>
-                                        <option value="ATIVO">Ativo</option>
-                                        <option value="INATIVO">Inativo</option>
-                                    </select>
-                                </div>
-                                 <div class="form-group">
-                                    <label for="filterSexo">Sexo</label>
-                                    <select id="filterSexo">
-                                        <option value="">Ambos</option>
-                                        <option value="Masculino">Masculino</option>
-                                        <option value="Feminino">Feminino</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="filterMunicipio">Município</label>
-                                <select id="filterMunicipio">
-                                    <option value="">Todos os municípios</option>
-                                </select>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="filterIdadeMin">Idade (mínima)</label>
-                                    <input type="number" id="filterIdadeMin" placeholder="Ex: 18">
-                                </div>
-                                <div class="form-group">
-                                    <label for="filterIdadeMax">Idade (máxima)</label>
-                                    <input type="number" id="filterIdadeMax" placeholder="Ex: 65">
-                                </div>
-                            </div>
-                            <div class="form-group" style="display: flex; align-items: center; padding-top: 20px;">
-                                 <input type="checkbox" id="filterApenasTitular" style="width: auto; margin-right: 10px;">
-                                <label for="filterApenasTitular" style="margin-bottom: 0;">Incluir apenas titulares</label>
-                            </div>
-                            <div class="form-actions" style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 10px;">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-file-csv"></i> Gerar Arquivo CSV
-                                </button>
-                            </div>
-                        </form>
-                        <div id="exportResult" style="margin-top: 20px; font-weight: bold;"></div>
+                    <div class="status-item">
+                        <span>Atraso:</span>
+                        <span class="status-value" id="status-atraso">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Cancelados:</span>
+                        <span class="status-value" id="status-cancelados">--</span>
                     </div>
                 </div>
- 
+            </div>
+            <div class="kpi-card">
+                <span class="card-title">Churn do Mês</span>
+                <h2 id="churn-total">--</h2>
+                <p id="churn-percentual">--% vs mês anterior</p>
+            </div>
+        </section>
+
+        <!-- Gráficos Cartão -->
+        <h2 class="section-title">Métricas do Cartão</h2>
+        <section class="chart-grid">
+            <div class="chart-section">
+                <h3>Aquisição de Titulares</h3>
+                <div class="chart-container">
+                    <canvas id="titularesChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Churn Rate</h3>
+                <div class="chart-container">
+                    <canvas id="churnChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Inadimplência</h3>
+                <div class="chart-container">
+                    <canvas id="inadimplenciaChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gráficos Clínica -->
+        <h2 class="section-title">Métricas da Clínica</h2>
+        <section class="chart-grid">
+            <div class="chart-section">
+                <h3>Consultas Realizadas</h3>
+                <div class="chart-container">
+                    <canvas id="consultasChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Tempo Médio das Consultas</h3>
+                <div class="chart-container">
+                    <canvas id="tempoMedioChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Taxa de Ocupação das Salas</h3>
+                <div class="chart-container">
+                    <canvas id="ocupacaoChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tabelas -->
+        <h2 class="section-title">Análise Detalhada</h2>
+        <section class="chart-grid">
+            <div class="chart-section">
+                <h3>Consultas por Profissional</h3>
+                <div class="chart-container">
+                    <canvas id="consultasProfissionalChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Consultas por Plano</h3>
+                <div class="chart-container">
+                    <canvas id="consultasPlanoChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projeções -->
+        <h2 class="section-title">Projeções Futuras</h2>
+        <section class="chart-grid">
+            <div class="chart-section">
+                <h3>Previsão de Demanda de Consultas</h3>
+                <div class="chart-container">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-section">
+                <h3>Previsão de Aquisição de Clientes</h3>
+                <div class="chart-container">
+                    <canvas id="acquisitionForecastChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coorte -->
+        <section class="chart-section chart-section-full">
+            <h3>Retenção de Clientes por Coorte</h3>
+            <p class="chart-subtitle">Percentual de clientes ativos desde o mês de cadastro.</p>
+            <div id="cohort-chart-container"></div>
+        </section>
+    </div>
+</div>
                 
                 <div class="page-content" id="usuariosPage">
                     <div class="content-header">
@@ -1106,6 +1246,7 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>

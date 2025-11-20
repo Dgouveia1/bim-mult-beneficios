@@ -2,44 +2,41 @@ import { _supabase } from './supabase.js';
 import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
-// ATUALIZADO: Importa showConfirm
 import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
-import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients  } from './pacientes.js';
+import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients, triggerPrintFromElement } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
-// Importa as novas funções de disponibilidade
-import { 
-    loadProfessionalsData, 
-    openProfessionalModal, 
-    saveProfessional,
-    openMyAvailabilityModal,
-    saveProfessionalEvent,
-    loadMyEvents,
-    deleteProfessionalEvent
-} from './profissionais.js';
+import { loadProfessionalsData, openProfessionalModal, saveProfessional, openMyAvailabilityModal, saveProfessionalEvent, loadMyEvents, deleteProfessionalEvent } from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
 import { setupVendasPage } from './vendas.js';
-import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
+import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js'; // CORRIGIDO: Nome da função de importação
 import { loadLogsData, setupLogsPage } from './logs.js';
-
+import { loadDashboardView } from './dashboard.js'; // IMPORTAÇÃO NOVO DASHBOARD
 
 const newClientModalEl = document.getElementById('newClientModal');
 
-// Função para limpar as inscrições de tempo real da página atual
+/**
+ * Remove todas as inscrições de tempo real (realtime subscriptions) ativas
+ * para evitar vazamento de memória ao navegar entre páginas.
+ */
 function cleanupRealtimeSubscriptions() {
     unsubscribeReception();
     unsubscribeSchedule();
     unsubscribePatients();
 }
 
+/**
+ * Navega para uma nova página na interface do dashboard.
+ * @param {string} pageName - O ID da página alvo (ex: 'home', 'clientes', 'dashboard').
+ */
 function navigateToPage(pageName) {
     cleanupRealtimeSubscriptions();
 
-    // Esconde todas as páginas
+    // Esconde todas as páginas e remove o estado ativo
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     
     // Mostra a página alvo
@@ -48,11 +45,12 @@ function navigateToPage(pageName) {
         targetPage.classList.add('active');
     }
 
-    // Atualiza o menu
+    // Atualiza o estado ativo no menu lateral
     document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
     const activeMenuItem = document.querySelector(`[data-page="${pageName}"]`);
     if (activeMenuItem) {
         activeMenuItem.classList.add('active');
+        // Se for um submenu-item, ativa o menu pai
         const parentMenu = activeMenuItem.closest('.submenu')?.previousElementSibling;
         if (parentMenu) parentMenu.classList.add('active');
     }
@@ -65,10 +63,13 @@ function navigateToPage(pageName) {
     overlay.classList.remove('visible');
     dashboard.classList.remove('sidebar-is-open');
 
-    // Carrega os dados da página que acabou de ser aberta
+    // Carrega os dados específicos da nova página
     loadPageData(pageName);
 }
 
+/**
+ * Carrega dados específicos para a página Home.
+ */
 async function loadHomePageData() {
     const userProfile = getCurrentUserProfile();
     if (!userProfile) return;
@@ -87,6 +88,7 @@ async function loadHomePageData() {
 
     const weatherElement = document.getElementById('weatherInfo');
     if (weatherElement) {
+        // Dados estáticos de exemplo
         weatherElement.textContent = 'Hoje o dia está com sol e algumas nuvens. A temperatura varia entre 22°C e 33°C.';
     }
 
@@ -104,6 +106,10 @@ async function loadHomePageData() {
     }
 }
 
+/**
+ * Roteador de dados: Chama a função de carregamento de dados para a página ativa.
+ * @param {string} pageName - Nome da página.
+ */
 async function loadPageData(pageName) {
     if (pageName === 'home') await loadHomePageData();
     else if (pageName === 'clientes') await loadClientsData();
@@ -114,24 +120,24 @@ async function loadPageData(pageName) {
     else if (pageName === 'usuarios') await loadUsersData();
     else if (pageName === 'profissionais') await loadProfessionalsData();
     else if (pageName === 'disparos') await loadMunicipios();
-    else if (pageName === 'confirmacoes') await loadConfirmationsData();
-    else if (pageName === 'logs') setupLogsPage(); // << ALTERADO: Apenas prepara a página de logs
-    // CORREÇÃO (Ponto 3): Chama a função de setup da página de vendas
+    else if (pageName === 'confirmacoes') await loadConfirmationsData(); // CORRIGIDO: Chamando a função com o nome correto
+    else if (pageName === 'logs') setupLogsPage();
     else if (pageName === 'vendas') setupVendasPage();
-    else if (pageName === 'prontuario') {
-        // CORREÇÃO (Ponto 4): Não carrega mais 'loadClientsData' aqui
-        setupProntuarioPage();
-    } else if (pageName === 'carteirinha') {
-        setupCarteirinhaPage();
-    }
+    else if (pageName === 'prontuario') setupProntuarioPage();
+    else if (pageName === 'carteirinha') setupCarteirinhaPage();
+    else if (pageName === 'dashboard') loadDashboardView(); // NOVO LOAD DASHBOARD
 }                                     
 
+/**
+ * Configura todos os ouvintes de eventos globais e de formulários.
+ */
 function setupEventListeners() {
     const dashboard = document.getElementById('dashboard');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mainContentOverlay');
 
+    // Toggle da Sidebar e Overlay
     if (sidebarToggle && sidebar && overlay && dashboard) {
         const toggleSidebar = () => {
             sidebar.classList.toggle('visible');
@@ -142,56 +148,53 @@ function setupEventListeners() {
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
     }
-
+    
+    // Autenticação
     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+    
+    // Navegação (delegação para o menu)
     document.getElementById('sidebar')?.addEventListener('click', (e) => {
         const menuItem = e.target.closest('.menu-item, .submenu-item');
         if (menuItem?.dataset.page) {
             e.preventDefault();
             navigateToPage(menuItem.dataset.page);
         } else if (menuItem?.nextElementSibling?.classList.contains('submenu')) {
+            // Expande/Contrai submenu
             menuItem.nextElementSibling.classList.toggle('active');
         }
     });
 
+    // Botões de Ação de Modal (Adicionar)
     document.getElementById('addClientBtn')?.addEventListener('click', () => openModal(newClientModalEl));
     document.getElementById('newAppointmentBtn')?.addEventListener('click', openNewAppointmentModal);
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
 
-    // --- CORREÇÃO 1: Botão de Disponibilidade (agora no Dashboard) ---
-    // O comentário foi atualizado para refletir a mudança. O ID único agora funciona.
+    // Botão de Disponibilidade (Home/Médicos)
     document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
         const user = getCurrentUserProfile();
         if (user && user.role === 'medicos') {
             openMyAvailabilityModal();
         } else {
-            // ATUALIZADO: Substitui alert() por showToast()
             showToast('Esta função é restrita a profissionais (médicos).', 'error');
         }
     });
 
-    // --- Formulários ---
+    // --- Submissão de Formulários ---
     document.getElementById('newClientForm')?.addEventListener('submit', handleNewClientSubmit);
     document.getElementById('detailsClientForm')?.addEventListener('submit', handleUpdateClient);
     document.getElementById('appointmentForm')?.addEventListener('submit', saveAppointment);
     document.getElementById('appointmentDetailsForm')?.addEventListener('submit', updateAppointment);
-
-    // --- CORREÇÃO ADICIONADA ---
-    // Adiciona o "ouvinte" de clique para o botão de excluir
     document.getElementById('deleteAppointmentBtn')?.addEventListener('click', deleteAppointment);
-    // --- FIM DA CORREÇÃO ---
 
     document.getElementById('paymentForm')?.addEventListener('submit', savePayment);
     document.getElementById('examForm')?.addEventListener('submit', saveExam);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
-    
-    // --- NOVO: Formulário de Eventos do Profissional ---
     document.getElementById('professionalEventForm')?.addEventListener('submit', saveProfessionalEvent);
-
-    // --- Botões de Adicionar Dependente ---
+    
+    // Adicionar Dependentes
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
             const container = document.getElementById('dependentesContainer');
             addDependenteField(container, 'dependenteCount');
@@ -201,6 +204,7 @@ function setupEventListeners() {
             addDependenteField(container, 'dependenteDetailsCount');
         });
     
+    // Formulário de Disparos/Exportação de Contatos
     document.body.addEventListener('submit', function(event) {
         if (event.target.id === 'exportForm') {
             event.preventDefault();
@@ -208,20 +212,18 @@ function setupEventListeners() {
         }
     });
 
+    // Busca de Clientes (com debounce)
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
-        // CORREÇÃO (Ponto 2): Mudar de 'input' para 'search' ou 'change' pode ser melhor, 
-        // mas vamos manter 'input' e confiar no debounce.
-        // A lógica de busca real foi movida para loadClientsData
         clientsSearchInput.addEventListener('input', (e) => {
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
-                const searchTerm = e.target.value;
-                loadClientsData(searchTerm); // A função loadClientsData agora lida com o termo
+                loadClientsData(e.target.value);
             }, 500); 
         });
     }
 
+    // Confirmação de Agenda (Checkbox)
     document.body.addEventListener('change', async function(event) {
         if (event.target.classList.contains('confirmation-checkbox')) {
             const checkbox = event.target;
@@ -234,13 +236,14 @@ function setupEventListeners() {
         }
     });
 
+    // Filtro de Logs
     document.getElementById('filterLogsBtn')?.addEventListener('click', () => {
         const startDate = document.getElementById('logStartDate').value;
         const endDate = document.getElementById('logEndDate').value;
         loadLogsData(startDate, endDate);
     });
 
-    // --- NOVO: Listeners do Modal de Disponibilidade ---
+    // Eventos do Modal de Disponibilidade (Profissionais)
     const eventDateInput = document.getElementById('eventDate');
     if (eventDateInput) {
         eventDateInput.addEventListener('change', (e) => {
@@ -262,8 +265,7 @@ function setupEventListeners() {
         });
     }
 
-    // --- Listener Global de Cliques (delegation) ---
-    // ATUALIZADO: O listener agora é 'async' para suportar 'await showConfirm'
+    // --- Listener Global de Cliques (Delegação de Ações) ---
     document.body.addEventListener('click', async function(event) {
         const target = event.target;
         // Fechar modais
@@ -271,7 +273,8 @@ function setupEventListeners() {
             const modal = target.closest('.modal');
             if(modal) modal.style.display = 'none';
         }
-        // Botões de Ação em Tabelas
+        
+        // Ações de Edição e Abertura de Modal
         const editUserButton = target.closest('.edit-user-btn');
         if (editUserButton) openUserModal(editUserButton.dataset.id);
 
@@ -298,21 +301,19 @@ function setupEventListeners() {
         
         const printGenericButton = target.closest('.print-btn');
         if (printGenericButton) {
-            import('./pacientes.js').then(mod => mod.triggerPrintFromElement(printGenericButton)).catch(err => console.error(err));
+           triggerPrintFromElement(printGenericButton);
         }
 
-        // ... (outros botões de clique) ...
-        
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
         
+        // Remover Dependente (com confirmação)
         const removeDependenteButton = target.closest('.remove-dependente-btn');
         if (removeDependenteButton) {
             const dependentGroup = removeDependenteButton.closest('.dependente-form-group');
             const dependentId = dependentGroup.dataset.dependenteId;
     
             if (dependentId) {
-                // ATUALIZADO: Substitui confirm() por showConfirm()
                 const confirmed = await showConfirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.');
                 if (confirmed) {
                     dependentGroup.style.display = 'none';
@@ -323,18 +324,26 @@ function setupEventListeners() {
                     dependentGroup.appendChild(deleteInput);
                 }
             } else {
-                // Se for um dependente novo (sem ID), apenas remove
+                // Se for um novo dependente sem ID, apenas remove
                 dependentGroup.remove();
             }
         }
     });
 
+    // Navegação da Agenda
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
     document.getElementById('nextDayBtn')?.addEventListener('click', () => changeDay(1));
+    
+    // Exportação de Clientes
     document.getElementById('exportClientsBtn')?.addEventListener('click', exportToExcel);
 }
 
+/**
+ * Inicializa o dashboard após a autenticação bem-sucedida.
+ * @param {object} user - Objeto de usuário do Supabase.
+ */
 async function initializeDashboard(user) {
+    // Adiciona atributos data-label para responsividade de tabelas
     document.querySelectorAll('table').forEach(table => {
         const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
         table.querySelectorAll('tbody tr').forEach(row => {
@@ -346,9 +355,9 @@ async function initializeDashboard(user) {
         });
     });
 
+    // Busca o perfil completo e a role
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
-        // ATUALIZADO: Substitui alert() por showToast()
         showToast('Erro crítico: Perfil do usuário não encontrado.', 'error');
         return handleLogout();
     }
@@ -357,15 +366,25 @@ async function initializeDashboard(user) {
     setupPermissions(profile.role);
     showDashboard();
     
+    // Carrega a página inicial padrão
     await loadPageData('home');
 }
 
+/**
+ * Ponto de entrada da aplicação, executado após o DOM ser carregado.
+ */
 document.addEventListener('DOMContentLoaded', async () => {
+    // Configura todos os listeners antes de tentar o login/inicialização
     setupEventListeners();
+    
+    // Tenta obter a sessão atual
     const { data: { session } } = await _supabase.auth.getSession();
+    
     if (session) {
+        // Se houver sessão, inicializa o dashboard
         await initializeDashboard(session.user);
     } else {
+        // Se não houver, mostra a tela de login
         showLoginScreen();
     }
 });

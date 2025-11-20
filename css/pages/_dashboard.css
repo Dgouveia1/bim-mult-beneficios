@@ -1,0 +1,269 @@
+/* =================================================================
+   PÁGINA: DASHBOARD (ANALYTICS)
+   ================================================================= */
+
+   #dashboardPage .dashboard-wrapper {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+#dashboardPage header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#dashboardPage header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--secondary-dark);
+    margin: 0;
+}
+
+#dashboardPage header p {
+    font-size: 1rem;
+    color: var(--gray-medium);
+    margin-top: 0.25rem;
+}
+
+/* Filtros */
+.dashboard-filters {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background-color: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    flex-wrap: wrap;
+}
+
+.filter-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--secondary-dark);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-group label {
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--black);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.export-buttons {
+    margin-left: auto;
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .export-buttons {
+        margin-left: 0;
+        width: 100%;
+        flex-direction: column;
+    }
+    .dashboard-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Seções */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--secondary-dark);
+    margin-bottom: 1.5rem;
+    margin-top: 2.5rem;
+    border-left: 5px solid var(--primary-color);
+    padding-left: 15px;
+}
+
+/* KPI Grid */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #eee;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--hover-shadow);
+}
+
+.kpi-card .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-card h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--secondary-dark);
+    margin: 0.5rem 0;
+}
+
+.kpi-card p {
+    font-size: 0.85rem;
+    margin: 0;
+    color: var(--gray-medium);
+}
+
+.kpi-card .positive { color: var(--confirmed-color); font-weight: 600; }
+.kpi-card .negative { color: var(--cancelled-color); font-weight: 600; }
+
+/* Gráficos */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-section {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.chart-section h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-dark);
+}
+
+.chart-subtitle {
+    font-size: 0.9rem;
+    color: var(--gray-medium);
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
+
+/* Tabela de Coorte */
+.cohort-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.cohort-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.cohort-table th, .cohort-table td {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #eee;
+    white-space: nowrap;
+}
+
+.cohort-table th {
+    background-color: var(--gray-light);
+    font-weight: 600;
+    color: var(--secondary-dark);
+}
+
+/* Novos estilos para as seções específicas */
+.dashboard-section {
+    margin-bottom: 3rem;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--gray-light);
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--gray-light);
+    border-radius: 8px;
+}
+
+.status-value {
+    font-weight: 600;
+    color: var(--secondary-dark);
+}
+
+.chart-section-full {
+    grid-column: 1 / -1;
+}
+
+.table-section {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.table-section h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-dark);
+    margin-bottom: 1rem;
+}
