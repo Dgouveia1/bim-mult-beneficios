@@ -1,7 +1,8 @@
 import { _supabase } from './supabase.js';
 import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
-import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel } from './clientes.js';
+// IMPORTAÇÃO ATUALIZADA: Adicionado handleGenerateContract
+import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, handleGenerateContract } from './clientes.js';
 import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
@@ -290,8 +291,13 @@ function setupEventListeners() {
         const appointmentCard = target.closest('.appointment-card[data-appointment-id]');
         if (appointmentCard) openAppointmentDetails(appointmentCard.dataset.appointmentId);
         
-        const detailsClientButton = target.closest('#clientsTableBody .btn[data-titular-id]');
+        // CORREÇÃO: Usar a classe específica .view-details-btn para evitar conflito
+        const detailsClientButton = target.closest('.view-details-btn');
         if (detailsClientButton) openDetailsModal(detailsClientButton.dataset.titularId);
+
+        // NOVO: Handler para o botão de Gerar Contrato
+        const contractButton = target.closest('.generate-contract-btn');
+        if (contractButton) handleGenerateContract(contractButton.dataset.titularId);
         
         const patientQueueItem = target.closest('.paciente-espera-item');
         if (patientQueueItem) selectPatient(patientQueueItem.dataset.appointmentId);

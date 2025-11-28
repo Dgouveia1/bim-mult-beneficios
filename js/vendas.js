@@ -365,5 +365,5 @@ function setupVendasPage() {
     form.dataset.listenerAttached = 'true';
 }
 
-export { setupVendasPage };
+export { setupVendasPage, generateContractPDF };
 

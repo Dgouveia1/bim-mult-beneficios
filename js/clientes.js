@@ -2,6 +2,8 @@ import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
 import { showToast } from './utils.js';
+// IMPORTAÇÃO DA FUNÇÃO DE CONTRATO
+import { generateContractPDF } from './vendas.js';
 
 // --- ELEMENTOS DO DOM ---
 const clientsTableBody = document.getElementById('clientsTableBody');
@@ -206,6 +208,16 @@ function renderClientsTable(people) {
         }
         // --- FIM DA LÓGICA WHATSAPP ---
 
+        // --- NOVO: BOTÃO DE CONTRATO (Apenas para titulares) ---
+        let contractButton = '';
+        if (person.tipo === 'Titular') {
+            contractButton = `
+                <button class="btn btn-secondary btn-small generate-contract-btn" data-titular-id="${person.titular_id}" title="Gerar Contrato" style="padding: 8px 10px; font-size: 14px; line-height: 1;">
+                    <i class="fas fa-file-contract"></i>
+                </button>
+            `;
+        }
+
         row.innerHTML = `
             <td data-label="Nome">${person.nome || 'N/A'} (${person.tipo})</td>
             <td data-label="CPF">${person.cpf || 'N/A'}</td>
@@ -213,8 +225,9 @@ function renderClientsTable(people) {
             <td data-label="Plano">${person.plano || 'N/A'}</td>
             <td data-label="Status"><span class="status status-${person.status === 'ATIVO' ? 'active' : 'inactive'}">${person.status}</span></td>
             <td class="actions" style="display: flex; gap: 8px; align-items: center;">
-                <button class="btn btn-secondary btn-small" data-titular-id="${person.titular_id}">Ver Detalhes</button>
-                ${whatsappButton} <!-- Botão do WhatsApp inserido aqui -->
+                <button class="btn btn-secondary btn-small view-details-btn" data-titular-id="${person.titular_id}">Ver Detalhes</button>
+                ${contractButton}
+                ${whatsappButton} 
             </td>
         `;
         clientsTableBody.appendChild(row);
@@ -226,6 +239,46 @@ function filterAndRenderClients() {
     const searchTerm = document.getElementById('clientsSearchInput').value;
     // Dispara a busca no servidor
     loadClientsData(searchTerm);
+}
+
+// --- FUNÇÃO PARA GERAR O CONTRATO NOVAMENTE ---
+async function handleGenerateContract(titularId) {
+    // Busca o botão específico para mostrar feedback visual
+    const btn = document.querySelector(`.generate-contract-btn[data-titular-id="${titularId}"]`);
+    const originalContent = btn ? btn.innerHTML : '';
+    
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    }
+
+    try {
+        // Busca os dados completos do cliente e dependentes
+        const { data: client, error: clientError } = await _supabase
+            .from('clients')
+            .select('*, dependents(*)')
+            .eq('id', titularId)
+            .single();
+
+        if (clientError) throw clientError;
+
+        // Garante que dependentes é um array
+        const dependents = client.dependents || [];
+
+        // Chama a função importada de vendas.js
+        await generateContractPDF(client, dependents);
+        
+        showToast('Contrato gerado com sucesso!');
+
+    } catch (error) {
+        console.error(error);
+        showToast('Erro ao gerar contrato: ' + error.message);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
+    }
 }
 
 // --- FUNÇÕES DE SUBMISSÃO (CREATE/UPDATE) ---
@@ -567,4 +620,4 @@ function exportToExcel() {
 }
 
 // --- EXPORTAÇÕES ---
-export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople };
+export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople, handleGenerateContract };
