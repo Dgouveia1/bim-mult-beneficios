@@ -524,16 +524,32 @@ async function openAppointmentDetails(appointmentId) {
         
         let patientData = null;
 
+        // Função helper para normalizar strings (remove espaços extras e converte para minusculo)
+        const normalize = (str) => str ? str.trim().toLowerCase().replace(/\s+/g, ' ') : '';
+
         if (appointment.client_id) {
             const { data: titular, error: titularError } = await _supabase.from('clients').select('*, dependents(*)').eq('id', appointment.client_id).single();
             if (titularError) throw titularError;
 
-            if (`${titular.nome} ${titular.sobrenome || ''}`.trim() === appointment.patient_name) {
+            // Prepara nomes para comparação
+            const apptPatientName = normalize(appointment.patient_name);
+            const titularName = normalize(`${titular.nome} ${titular.sobrenome || ''}`);
+
+            // 1. Tenta casar com o Titular
+            if (titularName === apptPatientName) {
                 patientData = titular;
-            } else {
-                const dependent = titular.dependents.find(d => `${d.nome} ${d.sobrenome || ''}`.trim() === appointment.patient_name);
+            } 
+            // 2. Tenta casar com algum Dependente
+            else {
+                const dependent = titular.dependents.find(d => normalize(`${d.nome} ${d.sobrenome || ''}`) === apptPatientName);
                 if (dependent) {
-                    patientData = { ...dependent, plano: titular.plano, status: titular.status };
+                    patientData = { 
+                        ...dependent, 
+                        plano: titular.plano, 
+                        status: titular.status,
+                        // Se o dependente não tiver telefone, usa o do titular
+                        telefone: dependent.telefone || titular.telefone 
+                    };
                 }
             }
         } else {
