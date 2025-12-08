@@ -529,7 +529,24 @@
                 </div>
 
                 <div class="page-content" id="financeiroPage">
-                    <div class="content-header"><h2 class="page-title">Financeiro</h2></div>
+                    <div class="content-header">
+                        <h2 class="page-title">Financeiro - Cartão Bim Familiar</h2>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title" style="margin-bottom: 20px;">Buscar Titular</h3>
+                        <div class="search-container" style="max-width: 100%; margin: 0;">
+                            <input type="search" id="financialSearchInput" placeholder="Digite o Nome ou CPF do titular...">
+                        </div>
+                        
+                        <div id="financialSearchResults" class="search-results-list" style="margin-top: 15px; border: 1px solid #eee; display: none;">
+                            <!-- Resultados da busca renderizados aqui -->
+                        </div>
+                    </div>
+
+                    <div id="financialWorkspace" style="display: none; margin-top: 20px;">
+                        <!-- Área que será preenchida ao selecionar um cliente -->
+                    </div>
                 </div>
 
  <!-- === PÁGINA DO DASHBOARD (NOVA) === -->
@@ -542,14 +559,9 @@
 
         <section class="dashboard-filters">
             <span class="filter-title">Filtrar por Plano:</span>
-            <div class="checkbox-group">
-                <input type="checkbox" id="dash-bim-familiar" name="dash-plan" value="Bim Familiar" checked>
-                <label for="dash-bim-familiar">BIM FAMILIAR</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="dash-multsaude" name="dash-plan" value="Mult" checked>
-                <label for="dash-multsaude">MULTSAÚDE</label>
-            </div>
+            <select id="dashboardPlanFilter" class="dashboard-select">
+                <option value="all">Todos os Planos</option>
+            </select>
             <button id="filter-dashboard-btn" class="btn btn-primary btn-small" style="margin-left: 15px;">Filtrar</button>
             <div class="export-buttons">
                 <button id="export-geral-btn" class="btn btn-secondary btn-small">Relatório Geral</button>
@@ -1243,6 +1255,42 @@
     </div>
 
     <div id="notificationContainer"></div>
+
+    <div class="modal" id="financialClientModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>Financeiro do Cliente</h2>
+                <button class="close-btn" data-close-modal="financialClientModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="financial-client-header">
+                    <h3 id="finModalClientName">Nome do Cliente</h3>
+                    <p>CPF: <span id="finModalClientCPF"></span> | Plano: <span id="finModalClientPlan"></span></p>
+                    <div id="finModalStatusBadge" class="status-badge">Analisando...</div>
+                </div>
+                
+                <div class="financial-actions-bar" style="margin: 20px 0; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button class="btn btn-primary" id="btnEmitirCarneModal"><i class="fas fa-file-invoice-dollar"></i> Emitir Carnê (Abertos)</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Linha Digitável / Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financialHistoryBody">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

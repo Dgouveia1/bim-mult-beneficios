@@ -218,6 +218,17 @@ function renderClientsTable(people) {
             `;
         }
 
+        // --- NOVO: BOTÃO DE CARNÊ (Regra: Apenas Titular e Plano Bim Familiar) ---
+        let financeButton = '';
+        if (person.tipo === 'Titular' && person.plano === 'Bim Familiar') {
+            // Usamos data-cpf para buscar o financeiro
+            financeButton = `
+                <button class="btn btn-primary btn-small emit-carne-btn" data-cpf="${person.cpf}" data-name="${person.nome}" title="Ver Financeiro / Emitir Carnê" style="padding: 8px 10px; font-size: 14px; line-height: 1; background-color: var(--secondary-dark);">
+                    <i class="fas fa-dollar-sign"></i>
+                </button>
+            `;
+        }
+
         row.innerHTML = `
             <td data-label="Nome">${person.nome || 'N/A'} (${person.tipo})</td>
             <td data-label="CPF">${person.cpf || 'N/A'}</td>
@@ -227,6 +238,7 @@ function renderClientsTable(people) {
             <td class="actions" style="display: flex; gap: 8px; align-items: center;">
                 <button class="btn btn-secondary btn-small view-details-btn" data-titular-id="${person.titular_id}">Ver Detalhes</button>
                 ${contractButton}
+                ${financeButton}
                 ${whatsappButton} 
             </td>
         `;

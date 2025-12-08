@@ -63,6 +63,18 @@
     cursor: pointer;
     accent-color: var(--primary-color);
 }
+.dashboard-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: var(--black);
+    background-color: var(--white);
+    min-width: 200px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
 
 .export-buttons {
     margin-left: auto;
@@ -267,3 +279,4 @@
     color: var(--secondary-dark);
     margin-bottom: 1rem;
 }
+

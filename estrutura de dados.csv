@@ -1,170 +1,197 @@
 categoria,objeto,detalhes
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: action | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: details | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_start_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico iniciou o atendimento.
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: patient_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_end_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico finalizou o atendimento.
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: action | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: details | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'agendado'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: appointment_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: checkin_time | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: confirmacao | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: data_nascimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_start_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico iniciou o atendimento.
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_end_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico finalizou o atendimento.
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: patient_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cep | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: data_nascimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: observacao | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Observações gerais sobre o cliente/venda.
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: carteirinha | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: vendedor | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: municipio | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: numero | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: endereco | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: observacao | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Observações gerais sobre o cliente/venda.
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: exame_fisico | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: conduta | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: procedimentos | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: atestado | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: cuidados_pos_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: laudo_texto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: cuidados_pos_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: data_nascimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: created_at | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: atestado | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: procedimentos | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: created_at | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: data_nascimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: protocol_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: protocol_name | TIPO: character varying(255) | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: Nome do protocolo para fácil identificação.
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Array de objetos JSON contendo os exames do protocolo.
-1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: ID do profissional que criou o protocolo.
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: bank_slip_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,"COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: timezone('utc'::text, now()) | DESCRIÇÃO: N/A"
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: client_cpf | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: boleto_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: barcode | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: client_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: snapshot_date | TIPO: date | NULÁVEL: YES | PADRÃO: CURRENT_DATE | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: bank_slip_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: payment_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_cpf | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: ID do profissional que criou o protocolo.
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Array de objetos JSON contendo os exames do protocolo.
+1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: protocol_name | TIPO: character varying(255) | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: Nome do protocolo para fácil identificação.
 1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: record_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: payments,COLUNA: method | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: payments,COLUNA: amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: custo | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: grupo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: tabela | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: event_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: event_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: specialty | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: CRM | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: CRM | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: role | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: full_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: full_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: assignee_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'todo'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: priority | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 2. CONSTRAINTS (CHAVES),TABELA: action_logs,CONSTRAINT: action_logs_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: action_logs,CONSTRAINT: action_logs_user_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): user_id | REFERENCIA: profiles(id)
+2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_client_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): client_id | REFERENCIA: clients(id)
 2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: clients,CONSTRAINT: clients_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
 2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_key | TIPO: UNIQUE | COLUNA(S): appointment_id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
-2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_titular_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): titular_id | REFERENCIA: clients(id)
-2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: exams,CONSTRAINT: exams_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: financial_daily_sync,CONSTRAINT: financial_daily_sync_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: financial_daily_sync,CONSTRAINT: financial_daily_sync_bank_slip_id_key | TIPO: UNIQUE | COLUNA(S): bank_slip_id
+2. CONSTRAINTS (CHAVES),TABELA: financial_history,CONSTRAINT: financial_history_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: image_exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: image_exam_protocols,CONSTRAINT: fk_professional | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: medical_records,CONSTRAINT: medical_records_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: professional_events,CONSTRAINT: professional_events_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: professional_events,CONSTRAINT: professional_events_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: professionals,CONSTRAINT: professionals_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: professional_events,CONSTRAINT: professional_events_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: professionals,null
-2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: professionals,CONSTRAINT: professionals_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: profiles,null
-2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_assignee_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): assignee_id | REFERENCIA: profiles(id)
+2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_assignee_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): assignee_id | REFERENCIA: profiles(id)
 3. ÍNDICES,TABELA: action_logs,ÍNDICE: action_logs_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX action_logs_pkey ON public.action_logs USING btree (id)
-3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
 3. ÍNDICES,TABELA: appointments,ÍNDICE: appointments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX appointments_pkey ON public.appointments USING btree (id)
+3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
 3. ÍNDICES,TABELA: clients,ÍNDICE: clients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX clients_pkey ON public.clients USING btree (id)
 3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_appointment_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_appointment_id_key ON public.consultations USING btree (appointment_id)
 3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_pkey ON public.consultations USING btree (id)
 3. ÍNDICES,TABELA: dependents,ÍNDICE: dependents_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX dependents_pkey ON public.dependents USING btree (id)
 3. ÍNDICES,TABELA: exam_protocols,ÍNDICE: exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exam_protocols_pkey ON public.exam_protocols USING btree (id)
 3. ÍNDICES,TABELA: exams,ÍNDICE: exams_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exams_pkey ON public.exams USING btree (id)
+3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: idx_financial_daily_cpf | DEFINIÇÃO: CREATE INDEX idx_financial_daily_cpf ON public.financial_daily_sync USING btree (client_cpf)
+3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: financial_daily_sync_bank_slip_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX financial_daily_sync_bank_slip_id_key ON public.financial_daily_sync USING btree (bank_slip_id)
+3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: financial_daily_sync_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX financial_daily_sync_pkey ON public.financial_daily_sync USING btree (id)
+3. ÍNDICES,TABELA: financial_history,ÍNDICE: financial_history_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX financial_history_pkey ON public.financial_history USING btree (id)
+3. ÍNDICES,TABELA: financial_history,ÍNDICE: idx_financial_history_cpf | DEFINIÇÃO: CREATE INDEX idx_financial_history_cpf ON public.financial_history USING btree (client_cpf)
 3. ÍNDICES,TABELA: image_exam_protocols,ÍNDICE: image_exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX image_exam_protocols_pkey ON public.image_exam_protocols USING btree (id)
 3. ÍNDICES,TABELA: medical_records,ÍNDICE: medical_records_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX medical_records_pkey ON public.medical_records USING btree (id)
 3. ÍNDICES,TABELA: payments,ÍNDICE: payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (id)
@@ -173,6 +200,21 @@ categoria,objeto,detalhes
 3. ÍNDICES,TABELA: professionals,ÍNDICE: professionals_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX professionals_pkey ON public.professionals USING btree (id)
 3. ÍNDICES,TABELA: profiles,ÍNDICE: profiles_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
 3. ÍNDICES,TABELA: tasks,ÍNDICE: tasks_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX tasks_pkey ON public.tasks USING btree (id)
+4. FUNÇÕES (RPC),FUNÇÃO: clean_cpf,"CREATE OR REPLACE FUNCTION public.clean_cpf(cpf_text text)
+ RETURNS text
+ LANGUAGE plpgsql
+AS $function$
+DECLARE
+    cleaned text;
+BEGIN
+    -- Remove tudo que nao for numero
+    cleaned := regexp_replace(cpf_text, '[^0-9]', '', 'g');
+    -- Retorna NULL se estiver vazio, senao retorna o CPF limpo
+    IF cleaned = '' THEN RETURN NULL; END IF;
+    RETURN cleaned;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: diagnose_name_matching,"CREATE OR REPLACE FUNCTION public.diagnose_name_matching()
  RETURNS TABLE(client_name_original text, appointment_name_original text, normalized_client_name text, normalized_appointment_name text, is_match boolean)
  LANGUAGE sql
@@ -209,37 +251,40 @@ BEGIN
         SELECT COUNT(*) as count
         FROM clients
         WHERE status = 'ATIVO'
-        AND (plan_filter = 'all' OR plano = plan_filter)
+        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
     ),
     novos_titulares_semana AS (
         SELECT 
             COUNT(*) FILTER (WHERE created_at >= current_week_start) as current,
             COUNT(*) FILTER (WHERE created_at >= last_week_start AND created_at < current_week_start) as previous
         FROM clients
-        WHERE (plan_filter = 'all' OR plano = plan_filter)
+        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
     ),
     novos_titulares_mes AS (
         SELECT 
             COUNT(*) FILTER (WHERE created_at >= current_month_start) as current,
             COUNT(*) FILTER (WHERE created_at >= last_month_start AND created_at < current_month_start) as previous
         FROM clients
-        WHERE (plan_filter = 'all' OR plano = plan_filter)
+        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
     ),
     status_titulares AS (
         SELECT 
             COUNT(*) FILTER (WHERE status = 'ATIVO') as ativos,
-            COUNT(*) FILTER (WHERE status = 'ATRASO') as atraso,
+            COUNT(*) FILTER (WHERE status = 'ATRASO' OR status = 'INATIVO') as atraso,
             COUNT(*) FILTER (WHERE status = 'CANCELADO') as cancelados
         FROM clients
-        WHERE (plan_filter = 'all' OR plano = plan_filter)
+        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
     ),
     churn_data AS (
         SELECT 
             COUNT(*) FILTER (WHERE status = 'CANCELADO' AND created_at >= current_month_start) as churn_total,
-            (COUNT(*) FILTER (WHERE status = 'CANCELADO' AND created_at >= current_month_start) * 100.0 / 
-             NULLIF(COUNT(*) FILTER (WHERE status = 'ATIVO'), 0)) as churn_percentual
+            CASE 
+                WHEN COUNT(*) FILTER (WHERE status = 'ATIVO') > 0 
+                THEN (COUNT(*) FILTER (WHERE status = 'CANCELADO' AND created_at >= current_month_start) * 100.0 / COUNT(*) FILTER (WHERE status = 'ATIVO'))
+                ELSE 0
+            END as churn_percentual
         FROM clients
-        WHERE (plan_filter = 'all' OR plano = plan_filter)
+        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
     )
     SELECT json_build_object(
         'titulares_ativos', (SELECT count FROM titulares_ativos),
@@ -276,18 +321,19 @@ BEGIN
             COUNT(*) FILTER (WHERE status = 'CANCELADO') as cancelados,
             COUNT(*) FILTER (WHERE status = 'ATIVO') as ativos
         FROM clients
-        WHERE created_at >= CURRENT_DATE - interval '6 months'
-        AND (plan_filter = 'all' OR plano = plan_filter)
+        WHERE created_at IS NOT NULL 
+        AND created_at >= CURRENT_DATE - interval '6 months'
+        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))) -- Correção para filtro múltiplo
         GROUP BY date_trunc('month', created_at)
     )
     SELECT 
-        mes,
+        md.mes,
         CASE 
-            WHEN ativos > 0 THEN (cancelados * 100.0 / ativos)
+            WHEN md.ativos > 0 THEN ROUND((md.cancelados * 100.0 / md.ativos), 2)
             ELSE 0 
         END as taxa_churn
-    FROM monthly_data
-    ORDER BY mes;
+    FROM monthly_data md
+    ORDER BY md.mes;
 END;
 $function$
 "
@@ -326,30 +372,26 @@ AS $function$
 DECLARE
     avg_last_4_weeks DECIMAL;
 BEGIN
-    -- Calcula a média de novos clientes semanais das últimas 4 semanas completas
     SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
     FROM (
         SELECT COUNT(c.id)::decimal as weekly_count
         FROM public.clients c
         WHERE c.created_at >= date_trunc('week', now() - interval '4 weeks')::date
           AND c.created_at < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY date_trunc('week', c.created_at)
     ) AS last_weeks;
 
-    -- Retorna os dados históricos e a previsão
     RETURN QUERY
     WITH historical_data AS (
         SELECT
-            -- CORREÇÃO: Garante que o resultado seja do tipo DATE
             (date_trunc('week', c.created_at))::date AS week_start,
             COUNT(c.id) AS count,
             FALSE AS is_forecast
         FROM public.clients c
         WHERE c.created_at >= date_trunc('week', now() - interval '8 weeks')::date
           AND c.created_at < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
-        -- CORREÇÃO: Agrupa pela expressão convertida para DATE
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY (date_trunc('week', c.created_at))::date
     ),
     forecast_data AS (
@@ -403,13 +445,19 @@ DECLARE
     last_week_start date := current_week_start - interval '1 week';
     current_month_start date := date_trunc('month', CURRENT_DATE);
     last_month_start date := current_month_start - interval '1 month';
+    total_professionals int;
+    monthly_capacity int;
 BEGIN
+    -- Calcula capacidade estimada: Profissionais * 22 dias úteis * 16 consultas/dia (8h * 2/h)
+    SELECT count(*) INTO total_professionals FROM professionals;
+    monthly_capacity := GREATEST(total_professionals * 22 * 16, 1); -- Evita divisão por zero
+
     WITH consultas_hoje AS (
         SELECT COUNT(*) as count
         FROM appointments a
         JOIN clients c ON a.client_id = c.id
         WHERE a.appointment_date = CURRENT_DATE
-        AND (plan_filter = 'all' OR c.plano = plan_filter)
+        AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     ),
     consultas_semana AS (
         SELECT 
@@ -417,7 +465,7 @@ BEGIN
             COUNT(*) FILTER (WHERE a.appointment_date >= last_week_start AND a.appointment_date < current_week_start) as previous
         FROM appointments a
         JOIN clients c ON a.client_id = c.id
-        WHERE (plan_filter = 'all' OR c.plano = plan_filter)
+        WHERE (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     ),
     consultas_mes AS (
         SELECT 
@@ -425,19 +473,15 @@ BEGIN
             COUNT(*) FILTER (WHERE a.appointment_date >= last_month_start AND a.appointment_date < current_month_start) as previous
         FROM appointments a
         JOIN clients c ON a.client_id = c.id
-        WHERE (plan_filter = 'all' OR c.plano = plan_filter)
+        WHERE (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     ),
     ocupacao AS (
         SELECT 
-            (COUNT(*) * 100.0 / 40) as current_occupancy, -- 40 horários disponíveis por dia
-            (LAG(COUNT(*)) OVER (ORDER BY date_trunc('month', a.appointment_date)) * 100.0 / 40) as previous_occupancy
+            COALESCE((COUNT(*) * 100.0 / monthly_capacity), 0) as current_occupancy
         FROM appointments a
         JOIN clients c ON a.client_id = c.id
-        WHERE a.appointment_date >= last_month_start
-        AND (plan_filter = 'all' OR c.plano = plan_filter)
-        GROUP BY date_trunc('month', a.appointment_date)
-        ORDER BY date_trunc('month', a.appointment_date) DESC
-        LIMIT 1
+        WHERE a.appointment_date >= current_month_start
+        AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     )
     SELECT json_build_object(
         'consultas_hoje', (SELECT count FROM consultas_hoje),
@@ -451,7 +495,7 @@ BEGIN
         ),
         'ocupacao_salas', json_build_object(
             'current', (SELECT current_occupancy FROM ocupacao),
-            'previous', (SELECT previous_occupancy FROM ocupacao)
+            'previous', 0
         )
     ) INTO result;
     
@@ -470,23 +514,24 @@ BEGIN
     FROM (
         SELECT COUNT(a.id)::decimal as weekly_count
         FROM public.appointments a
-        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
+        JOIN public.clients c ON a.client_id = c.id
         WHERE a.appointment_date >= date_trunc('week', now() - interval '4 weeks')::date
           AND a.appointment_date < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY date_trunc('week', a.appointment_date)
     ) AS last_weeks;
-RETURN QUERY
+
+    RETURN QUERY
     WITH historical_data AS (
         SELECT
             date_trunc('week', a.appointment_date)::date AS week_start,
             COUNT(a.id) AS count,
             FALSE AS is_forecast
         FROM public.appointments a
-        JOIN public.clients c ON a.patient_name = (c.nome || ' ' || c.sobrenome)
+        JOIN public.clients c ON a.client_id = c.id
         WHERE a.appointment_date >= date_trunc('week', now() - interval '8 weeks')::date
           AND a.appointment_date < date_trunc('week', now())::date
-          AND (plan_filter = 'all' OR c.plano = plan_filter)
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY week_start
     ),
     forecast_data AS (
@@ -515,7 +560,7 @@ BEGIN
     FROM appointments a
     JOIN clients c ON a.client_id = c.id
     WHERE a.appointment_date >= date_trunc('month', CURRENT_DATE)
-    AND (plan_filter = 'all' OR c.plano = plan_filter)
+    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     GROUP BY c.plano
     ORDER BY count DESC;
 END;
@@ -527,17 +572,16 @@ $function$
 AS $function$
 BEGIN
 RETURN QUERY
-SELECT
-p.name AS professional_name,
-COUNT(a.id) AS count
-FROM public.appointments a
-JOIN public.professionals AS p ON a.professional_id = p.id
-JOIN public.clients AS c ON a.client_id = c.id
-WHERE a.appointment_date >= date_trunc('month', CURRENT_DATE)
-AND a.appointment_date < (date_trunc('month', CURRENT_DATE) + interval '1 month')
-AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
-GROUP BY p.name
-ORDER BY count DESC;
+    SELECT
+        p.name AS professional_name,
+        COUNT(a.id) AS count
+    FROM public.appointments a
+    JOIN public.professionals AS p ON a.professional_id = p.id
+    JOIN public.clients AS c ON a.client_id = c.id
+    WHERE a.appointment_date >= date_trunc('month', CURRENT_DATE)
+    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    GROUP BY p.name
+    ORDER BY count DESC;
 END;
 $function$
 "
@@ -639,17 +683,32 @@ DECLARE
     result json;
     current_month_start date := date_trunc('month', CURRENT_DATE);
     last_month_start date := current_month_start - interval '1 month';
+    avg_ticket numeric;
 BEGIN
+    -- Calcula o ticket médio real (média dos pagamentos dos últimos 3 meses)
+    SELECT COALESCE(AVG(amount), 100) INTO avg_ticket 
+    FROM payments 
+    WHERE created_at >= (CURRENT_DATE - interval '3 months');
+
     WITH current_month_data AS (
         SELECT 
             COALESCE(SUM(p.amount), 0) as faturamento_bruto,
-            COALESCE(SUM(p.amount * 0.8), 0) as faturamento_liquido,
-            COALESCE(SUM(p.amount) + (COUNT(a.id) * 50), 0) as expectativa_faturamento
+            COALESCE(SUM(p.amount * 0.8), 0) as faturamento_liquido, -- Mantendo margem de 80% (ajustável)
+            -- Expectativa: Faturado + (Agendamentos Futuros * Ticket Médio Real)
+            COALESCE(SUM(p.amount), 0) + (
+                SELECT COUNT(*) * avg_ticket
+                FROM appointments a2
+                JOIN clients c2 ON a2.client_id = c2.id
+                WHERE a2.appointment_date >= CURRENT_DATE 
+                AND a2.appointment_date < (current_month_start + interval '1 month')
+                AND a2.status = 'agendado'
+                AND (plan_filter = 'all' OR c2.plano = ANY(string_to_array(plan_filter, ',')))
+            ) as expectativa_faturamento
         FROM appointments a
         LEFT JOIN payments p ON a.id = p.appointment_id
         JOIN clients c ON a.client_id = c.id
         WHERE a.appointment_date >= current_month_start
-        AND (plan_filter = 'all' OR c.plano = plan_filter)
+        AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     ),
     last_month_data AS (
         SELECT 
@@ -660,22 +719,21 @@ BEGIN
         JOIN clients c ON a.client_id = c.id
         WHERE a.appointment_date >= last_month_start 
         AND a.appointment_date < current_month_start
-        AND (plan_filter = 'all' OR c.plano = plan_filter)
+        AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     )
     SELECT json_build_object(
         'faturamento_bruto', json_build_object(
-            'current', current_month_data.faturamento_bruto,
-            'previous', last_month_data.faturamento_bruto
+            'current', (SELECT faturamento_bruto FROM current_month_data),
+            'previous', (SELECT faturamento_bruto FROM last_month_data)
         ),
         'faturamento_liquido', json_build_object(
-            'current', current_month_data.faturamento_liquido,
-            'previous', last_month_data.faturamento_liquido
+            'current', (SELECT faturamento_liquido FROM current_month_data),
+            'previous', (SELECT faturamento_liquido FROM last_month_data)
         ),
         'expectativa_faturamento', json_build_object(
-            'current', current_month_data.expectativa_faturamento
+            'current', (SELECT expectativa_faturamento FROM current_month_data)
         )
-    ) INTO result
-    FROM current_month_data, last_month_data;
+    ) INTO result;
     
     RETURN result;
 END;
@@ -693,18 +751,19 @@ BEGIN
             COUNT(*) FILTER (WHERE status = 'ATRASO') as atraso,
             COUNT(*) as total
         FROM clients
-        WHERE created_at >= CURRENT_DATE - interval '6 months'
-        AND (plan_filter = 'all' OR plano = plan_filter)
+        WHERE created_at IS NOT NULL
+        AND created_at >= CURRENT_DATE - interval '6 months'
+        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))) -- Correção para filtro múltiplo
         GROUP BY date_trunc('month', created_at)
     )
     SELECT 
-        mes,
+        md.mes,
         CASE 
-            WHEN total > 0 THEN (atraso * 100.0 / total)
+            WHEN md.total > 0 THEN ROUND((md.atraso * 100.0 / md.total), 2)
             ELSE 0 
         END as taxa_inadimplencia
-    FROM monthly_data
-    ORDER BY mes;
+    FROM monthly_data md
+    ORDER BY md.mes;
 END;
 $function$
 "
@@ -714,36 +773,37 @@ $function$
 AS $function$
 BEGIN
 RETURN QUERY
-WITH cohorts AS (
-SELECT id AS client_id, date_trunc('month', created_at)::date AS cohort_date
-FROM public.clients
-WHERE status = 'ATIVO' AND (plan_filter = 'all' OR plano = plan_filter)
-),
-activity AS (
-SELECT DISTINCT
-c.id AS client_id,
-date_trunc('month', a.appointment_date)::date AS activity_date
-FROM public.appointments a
-JOIN public.clients c ON normalize_name(c.nome || ' ' || c.sobrenome) = normalize_name(a.patient_name)
-WHERE (plan_filter = 'all' OR c.plano = plan_filter)
-),
-cohort_activity AS (
-SELECT
-c.client_id, c.cohort_date,
-EXTRACT(YEAR FROM a.activity_date)::int * 12 + EXTRACT(MONTH FROM a.activity_date)::int
-- (EXTRACT(YEAR FROM c.cohort_date)::int * 12 + EXTRACT(MONTH FROM c.cohort_date)::int) AS month_number
-FROM cohorts c JOIN activity a ON c.client_id = a.client_id
-WHERE a.activity_date >= c.cohort_date
-),
-cohort_size AS (
-SELECT cohort_date, count(*) AS total FROM cohorts GROUP BY cohort_date
-)
-SELECT
-to_char(ca.cohort_date, 'YYYY-MM') AS cohort_month, ca.month_number,
-count(DISTINCT ca.client_id) AS active_clients, cs.total AS total_in_cohort
-FROM cohort_activity ca JOIN cohort_size cs ON ca.cohort_date = cs.cohort_date
-GROUP BY ca.cohort_date, ca.month_number, cs.total
-ORDER BY ca.cohort_date, ca.month_number;
+    WITH cohorts AS (
+        SELECT id AS client_id, date_trunc('month', created_at)::date AS cohort_date
+        FROM public.clients
+        WHERE status = 'ATIVO' 
+        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+    ),
+    activity AS (
+        SELECT DISTINCT
+            c.id AS client_id,
+            date_trunc('month', a.appointment_date)::date AS activity_date
+        FROM public.appointments a
+        JOIN public.clients c ON a.client_id = c.id
+        WHERE (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    ),
+    cohort_activity AS (
+        SELECT
+            c.client_id, c.cohort_date,
+            EXTRACT(YEAR FROM a.activity_date)::int * 12 + EXTRACT(MONTH FROM a.activity_date)::int
+            - (EXTRACT(YEAR FROM c.cohort_date)::int * 12 + EXTRACT(MONTH FROM c.cohort_date)::int) AS month_number
+        FROM cohorts c JOIN activity a ON c.client_id = a.client_id
+        WHERE a.activity_date >= c.cohort_date
+    ),
+    cohort_size AS (
+        SELECT cohort_date, count(*) AS total FROM cohorts GROUP BY cohort_date
+    )
+    SELECT
+        to_char(ca.cohort_date, 'YYYY-MM') AS cohort_month, ca.month_number,
+        count(DISTINCT ca.client_id) AS active_clients, cs.total AS total_in_cohort
+    FROM cohort_activity ca JOIN cohort_size cs ON ca.cohort_date = cs.cohort_date
+    GROUP BY ca.cohort_date, ca.month_number, cs.total
+    ORDER BY ca.cohort_date, ca.month_number;
 END;
 $function$
 "
@@ -765,17 +825,23 @@ $function$
  RETURNS TABLE(mes text, taxa_ocupacao numeric)
  LANGUAGE plpgsql
 AS $function$
+DECLARE
+    total_professionals int;
+    monthly_capacity int;
 BEGIN
+    SELECT count(*) INTO total_professionals FROM professionals;
+    monthly_capacity := GREATEST(total_professionals * 22 * 16, 1);
+
     RETURN QUERY
     SELECT 
-        to_char(date_trunc('month', appointment_date), 'YYYY-MM') as mes,
-        (COUNT(*) * 100.0 / 120) as taxa_ocupacao -- 120 horários disponíveis por mês
+        to_char(date_trunc('month', appointment_date), 'YYYY-MM') as mes_label,
+        ROUND((COUNT(*) * 100.0 / monthly_capacity), 2) as taxa_ocupacao
     FROM appointments a
     JOIN clients c ON a.client_id = c.id
     WHERE appointment_date >= CURRENT_DATE - interval '6 months'
-    AND (plan_filter = 'all' OR c.plano = plan_filter)
+    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     GROUP BY date_trunc('month', appointment_date)
-    ORDER BY mes;
+    ORDER BY mes_label;
 END;
 $function$
 "
@@ -787,14 +853,48 @@ BEGIN
     RETURN QUERY
     SELECT 
         to_char(date_trunc('month', appointment_date), 'YYYY-MM') as mes,
-        AVG(EXTRACT(EPOCH FROM (end_time - start_time)) / 60) as tempo_medio
+        -- Calcula diferença entre hora real de fim e início em minutos
+        ROUND(AVG(EXTRACT(EPOCH FROM (consultation_end_time - consultation_start_time)) / 60), 1) as tempo_medio
     FROM appointments a
     JOIN clients c ON a.client_id = c.id
     WHERE appointment_date >= CURRENT_DATE - interval '6 months'
-    AND end_time IS NOT NULL AND start_time IS NOT NULL
-    AND (plan_filter = 'all' OR c.plano = plan_filter)
+    AND consultation_end_time IS NOT NULL 
+    AND consultation_start_time IS NOT NULL
+    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     GROUP BY date_trunc('month', appointment_date)
     ORDER BY mes;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(status_label text, count bigint)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+RETURN QUERY
+    WITH today_appointments AS (
+        SELECT
+            a.id, a.status, a.checkin_time, a.payment_status
+        FROM public.appointments a
+        JOIN public.clients c ON a.client_id = c.id
+        WHERE a.appointment_date = CURRENT_DATE
+        AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    )
+    SELECT 'Agendados' AS status_label, COUNT(*) AS count
+    FROM today_appointments
+    WHERE status = 'agendado' AND checkin_time IS NULL
+    UNION ALL
+    SELECT 'Aguardando' AS status_label, COUNT(*) AS count
+    FROM today_appointments
+    WHERE checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado', 'chegou')
+    UNION ALL
+    SELECT 'Finalizados' AS status_label, COUNT(*) AS count
+    FROM today_appointments
+    WHERE status = 'finalizado'
+    UNION ALL
+    SELECT 'A Pagar' AS status_label, COUNT(*) AS count
+    FROM today_appointments
+    WHERE payment_status = 'pendente' AND status != 'cancelado';
 END;
 $function$
 "
@@ -855,38 +955,6 @@ BEGIN
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_today_funnel_status,"CREATE OR REPLACE FUNCTION public.get_today_funnel_status(plan_filter text DEFAULT 'all'::text)
- RETURNS TABLE(status_label text, count bigint)
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-RETURN QUERY
-WITH today_appointments AS (
-    SELECT
-        a.id, a.status, a.checkin_time, a.payment_status
-    FROM public.appointments a
-    JOIN public.clients c ON a.client_id = c.id
-    WHERE a.appointment_date = CURRENT_DATE
-    AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
-)
-SELECT 'Agendados' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'agendado' AND checkin_time IS NULL
-UNION ALL
-SELECT 'Aguardando Atendimento' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE checkin_time IS NOT NULL AND status IN ('agendado', 'confirmado')
-UNION ALL
-SELECT 'Atendimentos Finalizados' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'finalizado'
-UNION ALL
-SELECT 'Pagamentos Pendentes' AS status_label, COUNT(*) AS count -- CORRIGIDO
-FROM today_appointments
-WHERE status = 'finalizado' AND payment_status = 'pendente';
-END;
-$function$
-"
 4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_consultations,"CREATE OR REPLACE FUNCTION public.get_weekly_consultations()
  RETURNS TABLE(week_start date, count bigint)
  LANGUAGE plpgsql
@@ -921,15 +989,16 @@ BEGIN
       public.clients c
     WHERE
       c.status = 'ATIVO' AND c.created_at IS NOT NULL
-      AND (plan_filter = 'all' OR c.plano = plan_filter)
+      AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     GROUP BY week_start
   )
   SELECT
-    to_char(wnc.week_start, 'YYYY-MM-DD') AS week_label,
+    to_char(wnc.week_start, 'DD/MM') AS week_label,
     SUM(wnc.new_clients_in_week) OVER (ORDER BY wnc.week_start)::bigint AS cumulative_count
   FROM
     weekly_new_clients wnc
-  ORDER BY wnc.week_start;
+  ORDER BY wnc.week_start
+  LIMIT 12; -- Limita às ultimas 12 semanas
 END;
 $function$
 "
@@ -1031,12 +1100,12 @@ $function$
    FROM profiles
   WHERE (profiles.id = auth.uid())) = ANY (ARRAY['superadmin'::text, 'admin'::text])) | VERIFICANDO (WITH CHECK): N/A"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: appointments,POLÍTICA: Permitir leitura para usuários logados | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable update for owning medical users | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((auth.role() = 'authenticated'::text) AND (( SELECT professionals.id
-   FROM professionals
-  WHERE (professionals.user_id = auth.uid())) = professional_id)) | VERIFICANDO (WITH CHECK): N/A"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable insert for authenticated medical users | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): ((auth.role() = 'authenticated'::text) AND (( SELECT profiles.role
    FROM profiles
   WHERE (profiles.id = auth.uid())) = 'medicos'::text))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,"POLÍTICA: Enable update for owning medical users | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): ((auth.role() = 'authenticated'::text) AND (( SELECT professionals.id
+   FROM professionals
+  WHERE (professionals.user_id = auth.uid())) = professional_id)) | VERIFICANDO (WITH CHECK): N/A"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,POLÍTICA: Enable read access for all authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,"POLÍTICA: Enable insert for owning professionals | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
@@ -1046,11 +1115,11 @@ $function$
    FROM professionals
   WHERE (professionals.id = image_exam_protocols.professional_id)))"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,POLÍTICA: Permitir leitura de protocolos de imagem para usuários autenti | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: professional_events,POLÍTICA: Authenticated users can read all events | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: professional_events,"POLÍTICA: Professionals can manage their own events | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.uid() = ( SELECT professionals.user_id
    FROM professionals
   WHERE (professionals.id = professional_events.professional_id))) | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
    FROM professionals
   WHERE (professionals.id = professional_events.professional_id)))"
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: professional_events,POLÍTICA: Authenticated users can read all events | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem editar perfis | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem criar novos perfis | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)

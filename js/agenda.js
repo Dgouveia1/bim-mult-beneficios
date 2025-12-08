@@ -388,9 +388,31 @@ function setupPatientSearch() {
             resultsContainer.style.display = 'block';
 
             try {
+                // =================================================================
+                // CORREÇÃO: Lógica de Busca Aprimorada (Nome + Sobrenome)
+                // =================================================================
+                
+                // Divide o termo de busca em palavras individuais
+                const searchWords = query.split(/\s+/).filter(w => w.length > 0);
+                
+                // Constrói filtro para Nome/Sobrenome: (nome LIKE w1 OR sobrenome LIKE w1) AND (nome LIKE w2 OR sobrenome LIKE w2)...
+                // Isso permite encontrar "João Silva" mesmo que "João" esteja no nome e "Silva" no sobrenome
+                const nameMatchConditions = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+                
+                // Combina com a busca por CPF. A estrutura final do .or() será:
+                // "and(condicaoNome1, condicaoNome2, ...), cpf.ilike.%query%"
+                // Isso significa: (Nome/Sobrenome batem com todas as palavras) OU (CPF bate)
+                const searchFilter = `and(${nameMatchConditions}),cpf.ilike.%${query}%`;
+
                 const [titularesRes, dependentesRes] = await Promise.all([
-                    _supabase.from('clients').select('id, nome, sobrenome, cpf').or(`nome.ilike.%${query}%,sobrenome.ilike.%${query}%,cpf.ilike.%${query}%`).limit(5),
-                    _supabase.from('dependents').select('nome, sobrenome, cpf, titular_id, clients!inner(nome, sobrenome)').or(`nome.ilike.%${query}%,sobrenome.ilike.%${query}%,cpf.ilike.%${query}%`).limit(5)
+                    _supabase.from('clients')
+                        .select('id, nome, sobrenome, cpf')
+                        .or(searchFilter)
+                        .limit(5),
+                    _supabase.from('dependents')
+                        .select('nome, sobrenome, cpf, titular_id, clients!inner(nome, sobrenome)')
+                        .or(searchFilter)
+                        .limit(5)
                 ]);
 
                 if (titularesRes.error) throw titularesRes.error;

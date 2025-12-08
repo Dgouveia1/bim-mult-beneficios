@@ -17,6 +17,8 @@ import { setupVendasPage } from './vendas.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js'; // CORRIGIDO: Nome da função de importação
 import { loadLogsData, setupLogsPage } from './logs.js';
 import { loadDashboardView } from './dashboard.js'; // IMPORTAÇÃO NOVO DASHBOARD
+// ADIÇÃO: Importar Financeiro
+import { setupFinanceiroPage, openFinancialModal, loadFinancialHistory, emitirCarne } from './financeiro.js';
 
 const newClientModalEl = document.getElementById('newClientModal');
 
@@ -126,6 +128,7 @@ async function loadPageData(pageName) {
     else if (pageName === 'vendas') setupVendasPage();
     else if (pageName === 'prontuario') setupProntuarioPage();
     else if (pageName === 'carteirinha') setupCarteirinhaPage();
+    else if (pageName === 'financeiro') setupFinanceiroPage(); // ADIÇÃO: Carrega página financeira
     else if (pageName === 'dashboard') loadDashboardView(); // NOVO LOAD DASHBOARD
 }                                     
 
@@ -298,6 +301,23 @@ function setupEventListeners() {
         // NOVO: Handler para o botão de Gerar Contrato
         const contractButton = target.closest('.generate-contract-btn');
         if (contractButton) handleGenerateContract(contractButton.dataset.titularId);
+
+        // NOVO: Ação do botão "Emitir Carnê" na tabela de Clientes
+        const carneBtn = target.closest('.emit-carne-btn');
+        if (carneBtn) {
+            const cpf = carneBtn.dataset.cpf;
+            const nome = carneBtn.dataset.name;
+            // Para reutilizar o modal financeiro, precisamos de um objeto cliente mínimo
+            // Aqui estamos "fabricando" um objeto com os dados que temos no botão
+            // Idealmente, buscaríamos o cliente completo, mas para exibir o modal e o financeiro (que usa CPF), isso basta.
+            const clientMock = {
+                nome: nome.split(' ')[0],
+                sobrenome: nome.split(' ').slice(1).join(' '),
+                cpf: cpf,
+                plano: 'Bim Familiar' // Sabemos que é Bim Familiar pela lógica de renderização
+            };
+            openFinancialModal(clientMock);
+        }
         
         const patientQueueItem = target.closest('.paciente-espera-item');
         if (patientQueueItem) selectPatient(patientQueueItem.dataset.appointmentId);
