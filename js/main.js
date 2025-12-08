@@ -98,11 +98,16 @@ async function loadHomePageData() {
     const quoteElement = document.getElementById('motivationalQuote');
     if (quoteElement) {
         const quotes = [
-            "Suba o primeiro degrau com fé. Não é necessário que você veja toda a escada. Apenas dê o primeiro passo.",
-            "O sucesso é a soma de pequenos esforços repetidos dia á dia.",
-            "A persistência realiza o impossível.",
-            "Não espere por uma crise para descobrir o que é importante em sua vida.",
-            "Comece onde você está. Use o que você tem. Faça o que você pode."
+            "A motivação é o que te faz começar. O hábito é o que te faz continuar.", 
+            "Não tenha medo de desistir do bom para perseguir o ótimo.", 
+            "A disciplina é a ponte entre metas e realizações.", 
+            "Grandes coisas não são feitas por impulso, mas pela união de pequenas coisas.", 
+            "A única maneira de fazer um excelente trabalho é amar o que você faz.", 
+            "Obstáculos são aquelas coisas assustadoras que você vê quando tira os olhos do seu objetivo.",
+            "A melhor maneira de prever o futuro é criá-lo.", 
+            "Se você não pode fazer grandes coisas, faça pequenas coisas de uma maneira grandiosa.",
+            "Acredite que você pode, e você já está no meio do caminho.", "O segredo para avançar é começar.", 
+            "A excelência não é um ato, mas um hábito.", "Cada novo dia é uma nova oportunidade para ser melhor que ontem.", "Planejamento, organização e foco são fatores essenciais para o sucesso.", "Não diminua a meta. Aumente o esforço.", "A criatividade é a inteligência se divertindo.", "O único lugar onde o sucesso vem antes do trabalho é no dicionário.", "Desafios são oportunidades de crescimento disfarçadas.", "Faça hoje o que seu 'eu' do futuro agradecerá.", "Produtividade nunca é um acidente. É sempre o resultado de comprometimento com a excelência.", "Sua atitude determina sua altitude.", "Tudo o que um sonho precisa para ser realizado é de alguém que acredite que ele possa ser realizado.", "A qualidade do seu trabalho é o seu melhor cartão de visitas.", "O insucesso é apenas uma oportunidade para recomeçar com mais inteligência.", "Foco no resultado, não na dificuldade.", "Talento é dom, é graça. Sucesso é trabalho, é persistência.", "Você nunca sabe que resultados virão da sua ação. Mas se você não fizer nada, não existirão resultados.", "Juntos somos mais fortes e vamos mais longe.", "A mudança é a lei da vida. E aqueles que olham apenas para o passado ou para o presente certamente perderão o futuro.", "Valorize o progresso, não apenas a perfeição.", "Tudo o que você sempre quis está do outro lado do medo.",
         ];
         const randomIndex = Math.floor(Math.random() * quotes.length);
         quoteElement.textContent = `"${quotes[randomIndex]}"`;
