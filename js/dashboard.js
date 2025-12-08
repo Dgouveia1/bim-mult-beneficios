@@ -295,6 +295,72 @@ async function fetchCardOverviewManual() {
     }
 }
 
+// NOVO: Busca Manual para Vendas por Vendedor (Bim Familiar)
+async function fetchSalesBySellerManual() {
+    try {
+        const today = new Date();
+        const startMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const startLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const endLastMonth = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59);
+
+        // Busca clientes 'Bim Familiar' criados nos últimos 2 meses
+        const { data, error } = await _supabase
+            .from('clients')
+            .select('vendedor, created_at, plano')
+            .eq('plano', 'Bim Familiar')
+            .gte('created_at', startLastMonth.toISOString());
+
+        if (error) throw error;
+
+        let salesCurrentMonth = 0;
+        let salesLastMonth = 0;
+        const sellerCountsCurrentMonth = {};
+
+        data.forEach(client => {
+            const createdAt = new Date(client.created_at);
+            const seller = client.vendedor ? client.vendedor.trim() : 'Não Identificado';
+
+            if (createdAt >= startMonth) {
+                salesCurrentMonth++;
+                if (!sellerCountsCurrentMonth[seller]) sellerCountsCurrentMonth[seller] = 0;
+                sellerCountsCurrentMonth[seller]++;
+            } else if (createdAt >= startLastMonth && createdAt <= endLastMonth) {
+                salesLastMonth++;
+            }
+        });
+
+        // Determinar Top Vendedor
+        let topSellerName = '-';
+        let topSellerCount = 0;
+        
+        Object.entries(sellerCountsCurrentMonth).forEach(([name, count]) => {
+            if (count > topSellerCount) {
+                topSellerCount = count;
+                topSellerName = name;
+            }
+        });
+
+        // Preparar dados para o gráfico (Ranking)
+        const chartData = Object.entries(sellerCountsCurrentMonth)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count); // Ordem decrescente
+
+        return {
+            kpi: {
+                total_current: salesCurrentMonth,
+                total_previous: salesLastMonth,
+                top_seller: topSellerName,
+                top_seller_count: topSellerCount
+            },
+            chart: chartData
+        };
+
+    } catch (e) {
+        console.error("Erro ao buscar vendas por vendedor:", e);
+        return { kpi: {}, chart: [] };
+    }
+}
+
 // BUSCA MANUAL PARA O GRÁFICO DE CONSULTAS (MENSAL - Histórico)
 async function fetchMonthlyConsultationsManual(planFilter = 'all') {
     try {
@@ -434,6 +500,82 @@ async function fetchWeeklyDataForProjections(planFilter = 'all') {
     }
 }
 
+// NOVO: Busca Manual para o Gráfico de Titulares (Substitui RPC bugada)
+async function fetchWeeklyTitularesManual() {
+    try {
+        const planFilter = 'Bim Familiar';
+        
+        // Data de 12 semanas atrás (aproximada)
+        const weeksAgo13 = new Date();
+        weeksAgo13.setDate(weeksAgo13.getDate() - (13 * 7)); // Pegamos um pouco mais para garantir
+        const dateStr = weeksAgo13.toISOString().split('T')[0];
+
+        // 1. Clientes criados recentemente
+        let clientQuery = _supabase
+            .from('clients')
+            .select(`created_at`)
+            .gte('created_at', dateStr) 
+            .eq('status', 'ATIVO')
+            .eq('plano', planFilter);
+
+        // 2. Contagem total anterior a data de corte
+        let countQuery = _supabase
+            .from('clients')
+            .select('*', { count: 'exact', head: true })
+            .lt('created_at', dateStr)
+            .eq('status', 'ATIVO')
+            .eq('plano', planFilter);
+
+        const [clientRes, countRes] = await Promise.all([clientQuery, countQuery]);
+        
+        if (clientRes.error) throw clientRes.error;
+        if (countRes.error) throw countRes.error;
+
+        let runningTotal = countRes.count || 0;
+        const resultData = [];
+
+        // Definir buckets de semanas
+        const now = new Date();
+        const currentWeekEnd = new Date(now);
+        // Ajusta para o próximo Sábado (fim da semana)
+        currentWeekEnd.setDate(now.getDate() + (6 - now.getDay()));
+        currentWeekEnd.setHours(23, 59, 59, 999);
+
+        // Gera 12 semanas (11 passadas + atual)
+        for (let i = 11; i >= 0; i--) {
+            const end = new Date(currentWeekEnd);
+            end.setDate(end.getDate() - (i * 7));
+            
+            const start = new Date(end);
+            start.setDate(start.getDate() - 6);
+            start.setHours(0, 0, 0, 0);
+            
+            // Filtra clientes nesta semana
+            const countNew = clientRes.data.filter(c => {
+                const d = new Date(c.created_at);
+                return d >= start && d <= end;
+            }).length;
+
+            runningTotal += countNew;
+
+            // Formata label DD/MM
+            const day = String(start.getDate()).padStart(2, '0');
+            const month = String(start.getMonth() + 1).padStart(2, '0');
+            
+            resultData.push({
+                week_label: `${day}/${month}`,
+                cumulative_count: runningTotal
+            });
+        }
+
+        return resultData;
+
+    } catch (e) {
+        console.error("Erro ao calcular titulares semanais:", e);
+        return [];
+    }
+}
+
 
 async function fetchChartData(planFilter = 'all') {
     // REGRA DE NEGÓCIO: 
@@ -450,9 +592,10 @@ async function fetchChartData(planFilter = 'all') {
         churnData, inadimplenciaData,
         tempoMedioData, ocupacaoData,
         consultasChartData,
-        weeklyData // NOVO: Dados semanais para projeção inteligente
+        weeklyData, // NOVO: Dados semanais para projeção inteligente
+        salesData // NOVO: Dados de Vendas por Vendedor
     ] = await Promise.all([
-        safeRpc('get_weekly_titulares', cardParams), // CARTÃO
+        fetchWeeklyTitularesManual(), // CORREÇÃO: Substitui RPC get_weekly_titulares
         safeRpc('get_consultations_by_professional', clinicParams), // CLÍNICA
         safeRpc('get_monthly_cohorts', cardParams), // CARTÃO
         safeRpc('get_today_funnel_status', clinicParams), // CLÍNICA
@@ -463,7 +606,8 @@ async function fetchChartData(planFilter = 'all') {
         safeRpc('get_tempo_medio_consultas', clinicParams), // CLÍNICA
         safeRpc('get_taxa_ocupacao', clinicParams), // CLÍNICA (Gráfico de barras)
         fetchMonthlyConsultationsManual(planFilter), // CLÍNICA (Histórico Mensal)
-        fetchWeeklyDataForProjections(planFilter) // CLÍNICA/CARTÃO (Dados para projeção)
+        fetchWeeklyDataForProjections(planFilter), // CLÍNICA/CARTÃO (Dados para projeção)
+        fetchSalesBySellerManual() // NOVO
     ]);
 
     // --- PROCESSAMENTO DA PROJEÇÃO INTELIGENTE ---
@@ -501,7 +645,8 @@ async function fetchChartData(planFilter = 'all') {
         churnRiskData, consultasPlanoData,
         churnData, inadimplenciaData,
         tempoMedioData, ocupacaoData,
-        consultasChartData
+        consultasChartData,
+        salesData // Retorna dados de vendas
     };
 }
 
@@ -607,6 +752,7 @@ function updateFinancialCard(idPrefix, data, period = 'mês') {
         return;
     }
 
+    // CORREÇÃO AQUI: Adicionei a lógica faltante e a chave de fechamento
     const percentageChange = ((current - previous) / previous) * 100;
     if (percentageChange >= 0) {
         compEl.textContent = `+${percentageChange.toFixed(1)}% vs ${period} anterior`;
@@ -617,6 +763,36 @@ function updateFinancialCard(idPrefix, data, period = 'mês') {
     }
 }
 
+function updateSalesKpi(kpiData) {
+    const totalEl = document.getElementById('vendas-mes-valor');
+    const compEl = document.getElementById('vendas-mes-comp');
+    const topNameEl = document.getElementById('top-vendedor-nome');
+    const topValEl = document.getElementById('top-vendedor-valor');
+
+    if (!totalEl || !compEl || !topNameEl || !topValEl) return;
+
+    // KPI 1: Total Vendas
+    const current = kpiData.total_current || 0;
+    const previous = kpiData.total_previous || 0;
+    
+    totalEl.textContent = current;
+    compEl.classList.remove('positive', 'negative');
+
+    if (previous === 0) {
+        compEl.textContent = current > 0 ? `+${current} vs mês anterior` : `vs mês anterior`;
+        if (current > 0) compEl.classList.add('positive');
+    } else {
+        const change = ((current - previous) / previous) * 100;
+        compEl.textContent = `${change > 0 ? '+' : ''}${change.toFixed(1)}% vs mês anterior`;
+        if (change >= 0) compEl.classList.add('positive');
+        else compEl.classList.add('negative');
+    }
+
+    // KPI 2: Top Vendedor
+    topNameEl.textContent = kpiData.top_seller || '-';
+    topValEl.textContent = `${kpiData.top_seller_count || 0} vendas`;
+}
+
 // --- CHARTS INITIALIZATION ---
 
 function clearCharts() {
@@ -625,6 +801,47 @@ function clearCharts() {
     }
     const cohortContainer = document.getElementById('cohort-chart-container');
     if (cohortContainer) cohortContainer.innerHTML = 'Carregando...';
+}
+
+function initializeSalesBySellerChart(data) {
+    const ctx = document.getElementById('vendasVendedorChart')?.getContext('2d');
+    if (!ctx) return;
+    
+    const safeData = data || [];
+
+    // Cores (Laranja Bim)
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: safeData.map(d => d.name),
+            datasets: [{
+                label: 'Vendas',
+                data: safeData.map(d => d.count),
+                backgroundColor: hexToRgba(primaryColor, 0.8),
+                borderColor: primaryColor,
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y', // Barra horizontal para melhor leitura dos nomes
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.x + ' vendas';
+                        }
+                    }
+                }
+            },
+            scales: { x: { beginAtZero: true } }
+        }
+    });
 }
 
 function initializeForecastChart(data, elementId) {
@@ -1133,6 +1350,11 @@ async function runDashboardUpdate() {
         setTxt('churn-total', cardData.churn_total || 0);
         updateKpiCardPercentage('churn-percentual', cardData.churn_percentual, 'mês');
 
+        // NOVO: Update Sales KPIs
+        if (chartsData.salesData?.kpi) {
+            updateSalesKpi(chartsData.salesData.kpi);
+        }
+
         // Initialize Charts
         initializeTitularesChart(chartsData.titularesData);
         initializeCohortChart(chartsData.cohortData);
@@ -1145,6 +1367,9 @@ async function runDashboardUpdate() {
         initializeChurnChart(chartsData.churnData);
         initializeInadimplenciaChart(chartsData.inadimplenciaData);
         
+        // NOVO: Gráfico de Vendas
+        initializeSalesBySellerChart(chartsData.salesData?.chart);
+
         // Agora inicializamos o gráfico de consultas com dados reais processados
         initializeConsultasChart(chartsData.consultasChartData);
         

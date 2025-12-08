@@ -2,6 +2,8 @@ import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
 import { showToast } from './utils.js';
+// NOVO: Importar para pegar o usuário logado
+import { getCurrentUserProfile } from './auth.js';
 // IMPORTAÇÃO DA FUNÇÃO DE CONTRATO
 import { generateContractPDF } from './vendas.js';
 
@@ -316,6 +318,10 @@ async function handleNewClientSubmit(event) {
         return;
     }
 
+    // ALTERAÇÃO: Clientes criados fora da aba de vendas recebem tag específica
+    // Em vez de usar o nome do usuário logado, usamos 'fora_aba_vendas'
+    const vendedorName = 'fora_aba_vendas';
+
     const titularData = {
         nome: titularFormProps.nome,
         sobrenome: titularFormProps.sobrenome,
@@ -329,7 +335,7 @@ async function handleNewClientSubmit(event) {
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
         observacao: titularFormProps.observacao,
-
+        vendedor: vendedorName // Campo alterado para tag fixa
     };
     
     const dependentesData = [];
@@ -371,7 +377,7 @@ async function handleNewClientSubmit(event) {
 
         if (titularError) throw titularError;
         
-        await logAction('CREATE_CLIENT', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}` });
+        await logAction('CREATE_CLIENT', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}`, vendedor: vendedorName });
 
         const titularId = newTitular.id;
 

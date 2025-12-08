@@ -2,6 +2,8 @@ import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
 import { showToast } from './utils.js';
+// NOVO: Importar para pegar o usuário logado
+import { getCurrentUserProfile } from './auth.js';
 
 let dependenteVendaCount = 0;
 
@@ -90,6 +92,10 @@ async function handleNewSaleSubmit(event) {
         return;
     }
 
+    // CORREÇÃO: Capturar o usuário logado para definir o vendedor
+    const currentUser = getCurrentUserProfile();
+    const vendedorName = currentUser ? currentUser.full_name : 'Sistema';
+
     const titularData = {
         nome: titularFormProps.nome,
         sobrenome: titularFormProps.sobrenome,
@@ -103,7 +109,7 @@ async function handleNewSaleSubmit(event) {
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
         observacao: titularFormProps.observacao,
-
+        vendedor: vendedorName // Campo adicionado
     };
 
     const dependentesData = [];
@@ -139,7 +145,7 @@ async function handleNewSaleSubmit(event) {
 
         if (titularError) throw titularError;
         
-        await logAction('CREATE_SALE', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}` });
+        await logAction('CREATE_SALE', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}`, vendedor: vendedorName });
 
         if (dependentesData.length > 0) {
             const dependentesParaSalvar = dependentesData.map(dep => ({
@@ -292,7 +298,7 @@ async function generateContractPDF(titular, dependentes) {
         
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
-        pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS E BENEFICIÁRIOS', pageWidth / 2, y, { align: 'center' });
+        pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS E BENEFÍCIÁRIOS', pageWidth / 2, y, { align: 'center' });
         y += 15;
         
         const tableData = [[
@@ -366,4 +372,3 @@ function setupVendasPage() {
 }
 
 export { setupVendasPage, generateContractPDF };
-
