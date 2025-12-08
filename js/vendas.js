@@ -92,6 +92,42 @@ async function handleNewSaleSubmit(event) {
         return;
     }
 
+    // === TRAVA DE CPF DUPLICADO (INÍCIO) ===
+    // Verifica se já existe um CPF cadastrado antes de prosseguir
+    if (titularFormProps.cpf) {
+        const originalBtnText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando CPF...';
+
+        try {
+            const { data: existingClient, error: checkError } = await _supabase
+                .from('clients')
+                .select('id')
+                .eq('cpf', titularFormProps.cpf)
+                .maybeSingle();
+
+            if (checkError) throw checkError;
+
+            if (existingClient) {
+                showToast('ERRO: Este CPF já está cadastrado para outro titular! Venda bloqueada.');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalBtnText;
+                return; // Interrompe a função aqui
+            }
+        } catch (error) {
+            console.error('Erro na verificação de CPF duplicado:', error);
+            showToast('Erro ao verificar disponibilidade do CPF. Tente novamente.');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalBtnText;
+            return;
+        }
+        
+        // Restaura o botão se passou na verificação (ele será desabilitado novamente abaixo para o salvamento)
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalBtnText;
+    }
+    // === TRAVA DE CPF DUPLICADO (FIM) ===
+
     // CORREÇÃO: Capturar o usuário logado para definir o vendedor
     const currentUser = getCurrentUserProfile();
     const vendedorName = currentUser ? currentUser.full_name : 'Sistema';

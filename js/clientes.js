@@ -318,6 +318,41 @@ async function handleNewClientSubmit(event) {
         return;
     }
 
+    // === TRAVA DE CPF DUPLICADO (INÍCIO) ===
+    if (titularFormProps.cpf) {
+        const originalBtnText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando CPF...';
+
+        try {
+            const { data: existingClient, error: checkError } = await _supabase
+                .from('clients')
+                .select('id')
+                .eq('cpf', titularFormProps.cpf)
+                .maybeSingle();
+
+            if (checkError) throw checkError;
+
+            if (existingClient) {
+                showToast('ERRO: Este CPF já está cadastrado para outro cliente!');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalBtnText;
+                return;
+            }
+        } catch (error) {
+            console.error('Erro na verificação de CPF duplicado:', error);
+            showToast('Erro ao verificar disponibilidade do CPF.');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalBtnText;
+            return;
+        }
+        
+        // Se passou, restaura botão (será desabilitado novamente mais abaixo, mas garante estado limpo)
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalBtnText;
+    }
+    // === TRAVA DE CPF DUPLICADO (FIM) ===
+
     // ALTERAÇÃO: Clientes criados fora da aba de vendas recebem tag específica
     // Em vez de usar o nome do usuário logado, usamos 'fora_aba_vendas'
     const vendedorName = 'fora_aba_vendas';
@@ -341,6 +376,10 @@ async function handleNewClientSubmit(event) {
     const dependentesData = [];
     const dependenteGroups = form.querySelectorAll('.dependente-form-group');
 
+    // Conjunto para verificar duplicidade dentro do próprio formulário
+    const cpfsInForm = new Set();
+    if(titularFormProps.cpf) cpfsInForm.add(titularFormProps.cpf);
+
     for (const group of dependenteGroups) {
         const id = group.dataset.dependenteNewId;
         const dependente = {
@@ -352,10 +391,19 @@ async function handleNewClientSubmit(event) {
             data_nascimento: group.querySelector(`[name="dependente_data_nascimento_${id}"]`).value,
         };
 
-        if (dependente.cpf && !validateCPF(dependente.cpf)) {
-            showToast(`O CPF do dependente ${dependente.nome} é inválido!`);
-            return;
+        if (dependente.cpf) {
+            if (!validateCPF(dependente.cpf)) {
+                showToast(`O CPF do dependente ${dependente.nome} é inválido!`);
+                return;
+            }
+            // Verifica duplicidade no formulário
+            if (cpfsInForm.has(dependente.cpf)) {
+                showToast(`O CPF ${dependente.cpf} está duplicado neste formulário (titular ou outro dependente).`);
+                return;
+            }
+            cpfsInForm.add(dependente.cpf);
         }
+
         if (dependente.telefone && !validatePhone(dependente.telefone)) {
             showToast(`O Telefone do dependente ${dependente.nome} parece inválido!`);
             return;
