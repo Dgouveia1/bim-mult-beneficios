@@ -43,11 +43,11 @@ function getCurrentUserProfile() {
 function setupPermissions(role) {
     // Mapeia roles para as classes CSS que elas podem ver
     const rolePermissions = {
-        superadmin: ['admin-only', 'medicos-only'], // Superadmin vê tudo
-        admin: ['admin-only', 'medicos-only'], // Admin vê tudo (ajuste conforme necessário)
-        recepcao: [], // Recepção não vê classes especiais
-        medicos: ['medicos-only'], // Médicos veem apenas 'medicos-only'
-        financeiro: ['admin-only'] // Financeiro vê 'admin-only' (ajuste se necessário)
+        superadmin: ['admin-only', 'medicos-only'], 
+        admin: ['admin-only', 'medicos-only'], 
+        recepcao: [], 
+        medicos: ['medicos-only'], 
+        financeiro: ['admin-only'] 
     };
 
     // 1. Esconde todos os elementos com classes de permissão
@@ -59,38 +59,69 @@ function setupPermissions(role) {
     const allowedClasses = rolePermissions[role] || [];
     allowedClasses.forEach(className => {
         document.querySelectorAll(`.${className}`).forEach(el => {
-            // Usa 'flex' ou 'block' dependendo do elemento para manter o layout
-            // Botões (como o de disponibilidade) são 'flex' no CSS base
             if (el.tagName === 'BUTTON' || el.style.display === 'flex') {
                 el.style.display = 'flex';
             } else {
-                el.style.display = 'block'; // Padrão para links de menu e divs
+                el.style.display = 'block'; 
             }
         });
     });
 
-    // 3. Lógica específica de MENU (sidebar) - mantida como estava
+    // 3. Lógica específica de MENU (sidebar)
     const allMenuItems = {
         'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true,
         'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true,
     };
+    
     const rolesPermissions = {
         superadmin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
         admin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
-        recepcao: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
+        recepcao: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true }, // Vê o menu pai
         medicos: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
         financeiro: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': false, 'submenu-clinica': false, 'menu-admin': true, 'submenu-admin': true }
     };
+
     const userPerms = rolesPermissions[role] || {};
+
     for (const menuId in allMenuItems) {
-        if (document.getElementById(menuId)) {
-            document.getElementById(menuId).style.display = 'none';
+        const el = document.getElementById(menuId);
+        if (el) {
+            el.style.display = userPerms[menuId] ? 'block' : 'none';
         }
     }
-    for (const menuId in userPerms) {
-        if (userPerms[menuId] && document.getElementById(menuId)) {
-            document.getElementById(menuId).style.display = 'block';
+
+    // 4. Lógica Fina para Itens DENTRO dos Submenus
+    
+    // a) Menu Cartão: Controle WhatsApp (Todos Admin/Recepção veem)
+    const whatsappLink = document.querySelector('[data-page="whatsapp_admin"]');
+    if (whatsappLink) {
+        if (role === 'admin' || role === 'superadmin' || role === 'recepcao') {
+            whatsappLink.style.display = 'block';
+        } else {
+            whatsappLink.style.display = 'none';
         }
+    }
+
+    // b) Menu Admin: Cronograma (Só Admin/Superadmin veem)
+    if (role === 'recepcao') {
+        const adminSubmenu = document.getElementById('submenu-admin');
+        if (adminSubmenu) {
+            // A recepção pode ver o menu "Marketing & Admin" (definido acima), mas NÃO o conteúdo dele
+            // exceto se tivéssemos movido o WhatsApp pra lá. Como o WhatsApp foi para "Cartão",
+            // podemos esconder TUDO do submenu-admin para a recepção se ela não precisar de nada lá.
+            // Mas, seguindo a lógica estrita: Cronograma é Admin Only.
+            
+            // Esconde itens específicos do submenu Admin para recepção
+            const cronogramaLink = adminSubmenu.querySelector('[data-page="cronograma"]');
+            if(cronogramaLink) cronogramaLink.style.display = 'none';
+            
+            // (Opcional) Se não houver nada visível no submenu, esconder o menu pai também?
+            // Por enquanto, deixamos o pai visível caso haja itens futuros compartilhados.
+        }
+    } else if (role === 'admin' || role === 'superadmin') {
+        // Garante visibilidade para admins
+        const cronogramaLink = document.querySelector('[data-page="cronograma"]');
+        if(cronogramaLink) cronogramaLink.style.display = 'block';
     }
 }
 

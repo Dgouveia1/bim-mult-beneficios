@@ -1,0 +1,107 @@
+/* =================================================================
+   PÁGINA: CONTROLE WHATSAPP (ADMIN)
+   ================================================================= */
+
+   .whatsapp-control-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    padding: 20px;
+    overflow: hidden;
+}
+
+.wpp-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wpp-table th {
+    background-color: #f8fafc;
+    color: var(--secondary-dark);
+    font-weight: 600;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #eef2f5;
+}
+
+.wpp-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eef2f5;
+    vertical-align: middle;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+.user-name {
+    font-weight: 600;
+    color: var(--secondary-dark);
+}
+.user-phone {
+    font-size: 0.85rem;
+    color: var(--gray-medium);
+}
+
+/* Badges */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-gray { background: #f3f4f6; color: #4b5563; }
+
+/* Status Indicator */
+.status-indicator {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.status-waiting { color: #d97706; animation: pulse 2s infinite; }
+.status-ok { color: #16a34a; }
+
+/* Response Time */
+.response-time {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.response-time small {
+    color: var(--gray-medium);
+    font-size: 0.8rem;
+}
+
+/* Message Preview */
+.last-msg-cell {
+    max-width: 250px;
+}
+.msg-preview {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #374151;
+    font-size: 0.9rem;
+}
+.msg-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .whatsapp-control-container {
+        overflow-x: auto;
+    }
+    .wpp-table {
+        min-width: 800px; /* Força scroll horizontal no mobile */
+    }
+}

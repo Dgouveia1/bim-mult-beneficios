@@ -48,6 +48,7 @@
                 </div>
                 <div class="menu-item" id="menu-cartao"><i class="fas fa-id-card"></i> Cartão Bim</div>
                 <div class="submenu" id="submenu-cartao">
+                    <a href="#" class="submenu-item" data-page="whatsapp_admin">Controle WhatsApp</a>
                     <a href="#" class="submenu-item" data-page="clientes">Clientes</a>
                     <a href="#" class="submenu-item" data-page="vendas">Vendas</a>
                     <a href="#" class="submenu-item" data-page="carteirinha">Gerar Carteirinha</a>
@@ -67,6 +68,7 @@
                 <div class="admin-only">
                     <div class="menu-item" id="menu-admin"><i class="fas fa-cogs"></i> Marketing & Admin</div>
                     <div class="submenu" id="submenu-admin">
+                        <a href="#" class="submenu-item" data-page="cronograma">Cronograma da Semana</a>
                         <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
                         <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
                         <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
@@ -795,7 +797,6 @@
                     <div class="content-header">
                         <h2 class="page-title">Logs de Ações do Sistema</h2>
                     </div>
-                    {/* Controles de Filtro */}
                     <div class="card" style="margin-bottom: 20px; padding: 15px;">
                         <div class="logs-filters" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                             <div class="form-group" style="margin-bottom: 0;">
@@ -825,6 +826,56 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <div class="page-content" id="whatsapp_adminPage">
+                    <div class="content-header">
+                        <h2 class="page-title"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Monitoramento de Atendimento</h2>
+                        <button class="btn btn-secondary btn-small" onclick="loadWhatsAppControlData()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+                    </div>
+                    
+                    <div class="whatsapp-control-container">
+                        <div class="table-container">
+                            <table class="wpp-table">
+                                <thead>
+                                    <tr>
+                                        <th>Contato</th>
+                                        <th>Vínculo</th>
+                                        <th>Consulta Futura</th>
+                                        <th>Status</th>
+                                        <th>Tempo Médio (Resp.)</th>
+                                        <th>Última Mensagem</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="whatsappControlBody">
+                                    <!-- Preenchido via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content" id="cronogramaPage">
+                    <div class="content-header">
+                        <h2 class="page-title"><i class="fas fa-calendar-week"></i> Cronograma da Semana</h2>
+                    </div>
+                    <div class="card" style="max-width: 800px; margin: 0 auto;">
+                        <form id="cronogramaForm">
+                            <div class="form-group">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <label for="cronogramaTexto" style="font-weight: bold; font-size: 1.1rem;">Texto do Cronograma</label>
+                                    <small id="cronogramaLastUpdate" style="color: var(--gray-medium); font-style: italic;">Carregando...</small>
+                                </div>
+                                <textarea id="cronogramaTexto" name="cronogramaTexto" rows="15" style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ddd; font-family: sans-serif; font-size: 1rem; resize: vertical;" placeholder="Digite o cronograma da semana aqui..."></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                                <button type="submit" class="btn btn-success" id="saveCronogramaBtn">
+                                    <i class="fas fa-save"></i> Salvar Alterações
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
     

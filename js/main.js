@@ -1,7 +1,6 @@
 import { _supabase } from './supabase.js';
 import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
-// IMPORTAÇÃO ATUALIZADA: Adicionado handleGenerateContract
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, handleGenerateContract } from './clientes.js';
 import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
@@ -14,17 +13,17 @@ import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
 import { setupVendasPage } from './vendas.js';
-import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js'; // CORRIGIDO: Nome da função de importação
+import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
 import { loadLogsData, setupLogsPage } from './logs.js';
-import { loadDashboardView } from './dashboard.js'; // IMPORTAÇÃO NOVO DASHBOARD
-// ADIÇÃO: Importar Financeiro
+import { loadDashboardView } from './dashboard.js';
 import { setupFinanceiroPage, openFinancialModal, loadFinancialHistory, emitirCarne } from './financeiro.js';
+import { setupWhatsAppAdminPage } from './whatsapp_admin.js';
+import { setupCronogramaPage } from './cronograma.js';
 
 const newClientModalEl = document.getElementById('newClientModal');
 
 /**
  * Remove todas as inscrições de tempo real (realtime subscriptions) ativas
- * para evitar vazamento de memória ao navegar entre páginas.
  */
 function cleanupRealtimeSubscriptions() {
     unsubscribeReception();
@@ -33,46 +32,60 @@ function cleanupRealtimeSubscriptions() {
 }
 
 /**
- * Navega para uma nova página na interface do dashboard.
- * @param {string} pageName - O ID da página alvo (ex: 'home', 'clientes', 'dashboard').
+ * Roteador de dados: Chama a função de carregamento de dados para a página ativa.
+ * @param {string} pageName - Nome da página.
  */
+async function loadPageData(pageName) {
+    if (pageName === 'home') await loadHomePageData();
+    else if (pageName === 'clientes') await loadClientsData();
+    else if (pageName === 'agenda') await loadScheduleView();
+    else if (pageName === 'recepcao') await loadReceptionQueue();
+    else if (pageName === 'pacientes') await loadPatientsData();
+    else if (pageName === 'laboratorio') await loadLaboratoryData();
+    else if (pageName === 'usuarios') await loadUsersData();
+    else if (pageName === 'profissionais') await loadProfessionalsData();
+    else if (pageName === 'disparos') await loadMunicipios();
+    else if (pageName === 'confirmacoes') await loadConfirmationsData();
+    else if (pageName === 'logs') setupLogsPage();
+    else if (pageName === 'vendas') setupVendasPage();
+    else if (pageName === 'prontuario') setupProntuarioPage();
+    else if (pageName === 'carteirinha') setupCarteirinhaPage();
+    else if (pageName === 'financeiro') setupFinanceiroPage();
+    else if (pageName === 'dashboard') loadDashboardView();
+    else if (pageName === 'whatsapp_admin') setupWhatsAppAdminPage();
+    else if (pageName === 'cronograma') setupCronogramaPage();
+}                                     
+
+// --- FUNÇÕES DE NAVEGAÇÃO E EVENTOS ---
 function navigateToPage(pageName) {
     cleanupRealtimeSubscriptions();
 
-    // Esconde todas as páginas e remove o estado ativo
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
     
-    // Mostra a página alvo
     const targetPage = document.getElementById(`${pageName}Page`);
     if (targetPage) {
         targetPage.classList.add('active');
     }
 
-    // Atualiza o estado ativo no menu lateral
     document.querySelectorAll('.menu-item, .submenu-item').forEach(item => item.classList.remove('active'));
     const activeMenuItem = document.querySelector(`[data-page="${pageName}"]`);
     if (activeMenuItem) {
         activeMenuItem.classList.add('active');
-        // Se for um submenu-item, ativa o menu pai
         const parentMenu = activeMenuItem.closest('.submenu')?.previousElementSibling;
         if (parentMenu) parentMenu.classList.add('active');
     }
 
-    // Fecha a sidebar (em telas menores)
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mainContentOverlay');
     const dashboard = document.getElementById('dashboard');
-    sidebar.classList.remove('visible');
-    overlay.classList.remove('visible');
-    dashboard.classList.remove('sidebar-is-open');
+    if (sidebar) sidebar.classList.remove('visible');
+    if (overlay) overlay.classList.remove('visible');
+    if (dashboard) dashboard.classList.remove('sidebar-is-open');
 
-    // Carrega os dados específicos da nova página
     loadPageData(pageName);
 }
 
-/**
- * Carrega dados específicos para a página Home.
- */
+// --- FUNÇÃO DA HOME PAGE (RESTAURADA) ---
 async function loadHomePageData() {
     const userProfile = getCurrentUserProfile();
     if (!userProfile) return;
@@ -89,12 +102,13 @@ async function loadHomePageData() {
         dateElement.textContent = today.toLocaleDateString('pt-BR', options);
     }
 
+    // Lógica da Previsão do Tempo (Mock)
     const weatherElement = document.getElementById('weatherInfo');
     if (weatherElement) {
-        // Dados estáticos de exemplo
         weatherElement.textContent = 'Hoje o dia está com sol e algumas nuvens. A temperatura varia entre 22°C e 33°C.';
     }
 
+    // Lógica da Frase do Dia
     const quoteElement = document.getElementById('motivationalQuote');
     if (quoteElement) {
         const quotes = [
@@ -114,39 +128,12 @@ async function loadHomePageData() {
     }
 }
 
-/**
- * Roteador de dados: Chama a função de carregamento de dados para a página ativa.
- * @param {string} pageName - Nome da página.
- */
-async function loadPageData(pageName) {
-    if (pageName === 'home') await loadHomePageData();
-    else if (pageName === 'clientes') await loadClientsData();
-    else if (pageName === 'agenda') await loadScheduleView();
-    else if (pageName === 'recepcao') await loadReceptionQueue();
-    else if (pageName === 'pacientes') await loadPatientsData();
-    else if (pageName === 'laboratorio') await loadLaboratoryData();
-    else if (pageName === 'usuarios') await loadUsersData();
-    else if (pageName === 'profissionais') await loadProfessionalsData();
-    else if (pageName === 'disparos') await loadMunicipios();
-    else if (pageName === 'confirmacoes') await loadConfirmationsData(); // CORRIGIDO: Chamando a função com o nome correto
-    else if (pageName === 'logs') setupLogsPage();
-    else if (pageName === 'vendas') setupVendasPage();
-    else if (pageName === 'prontuario') setupProntuarioPage();
-    else if (pageName === 'carteirinha') setupCarteirinhaPage();
-    else if (pageName === 'financeiro') setupFinanceiroPage(); // ADIÇÃO: Carrega página financeira
-    else if (pageName === 'dashboard') loadDashboardView(); // NOVO LOAD DASHBOARD
-}                                     
-
-/**
- * Configura todos os ouvintes de eventos globais e de formulários.
- */
 function setupEventListeners() {
     const dashboard = document.getElementById('dashboard');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('mainContentOverlay');
 
-    // Toggle da Sidebar e Overlay
     if (sidebarToggle && sidebar && overlay && dashboard) {
         const toggleSidebar = () => {
             sidebar.classList.toggle('visible');
@@ -158,29 +145,24 @@ function setupEventListeners() {
         overlay.addEventListener('click', toggleSidebar);
     }
     
-    // Autenticação
     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     
-    // Navegação (delegação para o menu)
     document.getElementById('sidebar')?.addEventListener('click', (e) => {
         const menuItem = e.target.closest('.menu-item, .submenu-item');
         if (menuItem?.dataset.page) {
             e.preventDefault();
             navigateToPage(menuItem.dataset.page);
         } else if (menuItem?.nextElementSibling?.classList.contains('submenu')) {
-            // Expande/Contrai submenu
             menuItem.nextElementSibling.classList.toggle('active');
         }
     });
 
-    // Botões de Ação de Modal (Adicionar)
     document.getElementById('addClientBtn')?.addEventListener('click', () => openModal(newClientModalEl));
     document.getElementById('newAppointmentBtn')?.addEventListener('click', openNewAppointmentModal);
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
-
-    // Botão de Disponibilidade (Home/Médicos)
+    
     document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
         const user = getCurrentUserProfile();
         if (user && user.role === 'medicos') {
@@ -190,20 +172,17 @@ function setupEventListeners() {
         }
     });
 
-    // --- Submissão de Formulários ---
     document.getElementById('newClientForm')?.addEventListener('submit', handleNewClientSubmit);
     document.getElementById('detailsClientForm')?.addEventListener('submit', handleUpdateClient);
     document.getElementById('appointmentForm')?.addEventListener('submit', saveAppointment);
     document.getElementById('appointmentDetailsForm')?.addEventListener('submit', updateAppointment);
     document.getElementById('deleteAppointmentBtn')?.addEventListener('click', deleteAppointment);
-
     document.getElementById('paymentForm')?.addEventListener('submit', savePayment);
     document.getElementById('examForm')?.addEventListener('submit', saveExam);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
     document.getElementById('professionalEventForm')?.addEventListener('submit', saveProfessionalEvent);
     
-    // Adicionar Dependentes
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
             const container = document.getElementById('dependentesContainer');
             addDependenteField(container, 'dependenteCount');
@@ -213,7 +192,6 @@ function setupEventListeners() {
             addDependenteField(container, 'dependenteDetailsCount');
         });
     
-    // Formulário de Disparos/Exportação de Contatos
     document.body.addEventListener('submit', function(event) {
         if (event.target.id === 'exportForm') {
             event.preventDefault();
@@ -221,7 +199,6 @@ function setupEventListeners() {
         }
     });
 
-    // Busca de Clientes (com debounce)
     const clientsSearchInput = document.getElementById('clientsSearchInput');
     if (clientsSearchInput) {
         clientsSearchInput.addEventListener('input', (e) => {
@@ -232,27 +209,23 @@ function setupEventListeners() {
         });
     }
 
-    // Confirmação de Agenda (Checkbox)
     document.body.addEventListener('change', async function(event) {
         if (event.target.classList.contains('confirmation-checkbox')) {
             const checkbox = event.target;
             const appointmentId = checkbox.dataset.appointmentId;
             const isConfirmed = checkbox.checked;
-            
             checkbox.disabled = true; 
             await updateConfirmationStatus(appointmentId, isConfirmed);
             checkbox.disabled = false; 
         }
     });
 
-    // Filtro de Logs
     document.getElementById('filterLogsBtn')?.addEventListener('click', () => {
         const startDate = document.getElementById('logStartDate').value;
         const endDate = document.getElementById('logEndDate').value;
         loadLogsData(startDate, endDate);
     });
 
-    // Eventos do Modal de Disponibilidade (Profissionais)
     const eventDateInput = document.getElementById('eventDate');
     if (eventDateInput) {
         eventDateInput.addEventListener('change', (e) => {
@@ -274,16 +247,13 @@ function setupEventListeners() {
         });
     }
 
-    // --- Listener Global de Cliques (Delegação de Ações) ---
     document.body.addEventListener('click', async function(event) {
         const target = event.target;
-        // Fechar modais
         if (target.closest('.close-btn') || target.closest('[data-close-modal]')) {
             const modal = target.closest('.modal');
             if(modal) modal.style.display = 'none';
         }
         
-        // Ações de Edição e Abertura de Modal
         const editUserButton = target.closest('.edit-user-btn');
         if (editUserButton) openUserModal(editUserButton.dataset.id);
 
@@ -299,27 +269,21 @@ function setupEventListeners() {
         const appointmentCard = target.closest('.appointment-card[data-appointment-id]');
         if (appointmentCard) openAppointmentDetails(appointmentCard.dataset.appointmentId);
         
-        // CORREÇÃO: Usar a classe específica .view-details-btn para evitar conflito
         const detailsClientButton = target.closest('.view-details-btn');
         if (detailsClientButton) openDetailsModal(detailsClientButton.dataset.titularId);
 
-        // NOVO: Handler para o botão de Gerar Contrato
         const contractButton = target.closest('.generate-contract-btn');
         if (contractButton) handleGenerateContract(contractButton.dataset.titularId);
 
-        // NOVO: Ação do botão "Emitir Carnê" na tabela de Clientes
         const carneBtn = target.closest('.emit-carne-btn');
         if (carneBtn) {
             const cpf = carneBtn.dataset.cpf;
             const nome = carneBtn.dataset.name;
-            // Para reutilizar o modal financeiro, precisamos de um objeto cliente mínimo
-            // Aqui estamos "fabricando" um objeto com os dados que temos no botão
-            // Idealmente, buscaríamos o cliente completo, mas para exibir o modal e o financeiro (que usa CPF), isso basta.
             const clientMock = {
                 nome: nome.split(' ')[0],
                 sobrenome: nome.split(' ').slice(1).join(' '),
                 cpf: cpf,
-                plano: 'Bim Familiar' // Sabemos que é Bim Familiar pela lógica de renderização
+                plano: 'Bim Familiar'
             };
             openFinancialModal(clientMock);
         }
@@ -338,7 +302,6 @@ function setupEventListeners() {
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
         
-        // Remover Dependente (com confirmação)
         const removeDependenteButton = target.closest('.remove-dependente-btn');
         if (removeDependenteButton) {
             const dependentGroup = removeDependenteButton.closest('.dependente-form-group');
@@ -355,26 +318,18 @@ function setupEventListeners() {
                     dependentGroup.appendChild(deleteInput);
                 }
             } else {
-                // Se for um novo dependente sem ID, apenas remove
                 dependentGroup.remove();
             }
         }
     });
 
-    // Navegação da Agenda
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
     document.getElementById('nextDayBtn')?.addEventListener('click', () => changeDay(1));
     
-    // Exportação de Clientes
     document.getElementById('exportClientsBtn')?.addEventListener('click', exportToExcel);
 }
 
-/**
- * Inicializa o dashboard após a autenticação bem-sucedida.
- * @param {object} user - Objeto de usuário do Supabase.
- */
 async function initializeDashboard(user) {
-    // Adiciona atributos data-label para responsividade de tabelas
     document.querySelectorAll('table').forEach(table => {
         const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
         table.querySelectorAll('tbody tr').forEach(row => {
@@ -386,7 +341,6 @@ async function initializeDashboard(user) {
         });
     });
 
-    // Busca o perfil completo e a role
     const { data: profile, error } = await _supabase.from('profiles').select('*').eq('id', user.id).single();
     if (error || !profile) {
         showToast('Erro crítico: Perfil do usuário não encontrado.', 'error');
@@ -397,25 +351,15 @@ async function initializeDashboard(user) {
     setupPermissions(profile.role);
     showDashboard();
     
-    // Carrega a página inicial padrão
     await loadPageData('home');
 }
 
-/**
- * Ponto de entrada da aplicação, executado após o DOM ser carregado.
- */
 document.addEventListener('DOMContentLoaded', async () => {
-    // Configura todos os listeners antes de tentar o login/inicialização
     setupEventListeners();
-    
-    // Tenta obter a sessão atual
     const { data: { session } } = await _supabase.auth.getSession();
-    
     if (session) {
-        // Se houver sessão, inicializa o dashboard
         await initializeDashboard(session.user);
     } else {
-        // Se não houver, mostra a tela de login
         showLoginScreen();
     }
 });
