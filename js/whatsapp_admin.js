@@ -50,8 +50,61 @@ async function loadWhatsAppControlData() {
 
         if (error) throw error;
 
+        // --- LÓGICA DE DEDUPLICAÇÃO POR TELEFONE ---
+        const uniqueDataMap = new Map();
+
+        data.forEach(row => {
+            // Ignora registros sem telefone
+            if (!row.telefone) return;
+
+            // Normaliza o telefone para usar como chave (apenas números)
+            const cleanPhone = row.telefone.replace(/\D/g, '');
+
+            if (!uniqueDataMap.has(cleanPhone)) {
+                // Se é a primeira vez que vemos este telefone, adiciona ao mapa
+                uniqueDataMap.set(cleanPhone, { ...row });
+            } else {
+                // Se já existe, mescla as informações para não duplicar a linha
+                const existing = uniqueDataMap.get(cleanPhone);
+                
+                // 1. LÓGICA DE NOME: Sem concatenação, prioriza Titular
+                // Se o registro atual for Titular, usamos o nome dele (sobrescrevendo dependente se houver)
+                if (row.tipo_vinculo === 'Titular') {
+                    existing.nome = row.nome;
+                }
+                // Se não for Titular, mantemos o nome que já estava (seja Titular anterior ou primeiro Dependente)
+
+                // 2. Prioriza status de cliente
+                if (row.is_client && !existing.is_client) {
+                    existing.is_client = true;
+                    existing.tipo_vinculo = row.tipo_vinculo;
+                } else if (row.is_client && existing.is_client) {
+                    // Se ambos são clientes, combina os vínculos se diferentes (Ex: Titular / Dependente)
+                    // Mantemos a concatenação aqui apenas para o VÍNCULO, para saber que o numero representa ambos
+                    if (row.tipo_vinculo && existing.tipo_vinculo && !existing.tipo_vinculo.includes(row.tipo_vinculo)) {
+                        existing.tipo_vinculo += ` / ${row.tipo_vinculo}`;
+                    }
+                }
+
+                // 3. Mescla informações de consulta (se algum tiver consulta, a linha marca como sim)
+                if (row.tem_consulta_marcada) {
+                    existing.tem_consulta_marcada = true;
+                }
+
+                // 4. Se algum dos duplicados estiver aguardando resposta, a conversa inteira está aguardando
+                if (row.aguardando_resposta) {
+                    existing.aguardando_resposta = true;
+                    // Mantém a data da mensagem mais relevante (a que está esperando)
+                    existing.last_msg_time = row.last_msg_time;
+                }
+            }
+        });
+
+        // Converte o mapa de volta para um array para ordenação e renderização
+        const uniqueData = Array.from(uniqueDataMap.values());
+
         // ORDENAÇÃO INTELIGENTE (Prioridade no tempo de espera)
-        data.sort((a, b) => {
+        uniqueData.sort((a, b) => {
             // 1º Critério: Quem está aguardando resposta vem primeiro
             if (a.aguardando_resposta && !b.aguardando_resposta) return -1;
             if (!a.aguardando_resposta && b.aguardando_resposta) return 1;
@@ -65,7 +118,7 @@ async function loadWhatsAppControlData() {
             return new Date(b.last_msg_time) - new Date(a.last_msg_time);
         });
 
-        renderWhatsAppTable(data);
+        renderWhatsAppTable(uniqueData);
         
         // Garante que o listener seja configurado apenas uma vez
         setupRealtimeListener();

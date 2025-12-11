@@ -249,19 +249,15 @@ async function fetchCardOverviewManual() {
             const createdAt = new Date(client.created_at);
             const status = client.status ? client.status.toUpperCase() : '';
 
-            // Contagem de Status
-            if (status === 'ATIVO') {
-                totalAtivos++;
-                statusAtivos++;
+            // --- CORREÇÃO: Unificação de Lógica de Ativos ---
+            // 'ATIVO' e 'DOACAO' contam para o TOTAL e para a lista de ATIVOS
+            if (status === 'ATIVO' || status === 'DOACAO') {
+                totalAtivos++; // Agora inclui Doação no Card Principal
+                statusAtivos++; // Já incluía Doação na lista
             } else if (status === 'INATIVO' || status === 'CANCELADO') {
                 statusCancelados++;
-            } else if (status === 'ATRASO' || status === 'DOACAO') {
-                // Considerando Doação como ativo ou separado? 
-                // Por enquanto, vamos agrupar Doação com Ativos se for o caso, ou Atraso se for pendente.
-                // Vou mapear 'DOACAO' como Ativo para contagem geral de "Titulares Ativos" se fizer sentido, 
-                // mas manterei separado nos status. Se 'ATRASO' existir, conta aqui.
-                if (status === 'DOACAO') statusAtivos++; 
-                else statusAtraso++;
+            } else if (status === 'ATRASO') {
+                statusAtraso++;
             }
 
             // Novos Clientes (Aquisição)
@@ -279,7 +275,7 @@ async function fetchCardOverviewManual() {
         const churnRate = totalBase > 0 ? (statusCancelados / totalBase) * 100 : 0;
 
         return {
-            titulares_ativos: totalAtivos, // Card principal
+            titulares_ativos: totalAtivos, // Agora bate com Status (Inclui Doação)
             novos_titulares_semana: { current: newWeekCurr, previous: newWeekPrev },
             novos_titulares_mes: { current: newMonthCurr, previous: newMonthPrev },
             status_ativos: statusAtivos,
@@ -510,21 +506,27 @@ async function fetchWeeklyTitularesManual() {
         weeksAgo13.setDate(weeksAgo13.getDate() - (13 * 7)); // Pegamos um pouco mais para garantir
         const dateStr = weeksAgo13.toISOString().split('T')[0];
 
-        // 1. Clientes criados recentemente
+        // --- CORREÇÃO: Filtro Unificado e Tratamento de Nulos ---
+        
+        // 1. Clientes criados recentemente (ATIVO ou DOACAO)
         let clientQuery = _supabase
             .from('clients')
             .select(`created_at`)
             .gte('created_at', dateStr) 
-            .eq('status', 'ATIVO')
+            .in('status', ['ATIVO', 'DOACAO']) // Inclui Doação
             .eq('plano', planFilter);
 
-        // 2. Contagem total anterior a data de corte
+        // 2. Contagem total anterior a data de corte (Base acumulada)
+        // Deve incluir: 
+        // a) Criados antes da data corte 
+        // b) OU com data NULA (migração antiga)
+        // E status ATIVO ou DOACAO
         let countQuery = _supabase
             .from('clients')
             .select('*', { count: 'exact', head: true })
-            .lt('created_at', dateStr)
-            .eq('status', 'ATIVO')
-            .eq('plano', planFilter);
+            .in('status', ['ATIVO', 'DOACAO']) // Inclui Doação
+            .eq('plano', planFilter)
+            .or(`created_at.lt.${dateStr},created_at.is.null`); // Inclui nulos na base inicial
 
         const [clientRes, countRes] = await Promise.all([clientQuery, countQuery]);
         
@@ -552,6 +554,7 @@ async function fetchWeeklyTitularesManual() {
             
             // Filtra clientes nesta semana
             const countNew = clientRes.data.filter(c => {
+                if (!c.created_at) return false; // Ignora nulos aqui pois já foram contados na base inicial
                 const d = new Date(c.created_at);
                 return d >= start && d <= end;
             }).length;

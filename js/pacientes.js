@@ -1,7 +1,7 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
 import { logAction } from './logger.js';
-import { showToast } from './utils.js';
+import { showToast, calculateAge } from './utils.js';
 
 // --- ESTADO DA CONSULTA ---
 let allExams = [];
@@ -11,11 +11,13 @@ let patientsSubscription = null;
 let currentUploadedFiles = [];
 let currentSelectedPatientData = null;
 let currentProfessionalData = null; // Esta variável guardará os dados do profissional logado
+let currentAppointmentData = null; // Armazena dados completos do agendamento atual
 
 // --- ELEMENTOS DO DOM (CACHE) ---
 const consultationWorkspaceDiv = document.getElementById('consultationWorkspace');
 const noPatientSelectedDiv = document.getElementById('noPatientSelected');
 const patientQueueListContainer = document.getElementById('patientQueueList');
+const pauseBtn = document.getElementById('pauseConsultationBtn');
 
 // --- FUNÇÃO AUXILIAR PARA CONVERTER IMAGEM PARA BASE64 ---
 function imageToBase64(url) {
@@ -81,7 +83,16 @@ async function loadPatientsData() {
         unsubscribePatients();
         const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
         if (!professional) throw new Error('Perfil profissional não encontrado.');
-        const { data, error } = await _supabase.from('appointments').select('*').eq('appointment_date', today).eq('professional_id', professional.id).in('status', ['chegou', 'em_atendimento']).order('start_time');
+        
+        // Inclui 'pausado' na lista de status visíveis na fila
+        const { data, error } = await _supabase
+            .from('appointments')
+            .select('*')
+            .eq('appointment_date', today)
+            .eq('professional_id', professional.id)
+            .in('status', ['chegou', 'em_atendimento', 'pausado'])
+            .order('start_time');
+            
         if (error) throw error;
         renderPatientsList(data);
         patientsSubscription = _supabase.channel('public:appointments_medico').on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `professional_id=eq.${professional.id}` }, () => loadPatientsData()).subscribe();
@@ -95,9 +106,17 @@ function renderPatientsList(data) {
     data.forEach(appt => {
         const item = document.createElement('div');
         item.className = 'paciente-espera-item';
+        
+        // Marca visualmente se está ativo ou pausado
         if (appt.status === 'em_atendimento') item.classList.add('active');
+        if (appt.status === 'pausado') item.style.borderLeft = '4px solid #ff9800'; // Indicador laranja para pausado
+
         item.dataset.appointmentId = appt.id;
-        item.innerHTML = `<span class="nome">${appt.patient_name}</span><span class="horario">${appt.start_time.substring(0, 5)}</span>`;
+        
+        let statusIcon = '';
+        if (appt.status === 'pausado') statusIcon = ' <i class="fas fa-pause" style="font-size: 0.8em; color: #ff9800;"></i>';
+        
+        item.innerHTML = `<span class="nome">${appt.patient_name}${statusIcon}</span><span class="horario">${appt.start_time.substring(0, 5)}</span>`;
         patientQueueListContainer.appendChild(item);
     });
 }
@@ -189,23 +208,40 @@ async function selectPatient(appointmentId) {
     noPatientSelectedDiv.style.display = 'none';
 
     try {
-        // CORREÇÃO 2: Registra o início da consulta
-        const startTime = new Date().toISOString();
-        const { error: updateError } = await _supabase.from('appointments').update({ 
-            status: 'em_atendimento',
-            consultation_start_time: startTime
-        }).eq('id', appointmentId);
-        
-        if (updateError) throw updateError;
-        
-        await logAction('START_CONSULTATION', {
-            appointmentId: appointmentId,
-            startTime: startTime
-        });
-
-        // Busca os detalhes do agendamento
+        // Busca os detalhes do agendamento primeiro para verificar status
         const { data: appt, error: apptError } = await _supabase.from('appointments').select('*, client_id').eq('id', appointmentId).single();
         if (apptError) throw apptError;
+        
+        currentAppointmentData = appt; // Armazena para uso global (pausa/resume)
+
+        // Se não estiver pausado e nem finalizado, marca como em atendimento (início)
+        // Se estiver 'chegou', muda para 'em_atendimento' e grava start_time se não houver
+        if (appt.status === 'chegou') {
+            const startTime = new Date().toISOString();
+            const { error: updateError } = await _supabase.from('appointments').update({ 
+                status: 'em_atendimento',
+                consultation_start_time: startTime
+            }).eq('id', appointmentId);
+            
+            if (updateError) throw updateError;
+            
+            await logAction('START_CONSULTATION', {
+                appointmentId: appointmentId,
+                startTime: startTime
+            });
+            appt.status = 'em_atendimento'; // Atualiza localmente
+        }
+
+        // --- CONFIGURAÇÃO DO BOTÃO DE PAUSA ---
+        if (pauseBtn) {
+            if (appt.status === 'pausado') {
+                pauseBtn.innerHTML = '<i class="fas fa-play"></i> Retomar Atendimento';
+                pauseBtn.className = 'btn btn-primary'; // Azul para retomar
+            } else {
+                pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar Atendimento';
+                pauseBtn.className = 'btn btn-warning'; // Laranja para pausar
+            }
+        }
 
         let patientDetails = null;
         
@@ -241,6 +277,12 @@ async function selectPatient(appointmentId) {
             document.getElementById('dadosPlano').textContent = currentSelectedPatientData.plano || 'N/A';
             document.getElementById('dadosEndereco').textContent = currentSelectedPatientData.endereco || 'N/A';
             document.getElementById('currentPatientPlan').textContent = currentSelectedPatientData.plano || 'N/A';
+            
+            // --- CÁLCULO E EXIBIÇÃO DA IDADE ---
+            const age = calculateAge(currentSelectedPatientData.data_nascimento);
+            document.getElementById('currentPatientAge').textContent = age;
+        } else {
+            document.getElementById('currentPatientAge').textContent = '-';
         }
 
         // Preenche os campos de impressão e atualiza as pré-visualizações
@@ -257,6 +299,87 @@ async function selectPatient(appointmentId) {
     } catch (error) {
         showToast('Erro ao selecionar o paciente: ' + error.message);
         console.error(error);
+    }
+}
+
+// --- FUNÇÃO PARA PAUSAR/RETOMAR ---
+async function togglePause() {
+    if (!currentAppointmentData) return;
+    
+    pauseBtn.disabled = true;
+    const isPausing = currentAppointmentData.status === 'em_atendimento';
+    
+    try {
+        const now = new Date().toISOString();
+        let pauseHistory = currentAppointmentData.pause_history || [];
+        
+        // Garante que é um array (caso venha null do banco)
+        if (!Array.isArray(pauseHistory)) pauseHistory = [];
+
+        let newStatus;
+        
+        if (isPausing) {
+            // INICIAR PAUSA
+            newStatus = 'pausado';
+            // Adiciona novo registro de pausa aberta
+            pauseHistory.push({ start: now, end: null });
+            
+            pauseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pausando...';
+        } else {
+            // RETOMAR ATENDIMENTO
+            newStatus = 'em_atendimento';
+            // Fecha a última pausa aberta
+            const lastPauseIndex = pauseHistory.findLastIndex(p => p.end === null);
+            if (lastPauseIndex !== -1) {
+                pauseHistory[lastPauseIndex].end = now;
+            } else {
+                console.warn('Tentativa de retomar sem pausa aberta encontrada. Criando registro de consistência.');
+            }
+            
+            pauseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Retomando...';
+        }
+
+        // Atualiza no Supabase
+        const { data, error } = await _supabase
+            .from('appointments')
+            .update({ 
+                status: newStatus,
+                pause_history: pauseHistory 
+            })
+            .eq('id', currentAppointmentData.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Atualiza estado local
+        currentAppointmentData = data;
+        
+        // Atualiza UI
+        if (newStatus === 'pausado') {
+            pauseBtn.innerHTML = '<i class="fas fa-play"></i> Retomar Atendimento';
+            pauseBtn.className = 'btn btn-primary';
+            showToast('Atendimento pausado.');
+        } else {
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar Atendimento';
+            pauseBtn.className = 'btn btn-warning';
+            showToast('Atendimento retomado.');
+        }
+        
+        // Atualiza a fila lateral para refletir a mudança de status/cor
+        loadPatientsData();
+
+    } catch (error) {
+        console.error('Erro ao alternar pausa:', error);
+        showToast('Erro ao processar pausa: ' + error.message, 'error');
+        // Restaura botão em caso de erro
+        if (currentAppointmentData.status === 'pausado') {
+            pauseBtn.innerHTML = '<i class="fas fa-play"></i> Retomar Atendimento';
+        } else {
+            pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar Atendimento';
+        }
+    } finally {
+        pauseBtn.disabled = false;
     }
 }
 
@@ -608,36 +731,48 @@ async function finalizeConsultation() {
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
     if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
     
-    const consultationData = {
-        appointment_id: appointmentId,
-        professional_id: professional.id,
-        queixa_principal: document.getElementById('queixaPrincipal').value,
-        exame_fisico: document.getElementById('exameFisico').value,
-        conduta: document.getElementById('conduta').value,
-        receituario: document.getElementById('receituario').value,
-        atestado: document.getElementById('atestadoTexto').value,
-        cuidados_pos_cirurgia: document.getElementById('cuidadosPosCirurgiaTexto').value,
-        orcamento: document.getElementById('orcamentoTexto').value,
-        pedido_exames: JSON.stringify(selectedExams),
-        pedido_exames_imagem: JSON.stringify(selectedImageExams),
-        anexos: currentUploadedFiles
-    };
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
     try {
+        // Se houver uma pausa aberta, fecha ela agora para contar o tempo corretamente
+        const now = new Date().toISOString();
+        if (currentAppointmentData && currentAppointmentData.status === 'pausado') {
+            const pauseHistory = currentAppointmentData.pause_history || [];
+            const lastPauseIndex = pauseHistory.findLastIndex(p => p.end === null);
+            if (lastPauseIndex !== -1) {
+                pauseHistory[lastPauseIndex].end = now;
+                // Atualiza o histórico de pausas antes de finalizar
+                await _supabase.from('appointments').update({ pause_history: pauseHistory }).eq('id', appointmentId);
+            }
+        }
+
+        const consultationData = {
+            appointment_id: appointmentId,
+            professional_id: professional.id,
+            queixa_principal: document.getElementById('queixaPrincipal').value,
+            exame_fisico: document.getElementById('exameFisico').value,
+            conduta: document.getElementById('conduta').value,
+            receituario: document.getElementById('receituario').value,
+            atestado: document.getElementById('atestadoTexto').value,
+            cuidados_pos_cirurgia: document.getElementById('cuidadosPosCirurgiaTexto').value,
+            orcamento: document.getElementById('orcamentoTexto').value,
+            pedido_exames: JSON.stringify(selectedExams),
+            pedido_exames_imagem: JSON.stringify(selectedImageExams),
+            anexos: currentUploadedFiles
+        };
+
         // Salva os dados da consulta
         await _supabase.from('consultations').upsert(consultationData, { onConflict: 'appointment_id' });
         
-        // CORREÇÃO 3: Registra o término da consulta
-        const endTime = new Date().toISOString();
+        // Registra o término da consulta
         await _supabase.from('appointments').update({ 
             status: 'finalizado',
-            consultation_end_time: endTime 
+            consultation_end_time: now 
         }).eq('id', appointmentId);
 
         await logAction('FINISH_CONSULTATION', {
             appointmentId: appointmentId,
-            endTime: endTime
+            endTime: now
         });
 
         showToast('Consulta finalizada e salva com sucesso!');
@@ -855,6 +990,7 @@ function setupPacientesEventListeners() {
     });
     
     document.getElementById('finalizeConsultationBtn')?.addEventListener('click', finalizeConsultation);
+    document.getElementById('pauseConsultationBtn')?.addEventListener('click', togglePause); // Listener do botão de pausa
     document.getElementById('saveProtocolBtn')?.addEventListener('click', saveProtocol);
     document.getElementById('saveProtocolBtnImg')?.addEventListener('click', saveImageProtocol);
     if(document.getElementById('fileUploadInput')) {

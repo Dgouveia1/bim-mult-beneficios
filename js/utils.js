@@ -2,6 +2,32 @@
 // FUNÇÕES UTILITÁRIAS (MÁSCARAS, VALIDAÇÕES, API)
 // =================================================================================
 
+
+export function calculateAge(birthDateString) {
+    if (!birthDateString) return 'N/A';
+    
+    // Suporta formato YYYY-MM-DD (Supabase) ou DD/MM/YYYY (Input)
+    let birthDate;
+    if (birthDateString.includes('/')) {
+        const parts = birthDateString.split('/');
+        birthDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+    } else {
+        birthDate = new Date(birthDateString);
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    
+    // Ajusta se ainda não fez aniversário este ano
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    if (isNaN(age)) return 'N/A';
+    return `${age} anos`;
+}
+
 // --- MÁSCARAS DE INPUT ---
 
 export function maskCPF(value) {
