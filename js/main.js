@@ -8,7 +8,7 @@ import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubsc
 import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients, triggerPrintFromElement } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
-import { loadProfessionalsData, openProfessionalModal, saveProfessional, openMyAvailabilityModal, saveProfessionalEvent, loadMyEvents, deleteProfessionalEvent } from './profissionais.js';
+import { loadProfessionalsData, openProfessionalModal, saveProfessional, openAvailabilityModal, saveProfessionalEvent, loadMyEvents, deleteProfessionalEvent } from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
 import { setupProntuarioPage } from './prontuario.js'; 
 import { setupCarteirinhaPage } from './carteirinha.js';
@@ -163,12 +163,22 @@ function setupEventListeners() {
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
     
+    // CORREÇÃO: Nova lógica para o botão "Gerenciar Disponibilidade" da Home
     document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
         const user = getCurrentUserProfile();
-        if (user && user.role === 'medicos') {
-            openMyAvailabilityModal();
+        
+        if (!user) return;
+
+        // Se for médico, abre a "Minha Disponibilidade" (sem ID)
+        if (user.role === 'medicos') {
+            openAvailabilityModal();
+        } 
+        // Se for Admin/Recepção, avisa e redireciona para a lista de profissionais
+        else if (['admin', 'superadmin', 'recepcao'].includes(user.role)) {
+            showToast('Para gerenciar a agenda, selecione um profissional na lista.', 'info');
+            navigateToPage('profissionais');
         } else {
-            showToast('Esta função é restrita a profissionais (médicos).', 'error');
+            showToast('Acesso negado.', 'error');
         }
     });
 
@@ -301,6 +311,12 @@ function setupEventListeners() {
 
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
+
+        // Listener para o botão de gerenciar disponibilidade na tabela de profissionais
+        const manageEventsButton = target.closest('.manage-events-btn');
+        if (manageEventsButton) {
+            openAvailabilityModal(manageEventsButton.dataset.id);
+        }
         
         const removeDependenteButton = target.closest('.remove-dependente-btn');
         if (removeDependenteButton) {

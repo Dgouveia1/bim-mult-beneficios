@@ -6,6 +6,34 @@ const patientInfoContainer = document.getElementById('prontuarioPatientInfo');
 
 let currentViewOnlyProfessionalId = null; // Guarda o ID do profissional (da tabela 'professionals') que está logado
 
+// Função auxiliar para processar listas de exames com segurança
+// Evita o erro de tentar fazer JSON.parse em algo que já é objeto (comum em campos JSONB do Supabase)
+function safeFormatExams(data) {
+    if (!data) return 'N/A';
+    
+    let list = [];
+    
+    // Se já for um objeto/array (comportamento padrão do Supabase para colunas JSONB)
+    if (typeof data === 'object') {
+        list = data;
+    } 
+    // Se for uma string (comportamento para colunas TEXT ou legado)
+    else if (typeof data === 'string') {
+        if (data === '[]') return 'N/A';
+        try {
+            list = JSON.parse(data);
+        } catch (e) {
+            console.warn('Erro ao processar JSON de exames:', e);
+            return 'Erro nos dados';
+        }
+    }
+
+    if (!Array.isArray(list) || list.length === 0) return 'N/A';
+    
+    // Mapeia e junta os nomes
+    return list.map(e => e.name).join(', ');
+}
+
 // Nova função para buscar o ID do profissional logado
 async function fetchCurrentProfessionalId() {
     try {
@@ -79,82 +107,99 @@ async function loadHistoryForPatient(patientData) {
             return;
         }
 
+        console.log(`[PRONTUÁRIO] Renderizando ${history.length} registros de histórico.`);
+
         // Renderiza o histórico
         history.forEach(consultation => {
-            const correspondingAppointment = patientAppointments.find(appt => appt.id === consultation.appointment_id);
-            const professionalName = correspondingAppointment?.professionals?.name || 'N/A';
-            const consultationDate = correspondingAppointment?.appointment_date ? new Date(correspondingAppointment.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR') : 'N/A';
+            try {
+                const correspondingAppointment = patientAppointments.find(appt => appt.id === consultation.appointment_id);
+                // Fallback seguro caso o agendamento correspondente não seja encontrado na lista local
+                const professionalName = correspondingAppointment?.professionals?.name || 'N/A';
+                const consultationDate = correspondingAppointment?.appointment_date ? new Date(correspondingAppointment.appointment_date + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data desc. (ID: ' + consultation.appointment_id + ')';
 
-            let attachmentsHtml = '';
-            if (consultation.anexos && consultation.anexos.length > 0) {
-                attachmentsHtml += '<p><strong>Anexos:</strong></p><ul style="list-style: none; padding-left: 5px;">';
-                consultation.anexos.forEach(file => {
-                    const { data } = _supabase.storage.from('resultados-exames').getPublicUrl(file.path);
-                    attachmentsHtml += `<li><a href="${data.publicUrl}" target="_blank" style="font-size: 13px;"><i class="fas fa-file-alt"></i> ${file.name}</a></li>`;
-                });
-                attachmentsHtml += '</ul>';
-            }
+                let attachmentsHtml = '';
+                if (consultation.anexos && Array.isArray(consultation.anexos) && consultation.anexos.length > 0) {
+                    attachmentsHtml += '<p><strong>Anexos:</strong></p><ul style="list-style: none; padding-left: 5px;">';
+                    consultation.anexos.forEach(file => {
+                        const { data } = _supabase.storage.from('resultados-exames').getPublicUrl(file.path);
+                        attachmentsHtml += `<li><a href="${data.publicUrl}" target="_blank" style="font-size: 13px;"><i class="fas fa-file-alt"></i> ${file.name}</a></li>`;
+                    });
+                    attachmentsHtml += '</ul>';
+                }
 
-            // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
-            const creatorProfId = consultation.professional_id;
-            const viewerProfId = currentViewOnlyProfessionalId; // ID do profissional logado
-            const isOwner = (creatorProfId === viewerProfId);
-            
-            const item = document.createElement('div');
-            item.className = 'historico-item card';
+                // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
+                const creatorProfId = consultation.professional_id;
+                const viewerProfId = currentViewOnlyProfessionalId; // ID do profissional logado
+                const isOwner = (creatorProfId === viewerProfId);
+                
+                const item = document.createElement('div');
+                item.className = 'historico-item card';
 
-            let sensitiveDetailsHtml = '';
+                let sensitiveDetailsHtml = '';
 
-            if (isOwner) {
-                // 1. O usuário é o dono, mostra tudo
-                sensitiveDetailsHtml = `
-                    <p><strong>Queixa Principal:</strong> ${consultation.queixa_principal || 'N/A'}</p>
-                    <p><strong>Conduta:</strong> ${consultation.conduta || 'N/A'}</p>
-                    <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
-                    <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
-                        <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
-                        <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
-                        <p><strong>Pedidos de Exames Lab:</strong> ${consultation.pedido_exames && consultation.pedido_exames !== '[]' ? JSON.parse(consultation.pedido_exames).map(e => e.name).join(', ') : 'N/A'}</p>
-                        <p><strong>Pedidos de Exames Imagem:</strong> ${consultation.pedido_exames_imagem && consultation.pedido_exames_imagem !== '[]' ? JSON.parse(consultation.pedido_exames_imagem).map(e => e.name).join(', ') : 'N/A'}</p>
-                        ${attachmentsHtml}
-                    </div>
+                if (isOwner) {
+                    // CORREÇÃO AQUI: Uso da função safeFormatExams para evitar crash no JSON.parse
+                    const examesLabTexto = safeFormatExams(consultation.pedido_exames);
+                    const examesImgTexto = safeFormatExams(consultation.pedido_exames_imagem);
+
+                    // 1. O usuário é o dono, mostra tudo
+                    sensitiveDetailsHtml = `
+                        <p><strong>Queixa Principal:</strong> ${consultation.queixa_principal || 'N/A'}</p>
+                        <p><strong>Conduta:</strong> ${consultation.conduta || 'N/A'}</p>
+                        <p class="details-link" style="color: var(--primary-color); cursor: pointer;">Ver Detalhes</p>
+                        <div class="full-details" style="display: none; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px;">
+                            <p><strong>Exame Físico:</strong> ${consultation.exame_fisico || 'N/A'}</p>
+                            <p><strong>Receituário:</strong> ${consultation.receituario || 'N/A'}</p>
+                            <p><strong>Pedidos de Exames Lab:</strong> ${examesLabTexto}</p>
+                            <p><strong>Pedidos de Exames Imagem:</strong> ${examesImgTexto}</p>
+                            ${attachmentsHtml}
+                        </div>
+                    `;
+                } else {
+                    // 2. O usuário NÃO é o dono, mostra mensagem de restrição
+                    sensitiveDetailsHtml = `
+                        <p><strong>Queixa Principal:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
+                        <p><strong>Conduta:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
+                        <p style="color: var(--cancelled-color); font-style: italic; background-color: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                            <i class="fas fa-lock"></i> O acesso aos detalhes completos (exame físico, receitas, etc.) é restrito ao profissional que realizou a consulta.
+                        </p>
+                    `;
+                }
+
+                // Renderiza o item com a informação (completa ou restrita)
+                item.innerHTML = `
+                    <p><strong>Data:</strong> ${consultationDate}</p>
+                    <p><strong>Profissional:</strong> ${professionalName}</p>
+                    ${sensitiveDetailsHtml}
                 `;
-            } else {
-                // 2. O usuário NÃO é o dono, mostra mensagem de restrição
-                sensitiveDetailsHtml = `
-                    <p><strong>Queixa Principal:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
-                    <p><strong>Conduta:</strong> <span style="color: var(--gray-medium); font-style: italic;">[Informação Protegida]</span></p>
-                    <p style="color: var(--cancelled-color); font-style: italic; background-color: #ffebee; padding: 10px; border-radius: 5px; margin-top: 10px;">
-                        <i class="fas fa-lock"></i> O acesso aos detalhes completos (exame físico, receitas, etc.) é restrito ao profissional que realizou a consulta.
-                    </p>
-                `;
-            }
+                
+                // Adiciona o listener de clique SOMENTE se o link "Ver Detalhes" existir
+                const detailsLink = item.querySelector('.details-link');
+                if (detailsLink) {
+                    detailsLink.addEventListener('click', (e) => {
+                        const fullDetails = e.target.nextElementSibling;
+                        if (fullDetails) {
+                            fullDetails.style.display = fullDetails.style.display === 'none' ? 'block' : 'none';
+                            e.target.textContent = fullDetails.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
+                        }
+                    });
+                }
+                
+                historyContainer.appendChild(item);
 
-            // Renderiza o item com a informação (completa ou restrita)
-            item.innerHTML = `
-                <p><strong>Data:</strong> ${consultationDate}</p>
-                <p><strong>Profissional:</strong> ${professionalName}</p>
-                ${sensitiveDetailsHtml}
-            `;
-            
-            // Adiciona o listener de clique SOMENTE se o link "Ver Detalhes" existir
-            const detailsLink = item.querySelector('.details-link');
-            if (detailsLink) {
-                detailsLink.addEventListener('click', (e) => {
-                    const fullDetails = e.target.nextElementSibling;
-                    if (fullDetails) {
-                        fullDetails.style.display = fullDetails.style.display === 'none' ? 'block' : 'none';
-                        e.target.textContent = fullDetails.style.display === 'none' ? 'Ver Detalhes' : 'Esconder Detalhes';
-                    }
-                });
+            } catch (innerError) {
+                console.error(`[PRONTUÁRIO] Erro ao renderizar item do histórico (ID Consult: ${consultation.id}):`, innerError);
+                // Opcional: Adicionar um placeholder de erro visual
+                const errorItem = document.createElement('div');
+                errorItem.className = 'historico-item card';
+                errorItem.style.borderLeftColor = 'red';
+                errorItem.innerHTML = `<p style="color:red">Erro ao exibir este registro. Verifique o console.</p>`;
+                historyContainer.appendChild(errorItem);
             }
-            // --- FIM DA LÓGICA DE SEGURANÇA ---
-
-            historyContainer.appendChild(item);
         });
 
     } catch (error) {
-        console.error('[PRONTUÁRIO] Erro ao carregar histórico:', error);
+        console.error('[PRONTUÁRIO] Erro geral ao carregar histórico:', error);
         historyContainer.innerHTML = `<p style="color:red;">Erro ao carregar o histórico: ${error.message}</p>`;
     }
 }

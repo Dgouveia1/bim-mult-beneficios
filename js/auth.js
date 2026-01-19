@@ -45,7 +45,11 @@ function setupPermissions(role) {
     const rolePermissions = {
         superadmin: ['admin-only', 'medicos-only'], 
         admin: ['admin-only', 'medicos-only'], 
-        recepcao: [], 
+        // CORREÇÃO: Recepção agora vê elementos 'admin-only' limitados (necessário para ver o menu 'Marketing & Admin' onde 'Profissionais' está)
+        // Isso é necessário porque o menu pai está envolto em <div class="admin-only"> no HTML.
+        // Se quisermos ser mais restritos, deveríamos mudar o HTML, mas via JS, permitimos que vejam o container pai
+        // e filtramos os filhos abaixo.
+        recepcao: ['admin-only'], 
         medicos: ['medicos-only'], 
         financeiro: ['admin-only'] 
     };
@@ -103,25 +107,35 @@ function setupPermissions(role) {
     }
 
     // b) Menu Admin: Cronograma (Só Admin/Superadmin veem)
-    if (role === 'recepcao') {
-        const adminSubmenu = document.getElementById('submenu-admin');
-        if (adminSubmenu) {
-            // A recepção pode ver o menu "Marketing & Admin" (definido acima), mas NÃO o conteúdo dele
-            // exceto se tivéssemos movido o WhatsApp pra lá. Como o WhatsApp foi para "Cartão",
-            // podemos esconder TUDO do submenu-admin para a recepção se ela não precisar de nada lá.
-            // Mas, seguindo a lógica estrita: Cronograma é Admin Only.
-            
-            // Esconde itens específicos do submenu Admin para recepção
-            const cronogramaLink = adminSubmenu.querySelector('[data-page="cronograma"]');
+    const adminSubmenu = document.getElementById('submenu-admin');
+    if (adminSubmenu) {
+        // Seleciona itens específicos para esconder/mostrar
+        const cronogramaLink = adminSubmenu.querySelector('[data-page="cronograma"]');
+        const logsLink = adminSubmenu.querySelector('[data-page="logs"]');
+        const dashboardLink = adminSubmenu.querySelector('[data-page="dashboard"]');
+        const usersLink = adminSubmenu.querySelector('[data-page="usuarios"]');
+        const financeiroLink = adminSubmenu.querySelector('[data-page="financeiro"]');
+        const labLink = adminSubmenu.querySelector('[data-page="laboratorio"]');
+        const profLink = adminSubmenu.querySelector('[data-page="profissionais"]');
+
+        if (role === 'recepcao') {
+            // Recepção vê APENAS Profissionais (para agenda) e talvez Laboratório?
+            // Vamos esconder as funções sensíveis de admin
             if(cronogramaLink) cronogramaLink.style.display = 'none';
+            if(logsLink) logsLink.style.display = 'none';
+            if(dashboardLink) dashboardLink.style.display = 'none';
+            if(usersLink) usersLink.style.display = 'none';
+            if(financeiroLink) financeiroLink.style.display = 'none';
             
-            // (Opcional) Se não houver nada visível no submenu, esconder o menu pai também?
-            // Por enquanto, deixamos o pai visível caso haja itens futuros compartilhados.
+            // Garante que Profissionais esteja visível para Recepção
+            if(profLink) profLink.style.display = 'block';
+            
+        } else if (role === 'admin' || role === 'superadmin') {
+            // Admins veem tudo
+            if(cronogramaLink) cronogramaLink.style.display = 'block';
+            if(logsLink) logsLink.style.display = 'block';
+            if(profLink) profLink.style.display = 'block';
         }
-    } else if (role === 'admin' || role === 'superadmin') {
-        // Garante visibilidade para admins
-        const cronogramaLink = document.querySelector('[data-page="cronograma"]');
-        if(cronogramaLink) cronogramaLink.style.display = 'block';
     }
 }
 

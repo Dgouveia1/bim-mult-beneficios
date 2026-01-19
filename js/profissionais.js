@@ -1,7 +1,6 @@
 import { _supabase } from './supabase.js';
 import { logAction } from './logger.js';
 import { getCurrentUserProfile } from './auth.js';
-// ATUALIZADO: Importa showConfirm
 import { showToast, showConfirm } from './utils.js';
 
 const professionalModal = document.getElementById('professionalModal');
@@ -42,8 +41,11 @@ async function loadProfessionalsData() {
                 <td>${prof.specialty || ''}</td>
                 <td>${prof.CRM || ''}</td>
                 <td class="actions">
-                    <button class="btn btn-secondary btn-small edit-professional-btn" data-id="${prof.id}">
-                        <i class="fas fa-edit"></i> Editar
+                    <button class="btn btn-warning btn-small manage-events-btn" data-id="${prof.id}" title="Gerenciar Bloqueios e Agenda">
+                        <i class="fas fa-calendar-times"></i> Bloqueios
+                    </button>
+                    <button class="btn btn-secondary btn-small edit-professional-btn" data-id="${prof.id}" title="Editar Dados">
+                        <i class="fas fa-edit"></i>
                     </button>
                 </td>
             `;
@@ -108,48 +110,72 @@ async function saveProfessional(event) {
 
 
 // =================================================================
-// NOVAS FUNÇÕES: GERENCIAR DISPONIBILIDADE (PROFISSIONAL LOGADO)
+// NOVAS FUNÇÕES: GERENCIAR DISPONIBILIDADE (GLOBAL)
 // =================================================================
 
 /**
- * Abre o modal para o profissional logado gerenciar seus bloqueios.
+ * Abre o modal para gerenciar bloqueios.
+ * Pode ser chamado passando um ID específico (Admin/Recepção na lista)
+ * ou sem ID (Médico logado clicando na Home).
  */
-async function openMyAvailabilityModal() {
+async function openAvailabilityModal(targetProfessionalId = null) {
     const user = getCurrentUserProfile();
-    if (user.role !== 'medicos') {
-        showToast('Acesso negado. Esta função é apenas para profissionais de saúde.');
-        return;
-    }
+    let profIdToLoad = targetProfessionalId;
+    let profName = 'Profissional';
 
     try {
-        // 1. Encontra o ID do profissional com base no user_id logado
-        const { data: professional, error } = await _supabase
-            .from('professionals')
-            .select('id')
-            .eq('user_id', user.id)
-            .single();
+        // Se nenhum ID foi passado, tenta descobrir o ID do profissional logado
+        if (!profIdToLoad) {
+            if (user.role === 'medicos') {
+                const { data: professional, error } = await _supabase
+                    .from('professionals')
+                    .select('id, name')
+                    .eq('user_id', user.id)
+                    .single();
 
-        if (error || !professional) {
-            throw new Error('Perfil profissional não encontrado. Contate o administrador.');
+                if (error || !professional) {
+                    throw new Error('Perfil profissional não encontrado para este usuário.');
+                }
+                profIdToLoad = professional.id;
+                profName = professional.name;
+            } else {
+                showToast('Por favor, selecione um profissional na lista para gerenciar a agenda.', 'info');
+                return;
+            }
+        } else {
+            // Se passou ID, busca o nome apenas para exibir no modal
+            const { data: professional } = await _supabase
+                .from('professionals')
+                .select('name')
+                .eq('id', profIdToLoad)
+                .single();
+            if (professional) profName = professional.name;
         }
 
         // 2. Reseta o formulário e define a data padrão
         eventForm.reset();
-        eventProfessionalIdInput.value = professional.id;
+        eventProfessionalIdInput.value = profIdToLoad;
         const today = new Date().toISOString().split('T')[0];
         eventDateInput.value = today;
 
+        // Atualiza o título do modal para saber de quem é a agenda
+        const modalTitle = eventModal.querySelector('h2');
+        if (modalTitle) modalTitle.innerHTML = `Gerenciar Disponibilidade <br><small style="font-size:0.6em; color:#666;">${profName}</small>`;
+
         // 3. Carrega os eventos para o dia de hoje
-        await loadMyEvents(professional.id, today);
+        await loadMyEvents(profIdToLoad, today);
 
         // 4. Abre o modal
         eventModal.style.display = 'flex';
 
     } catch (error) {
-        showToast('Erro ao abrir gerenciador: ' + error.message);
+        showToast('Erro ao abrir gerenciador: ' + error.message, 'error');
         console.error(error);
     }
 }
+
+// Mantendo alias para compatibilidade com chamadas antigas se houver
+const openMyAvailabilityModal = () => openAvailabilityModal();
 
 /**
  * Carrega e exibe os eventos de bloqueio para um profissional e data específicos.
@@ -219,7 +245,7 @@ async function saveProfessionalEvent(event) {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
     try {
-        // Verifica conflito com outros eventos do PRÓPRIO profissional
+        // Verifica conflito com outros eventos deste profissional
         const { data: conflictingEvents, error: checkError } = await _supabase
             .from('professional_events')
             .select('id')
@@ -231,7 +257,7 @@ async function saveProfessionalEvent(event) {
         if (checkError) throw checkError;
 
         if (conflictingEvents.length > 0) {
-            throw new Error('Você já possui um bloqueio que conflita com este horário.');
+            throw new Error('Já existe um bloqueio que conflita com este horário para este profissional.');
         }
 
         // Insere o novo evento
@@ -249,9 +275,10 @@ async function saveProfessionalEvent(event) {
         document.getElementById('eventEndTime').value = '';
         
         await loadMyEvents(formData.professional_id, formData.event_date);
+        showToast('Bloqueio salvo com sucesso.');
 
     } catch (error) {
-        showToast('Erro ao salvar bloqueio: ' + error.message);
+        showToast('Erro ao salvar bloqueio: ' + error.message, 'error');
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Bloqueio';
@@ -262,7 +289,6 @@ async function saveProfessionalEvent(event) {
  * Exclui um evento de bloqueio.
  */
 async function deleteProfessionalEvent(eventId) {
-    // ATUALIZADO: Substitui confirm() por showConfirm()
     const confirmed = await showConfirm('Tem certeza que deseja excluir este bloqueio?');
     if (!confirmed) return;
 
@@ -275,7 +301,7 @@ async function deleteProfessionalEvent(eventId) {
         if (error) throw error;
         
         await logAction('DELETE_PROFESSIONAL_EVENT', { eventId: eventId });
-        showToast('Bloqueio removido com sucesso.'); // Adiciona feedback
+        showToast('Bloqueio removido com sucesso.');
 
         // Recarrega a lista
         const professionalId = eventProfessionalIdInput.value;
@@ -283,7 +309,7 @@ async function deleteProfessionalEvent(eventId) {
         await loadMyEvents(professionalId, date);
 
     } catch (error) {
-        showToast('Erro ao excluir bloqueio: ' + error.message);
+        showToast('Erro ao excluir bloqueio: ' + error.message, 'error');
     }
 }
 
@@ -291,7 +317,8 @@ export {
     loadProfessionalsData, 
     openProfessionalModal, 
     saveProfessional,
-    openMyAvailabilityModal,
+    openAvailabilityModal, // Exportada com o novo nome
+    openMyAvailabilityModal, // Mantida para compatibilidade
     saveProfessionalEvent,
     loadMyEvents,
     deleteProfessionalEvent
