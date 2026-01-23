@@ -1,7 +1,7 @@
 import { _supabase } from './supabase.js';
 import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
-import { showToast } from './utils.js';
+import { showToast, showConfirm } from './utils.js';
 // NOVO: Importar para pegar o usuário logado
 import { getCurrentUserProfile } from './auth.js';
 
@@ -93,7 +93,6 @@ async function handleNewSaleSubmit(event) {
     }
 
     // === TRAVA DE CPF DUPLICADO (INÍCIO) ===
-    // Verifica se já existe um CPF cadastrado antes de prosseguir
     if (titularFormProps.cpf) {
         const originalBtnText = submitButton.innerHTML;
         submitButton.disabled = true;
@@ -112,7 +111,7 @@ async function handleNewSaleSubmit(event) {
                 showToast('ERRO: Este CPF já está cadastrado para outro titular! Venda bloqueada.');
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalBtnText;
-                return; // Interrompe a função aqui
+                return;
             }
         } catch (error) {
             console.error('Erro na verificação de CPF duplicado:', error);
@@ -122,13 +121,11 @@ async function handleNewSaleSubmit(event) {
             return;
         }
         
-        // Restaura o botão se passou na verificação (ele será desabilitado novamente abaixo para o salvamento)
         submitButton.disabled = false;
         submitButton.innerHTML = originalBtnText;
     }
     // === TRAVA DE CPF DUPLICADO (FIM) ===
 
-    // CORREÇÃO: Capturar o usuário logado para definir o vendedor
     const currentUser = getCurrentUserProfile();
     const vendedorName = currentUser ? currentUser.full_name : 'Sistema';
 
@@ -145,7 +142,7 @@ async function handleNewSaleSubmit(event) {
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
         observacao: titularFormProps.observacao,
-        vendedor: vendedorName // Campo adicionado
+        vendedor: vendedorName 
     };
 
     const dependentesData = [];
@@ -167,9 +164,10 @@ async function handleNewSaleSubmit(event) {
     }
 
     submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando no Sistema...';
 
     try {
+        // 1. Salvar Cliente no Supabase
         const { data: newTitular, error: titularError } = await _supabase
             .from('clients')
             .insert({
@@ -197,15 +195,74 @@ async function handleNewSaleSubmit(event) {
             if (dependentesError) throw dependentesError;
         }
 
-        showToast('Venda registrada com sucesso! Gerando contrato...');
-        // Passa o objeto 'titular' completo e os dependentes
+        // =========================================================================
+        // INTEGRAÇÃO ASAAS + WHATSAPP (ATUALIZADO)
+        // =========================================================================
+        if (titularData.plano === 'Bim Familiar') { 
+            submitButton.innerHTML = '<i class="fas fa-sync fa-spin"></i> Gerando Cobrança Asaas...';
+            
+            try {
+                // Chama a Edge Function
+                const { data: asaasResponse, error: funcError } = await _supabase.functions.invoke('create-asaas-subscription', {
+                    body: {
+                        record: newTitular,
+                        titularData: titularData
+                    }
+                });
+
+                if (funcError) {
+                    // Detalhe importante: Se a função retorna 400, funcError captura isso
+                    console.error("Erro Supabase Function:", funcError);
+                    let msg = funcError.message;
+                    // Tenta extrair mensagem JSON se disponível
+                    try {
+                        const errBody = JSON.parse(funcError.message);
+                        if(errBody.error) msg = errBody.error;
+                    } catch(e) {}
+                    throw new Error(msg);
+                }
+
+                if (!asaasResponse || !asaasResponse.success) {
+                    throw new Error('Erro Asaas: ' + (asaasResponse?.error || 'Resposta desconhecida'));
+                }
+
+                // --- LÓGICA DE WHATSAPP ---
+                if (asaasResponse.payment_link) {
+                    const firstName = titularData.nome.split(' ')[0];
+                    const whatsappMessage = `Olá ${firstName}, seja bem-vindo(a) à Bim Benefícios! 🧡\n\nAqui está o link seguro para ativar sua assinatura e escolher a forma de pagamento (Pix, Boleto ou Cartão):\n${asaasResponse.payment_link}`;
+                    
+                    // Garante formato 55 + DDD + Numero
+                    const rawPhone = titularData.telefone.replace(/\D/g, '');
+                    const phoneForLink = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
+                    
+                    const whatsappUrl = `https://wa.me/${phoneForLink}?text=${encodeURIComponent(whatsappMessage)}`;
+
+                    const sendWpp = await showConfirm(`Venda salva e Assinatura criada no Asaas!\n\nDeseja enviar o link de pagamento para o cliente via WhatsApp agora?`);
+                    
+                    if (sendWpp) {
+                        window.open(whatsappUrl, '_blank');
+                    }
+                } else {
+                    showToast('Venda salva, mas o link de pagamento não foi retornado pelo Asaas.', 'warning');
+                }
+
+            } catch (asaasErr) {
+                console.error('Erro na integração Asaas:', asaasErr);
+                // Feedback mais claro para o usuário sobre o erro
+                alert(`ATENÇÃO: Cliente salvo no sistema, mas houve erro ao integrar com o Asaas:\n${asaasErr.message}\n\nVerifique se a Chave de API está configurada nos Secrets do Supabase.`);
+            }
+        }
+        // =========================================================================
+
+        showToast('Gerando contrato PDF...');
         await generateContractPDF(newTitular, dependentesData);
+        
         form.reset();
         document.getElementById('vendasDependentesContainer').innerHTML = '';
         dependenteVendaCount = 0;
 
     } catch (error) {
-        showToast('Erro ao salvar venda: ' + error.message);
+        showToast('Erro crítico ao salvar venda: ' + error.message, 'error');
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
@@ -213,8 +270,7 @@ async function handleNewSaleSubmit(event) {
 }
 
 /**
- * CORREÇÃO: Função de geração de PDF atualizada para melhor formatação
- * e inclusão de assinaturas.
+ * Função de geração de PDF do Contrato
  */
 async function generateContractPDF(titular, dependentes) {
     const { jsPDF } = window.jspdf;
@@ -222,9 +278,8 @@ async function generateContractPDF(titular, dependentes) {
     const margin = 20;
     const pageWidth = pdf.internal.pageSize.getWidth();
     const usableWidth = pageWidth - (margin * 2);
-    let y = margin; // Posição vertical inicial
+    let y = margin; 
 
-    // --- Helper para texto justificado ---
     const addWrappedText = (text, x, startY, maxWidth, lineHeight, isJustified = false) => {
         const lines = pdf.splitTextToSize(text, maxWidth);
         if (isJustified) {
@@ -236,19 +291,15 @@ async function generateContractPDF(titular, dependentes) {
     };
 
     try {
-        // --- 1. ADICIONAR LOGO ---
-        // Usando a logo dos arquivos. Ajuste o caminho se necessário.
         const logoBase64 = await imageToBase64('Logo_para_Marca_d_Água_MULTSAÚDE_Símbolo_(Laranja).png');
-        pdf.addImage(logoBase64, 'PNG', margin, y, 30, 30); // Logo de 30x30mm
-        y += 40; // Espaço após a logo
+        pdf.addImage(logoBase64, 'PNG', margin, y, 30, 30); 
+        y += 40; 
 
-        // --- 2. TÍTULO ---
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
         pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS "BIM MULT BENEFICIOS"', pageWidth / 2, y, { align: 'center' });
         y += 15;
 
-        // --- 3. DADOS DAS PARTES ---
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'bold');
         pdf.text('CONTRATADA:', margin, y);
@@ -274,7 +325,6 @@ async function generateContractPDF(titular, dependentes) {
         );
         y += 10;
 
-        // --- 4. CLÁUSULAS ---
         const clausulas = [
             { title: 'CLÁUSULA 1ª – DO OBJETO', text: 'O presente contrato tem por objeto a prestação dos serviços descritos e detalhados no Anexo 1 deste instrumento. O Anexo compõe o presente contrato e são parte integrante deste, independentemente de transcrição, declarando-se o (a) CONTRATANTE ciente de seu inteiro teor.' },
             { title: 'CLÁUSULA 2ª – DA CARÊNCIA PARA UTILIZAÇÃO DOS BENEFÍCIOS:', text: 'O acesso aos benefícios e/ou às coberturas garantidas neste contrato somente terão efeito após o cumprimento dos prazos e condições descritos no Anexo 2. O (a) CONTRATANTE declara-se ciente de que há a possibilidade de necessidade de reiteração no cumprimento do prazo de carência em caso de inadimplemento, conforme prazos e condições dispostas no Anexo do presente contrato.' },
@@ -286,7 +336,7 @@ async function generateContractPDF(titular, dependentes) {
 
         pdf.setFontSize(10);
         clausulas.forEach(clausula => {
-            if (y > 250) { // Verifica se precisa de nova página
+            if (y > 250) { 
                 pdf.addPage();
                 y = margin;
             }
@@ -294,21 +344,19 @@ async function generateContractPDF(titular, dependentes) {
             y = addWrappedText(clausula.title, margin, y, usableWidth, 5);
             y += 2;
             pdf.setFont('helvetica', 'normal');
-            y = addWrappedText(clausula.text, margin, y, usableWidth, 5, true); // Justificado
+            y = addWrappedText(clausula.text, margin, y, usableWidth, 5, true); 
             y += 7;
         });
 
-        if (y > 220) { // Pula para nova página se tiver pouco espaço para assinaturas
+        if (y > 220) { 
             pdf.addPage();
             y = margin;
         }
 
-        // --- 5. DATA E LOCAL ---
         const today = new Date();
         pdf.text(`Fernandópolis - SP, ${today.toLocaleDateString('pt-BR')}`, pageWidth / 2, y + 10, { align: 'center' });
         y += 25;
 
-        // --- 6. ASSINATURAS ---
         pdf.text('________________________________________', margin, y);
         pdf.text('________________________________________', pageWidth / 2 + 10, y);
         y += 5;
@@ -327,8 +375,6 @@ async function generateContractPDF(titular, dependentes) {
         pdf.text('CNPJ: 37.054.912/0001-56', pageWidth / 2 + 10, y);
         y += 10;
 
-
-        // --- 7. PÁGINA DE ANEXOS ---
         pdf.addPage();
         y = margin;
         
@@ -349,7 +395,7 @@ async function generateContractPDF(titular, dependentes) {
             tableData.push([
                 `${d.nome} ${d.sobrenome}`,
                 d.cpf || 'N/A',
-                d.data_nascimento || 'N/A', // Vem como dd/mm/aaaa do form
+                d.data_nascimento || 'N/A', 
                 titular.plano,
                 'DEPENDENTE'
             ]);
@@ -360,7 +406,7 @@ async function generateContractPDF(titular, dependentes) {
             head: [['Nome', 'CPF', 'Data Nascimento', 'Plano', 'Parentesco']],
             body: tableData,
             theme: 'striped',
-            headStyles: { fillColor: [30, 77, 107] } // Azul escuro (var(--secondary-dark))
+            headStyles: { fillColor: [30, 77, 107] } 
         });
         
         y = pdf.autoTable.previous.finalY + 10;
@@ -382,7 +428,6 @@ async function generateContractPDF(titular, dependentes) {
         const anexo2Text = '1. A CONTRATADA terá direito a acesso a uma rede de profissionais de saúde, incluindo médicos de diversas especialidades e odontologia com descontos especiais sobre os honorários, cobrados.\n2. A CONTRATADA também terá acesso a exames laboratoriais e de imagem com descontos previamente estabelecidos, conforme tabela de preços que será disponibilizada pelo CONTRATANTE.\n3. Os descontos aplicáveis serão informados a CONTRATADA no momento da solicitação dos serviços e poderão variar de acordo com a especialidade e o tipo de exame.\n4. A CONTRATADA concorda em seguir os procedimentos necessários para agendamento e realização dos serviços, conforme as orientações do CONTRATANTE.\n5. O CONTRATANTE se reserva o direito de atualizar a lista de médicos e exames disponíveis, bem como os respectivos descontos, mediante aviso prévio a CONTRATADA.';
         y = addWrappedText(anexo2Text, margin, y, usableWidth, 5, true);
 
-        // --- 8. SALVAR O PDF ---
         pdf.save(`contrato-${titular.nome.toLowerCase().replace(/\s/g, '_')}.pdf`);
 
     } catch (error) {
@@ -395,7 +440,6 @@ function setupVendasPage() {
     const form = document.getElementById('newSaleForm');
     if (!form) return;
     
-    // Verifica se os listeners já foram anexados
     if (form.dataset.listenerAttached) return;
 
     form.addEventListener('submit', handleNewSaleSubmit);
