@@ -5,6 +5,7 @@ import { showToast } from './utils.js';
 const searchInput = document.getElementById('financialSearchInput');
 const resultsContainer = document.getElementById('financialSearchResults');
 const financialModal = document.getElementById('financialClientModal');
+const financialWorkspace = document.getElementById('financialWorkspace');
 
 // --- ESTADO ---
 let currentFinancialClient = null;
@@ -12,6 +13,9 @@ let currentFinancialData = [];
 
 // --- FUNÇÃO PRINCIPAL DE BUSCA ---
 async function setupFinanceiroPage() {
+    // Injeta os botões de alternância se não existirem
+    injectTabControls();
+
     if (!searchInput) return;
 
     let debounceTimer;
@@ -34,38 +38,153 @@ async function setupFinanceiroPage() {
     });
 }
 
-// Busca apenas titulares do plano Bim Familiar
+function injectTabControls() {
+    const card = document.querySelector('#financeiroPage .card');
+    if (!card || card.querySelector('.finance-tabs')) return;
+
+    // Cria os botões de aba
+    const tabsHtml = `
+        <div class="finance-tabs" style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <button class="btn btn-secondary active" id="tabIndividualSearch">Busca Individual</button>
+            <button class="btn btn-secondary" id="tabOverdueList" style="background-color: #fce4ec; color: #c62828; border: 1px solid #c62828;">
+                <i class="fas fa-exclamation-circle"></i> Monitorar Inadimplência
+            </button>
+        </div>
+        <div id="overdueListContainer" style="display: none;">
+            <h3 style="color: #c62828; margin-bottom: 15px;">Clientes em Atraso (Geral)</h3>
+            <div class="table-container">
+                <table class="financial-table">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
+                            <th>Valor Vencido</th>
+                            <th>Vencimento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overdueTableBody">
+                        <tr><td colspan="5">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    // Insere antes do título "Buscar Titular"
+    const title = card.querySelector('.card-title');
+    title.insertAdjacentHTML('beforebegin', tabsHtml);
+
+    // Configura listeners das abas
+    document.getElementById('tabIndividualSearch').addEventListener('click', (e) => switchTab('individual', e.target));
+    document.getElementById('tabOverdueList').addEventListener('click', (e) => switchTab('overdue', e.target));
+}
+
+function switchTab(tab, btn) {
+    // Atualiza estilo dos botões
+    document.querySelectorAll('.finance-tabs .btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const searchSection = document.querySelector('#financeiroPage .card-title'); // "Buscar Titular"
+    const searchInputDiv = document.querySelector('#financeiroPage .search-container');
+    const overdueContainer = document.getElementById('overdueListContainer');
+
+    if (tab === 'individual') {
+        searchSection.style.display = 'block';
+        searchInputDiv.style.display = 'flex';
+        overdueContainer.style.display = 'none';
+        resultsContainer.style.display = 'none';
+    } else {
+        searchSection.style.display = 'none';
+        searchInputDiv.style.display = 'none';
+        overdueContainer.style.display = 'block';
+        loadOverdueClients(); // Carrega a lista da view
+    }
+}
+
+// =================================================================
+// NOVA FUNÇÃO: CARREGAR LISTA DE INADIMPLENTES (VIEW)
+// =================================================================
+async function loadOverdueClients() {
+    const tbody = document.getElementById('overdueTableBody');
+    tbody.innerHTML = '<tr><td colspan="5">Carregando inadimplentes...</td></tr>';
+
+    try {
+        const { data, error } = await _supabase
+            .from('view_clients_overdue')
+            .select('*')
+            .order('data_vencimento', { ascending: true }); // Mais antigos primeiro
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:green;"><i class="fas fa-check-circle"></i> Nenhum cliente em atraso no momento!</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            
+            const valor = parseFloat(row.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            const vencimento = new Date(row.data_vencimento).toLocaleDateString('pt-BR');
+            const cleanPhone = row.telefone ? row.telefone.replace(/\D/g, '') : '';
+            
+            let whatsappBtn = '';
+            if (cleanPhone.length >= 10) {
+                const msg = `Olá ${row.nome}, notamos uma pendência no valor de ${valor} com vencimento em ${vencimento}. Segue o link para regularização: ${row.link_boleto || 'Entre em contato'}`;
+                whatsappBtn = `
+                    <a href="https://wa.me/55${cleanPhone}?text=${encodeURIComponent(msg)}" target="_blank" class="btn btn-small btn-success" title="Cobrar no WhatsApp">
+                        <i class="fab fa-whatsapp"></i> Cobrar
+                    </a>
+                `;
+            }
+
+            tr.innerHTML = `
+                <td>
+                    <strong>${row.nome} ${row.sobrenome || ''}</strong><br>
+                    <small>CPF: ${row.cpf}</small>
+                </td>
+                <td>${row.telefone || '-'}</td>
+                <td style="color: #c62828; font-weight: bold;">${valor}</td>
+                <td>${vencimento}</td>
+                <td>
+                    <div style="display:flex; gap: 5px;">
+                        <a href="${row.link_boleto}" target="_blank" class="btn btn-small btn-secondary"><i class="fas fa-barcode"></i> Boleto</a>
+                        ${whatsappBtn}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar view de inadimplência:", error);
+        tbody.innerHTML = `<tr><td colspan="5" style="color:red">Erro: ${error.message}. (Verifique se a View SQL foi criada)</td></tr>`;
+    }
+}
+
+// ... (Resto do código original: searchTitular, openFinancialModal, loadFinancialHistory, emitirCarne) ...
+
 async function searchTitular(term) {
     resultsContainer.innerHTML = '<div style="padding:10px;">Buscando...</div>';
     resultsContainer.style.display = 'block';
 
     try {
-        // Divide o termo para permitir busca por "Nome Sobrenome"
-        // Ex: "Davi Silva" vai buscar (nome tem Davi OU sobrenome tem Davi) E (nome tem Silva OU sobrenome tem Silva)
         const searchWords = term.toLowerCase().split(/\s+/).filter(w => w.length > 0);
         
         let query = _supabase
             .from('clients')
             .select('id, nome, sobrenome, cpf, plano, status');
 
-        // Regra 6: Apenas plano "Bim Familiar" (usando ilike para ignorar maiúsculas/minúsculas)
         query = query.ilike('plano', 'Bim Familiar'); 
 
-        // Constrói a lógica de filtro de nome/cpf
         if (searchWords.length > 0) {
-            // Se for CPF (apenas números), busca direto
             const isNumber = /^\d+$/.test(term.replace(/[.-]/g, ''));
             
             if (isNumber) {
                 query = query.ilike('cpf', `%${term}%`);
             } else {
-                // Monta o filtro AND para cada palavra digitada
-                // A sintaxe do Supabase para complex OR/AND é: .or('and(cond1,cond2),cond3')
-                // Aqui queremos: (NomeMatchPalavra1 OR SobrenomeMatchPalavra1) AND (NomeMatchPalavra2 OR SobrenomeMatchPalavra2)...
-                
-                // Nota: O Supabase JS client tem limitações para agrupar ANDs dentro de um OR fluido.
-                // Vamos usar a lógica de filtro acumulativo:
-                
                 for (const word of searchWords) {
                     query = query.or(`nome.ilike.%${word}%,sobrenome.ilike.%${word}%`);
                 }
@@ -86,7 +205,6 @@ async function searchTitular(term) {
         clients.forEach(client => {
             const item = document.createElement('div');
             item.className = 'search-result-item';
-            // Estilizando inline para garantir que apareça bem, ou use as classes CSS existentes
             item.style.cssText = 'padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center;';
             
             item.innerHTML = `
@@ -97,12 +215,11 @@ async function searchTitular(term) {
                 <button class="btn btn-small btn-secondary" style="font-size: 12px; padding: 5px 10px;">Ver Financeiro</button>
             `;
             
-            // Adiciona efeito de hover
             item.addEventListener('mouseenter', () => { item.style.backgroundColor = '#f9f9f9'; });
             item.addEventListener('mouseleave', () => { item.style.backgroundColor = 'transparent'; });
             
             item.onclick = (e) => {
-                e.stopPropagation(); // Evita fechar se houver listener global
+                e.stopPropagation(); 
                 openFinancialModal(client);
             };
             resultsContainer.appendChild(item);
@@ -114,22 +231,17 @@ async function searchTitular(term) {
     }
 }
 
-// --- MODAL E DADOS FINANCEIROS ---
-
 async function openFinancialModal(client) {
     currentFinancialClient = client;
     
-    // Preenche cabeçalho do modal
     document.getElementById('finModalClientName').textContent = `${client.nome} ${client.sobrenome || ''}`;
     document.getElementById('finModalClientCPF').textContent = client.cpf || 'N/A';
     document.getElementById('finModalClientPlan').textContent = client.plano || 'N/A';
     
-    // Abre modal
     if(financialModal) financialModal.style.display = 'flex';
     resultsContainer.style.display = 'none';
     searchInput.value = '';
 
-    // Usa o CPF para buscar os dados na tabela de sincronização
     if (client.cpf) {
         await loadFinancialHistory(client.cpf);
     } else {
@@ -144,29 +256,21 @@ async function loadFinancialHistory(cpf) {
     badge.className = 'status-badge';
     badge.textContent = 'Verificando...';
 
-    // Limpa caracteres não numéricos do CPF para garantir match exato
     const cleanCpf = cpf.replace(/\D/g, '');
 
     try {
-        // 1. Busca na tabela de sincronização diária (Estado Atual)
-        // OBS: Estamos assumindo que na tabela financial_daily_sync o CPF está limpo (apenas números)
-        // Se estiver formatado (xxx.xxx.xxx-xx), remova o .replace no cleanCpf acima ou ajuste conforme seu padrão.
-        
         let { data: invoices, error } = await _supabase
             .from('financial_daily_sync')
             .select('*')
-            // Tentamos buscar tanto formatado quanto limpo para garantir
             .or(`client_cpf.eq.${cpf},client_cpf.eq.${cleanCpf}`)
             .order('due_date', { ascending: false });
 
         if (error) throw error;
 
-        // --- MOCK TEMPORÁRIO PARA TESTES (Se não tiver integração real ainda) ---
         if (!invoices || invoices.length === 0) {
-            console.warn("Nenhum dado real encontrado. Usando MOCK para demonstração.");
-            invoices = generateMockInvoices();
+            console.warn("Nenhum dado real encontrado.");
+            invoices = [];
         }
-        // -----------------------------------------------------------------------
 
         currentFinancialData = invoices;
         renderFinancialTable(invoices);
@@ -190,7 +294,6 @@ function renderFinancialTable(invoices) {
     invoices.forEach(inv => {
         const tr = document.createElement('tr');
         
-        // Tradução de status
         const statusMap = {
             'OPEN': 'Em Aberto',
             'PAID': 'Pago',
@@ -201,7 +304,6 @@ function renderFinancialTable(invoices) {
         const date = new Date(inv.due_date).toLocaleDateString('pt-BR');
         const value = parseFloat(inv.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // Botão de 2ª via (apenas se não estiver pago/cancelado)
         let actionBtn = '';
         if (inv.status === 'OPEN' || inv.status === 'OVERDUE') {
             actionBtn = `
@@ -215,7 +317,6 @@ function renderFinancialTable(invoices) {
             actionBtn = `<span style="color: var(--gray-medium);">Cancelado</span>`;
         }
 
-        // Linha digitável com copiar
         const barcodeHtml = inv.barcode ? `
             <div class="barcode-box">
                 <span style="font-size: 11px;">${inv.barcode.substring(0, 20)}...</span>
@@ -240,11 +341,9 @@ function renderFinancialTable(invoices) {
     });
 }
 
-// Regra 5: Status regido pela lógica de pagamentos (Regra de negócio)
 function updateFinancialStatus(invoices) {
     const badge = document.getElementById('finModalStatusBadge');
     
-    // Lógica: Se tiver boleto com status 'OVERDUE', é irregular.
     const hasOverdue = invoices.some(inv => inv.status === 'OVERDUE');
     
     if (hasOverdue) {
@@ -256,9 +355,7 @@ function updateFinancialStatus(invoices) {
     }
 }
 
-// Regra 4: Emitir Carnê (Todos os abertos/atrasados)
 function emitirCarne(invoices) {
-    // Filtra apenas o que deve ser pago
     const openInvoices = invoices.filter(inv => inv.status === 'OPEN' || inv.status === 'OVERDUE');
 
     if (openInvoices.length === 0) {
@@ -284,7 +381,6 @@ function emitirCarne(invoices) {
         const value = parseFloat(inv.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const statusMap = { 'OPEN': 'A Vencer', 'OVERDUE': 'ATRASADO' };
         
-        // Desenha uma "caixa" para o boleto
         doc.setDrawColor(200);
         doc.rect(15, y - 5, 180, 25);
 
@@ -315,44 +411,6 @@ function emitirCarne(invoices) {
 
     doc.save(`carne_${currentFinancialClient.nome.replace(/\s/g, '_')}.pdf`);
     showToast('Lista de pagamentos gerada!', 'success');
-}
-
-// --- MOCK DATA GENERATOR (Para testes sem backend) ---
-function generateMockInvoices() {
-    const today = new Date();
-    const mockData = [];
-    
-    // 1 fatura atrasada (Mês passado)
-    const d1 = new Date(today); d1.setMonth(today.getMonth() - 1);
-    mockData.push({
-        due_date: d1.toISOString(),
-        amount: 89.90,
-        status: 'OVERDUE',
-        barcode: '34191.79001 01043.510047 91020.150008 8 99990000008990',
-        boleto_url: 'https://www.google.com'
-    });
-
-    // 1 fatura paga (2 meses atrás)
-    const d2 = new Date(today); d2.setMonth(today.getMonth() - 2);
-    mockData.push({
-        due_date: d2.toISOString(),
-        amount: 89.90,
-        status: 'PAID',
-        barcode: '34191.79001 01043.510047 91020.150008 8 99990000008990',
-        boleto_url: '#'
-    });
-
-    // 1 fatura futura (Mês que vem)
-    const d3 = new Date(today); d3.setMonth(today.getMonth() + 1);
-    mockData.push({
-        due_date: d3.toISOString(),
-        amount: 89.90,
-        status: 'OPEN',
-        barcode: '34191.79001 01043.510047 91020.150008 8 99990000008990',
-        boleto_url: 'https://www.google.com'
-    });
-
-    return mockData;
 }
 
 export { setupFinanceiroPage, openFinancialModal, emitirCarne, loadFinancialHistory };

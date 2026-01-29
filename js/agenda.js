@@ -1,7 +1,6 @@
 import { _supabase } from './supabase.js';
 import { openModal } from './clientes.js';
 import { logAction } from './logger.js';
-// ATUALIZADO: Importa showConfirm
 import { showToast, showConfirm } from './utils.js';
 
 let currentScheduleDate = new Date();
@@ -14,7 +13,7 @@ const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6
 
 
 // =================================================================
-// MODIFICAÇÃO: saveAppointment
+// MODIFICAÇÃO: saveAppointment COM TRAVA FINANCEIRA
 // =================================================================
 async function saveAppointment(event) {
     event.preventDefault();
@@ -41,7 +40,6 @@ async function saveAppointment(event) {
         return;
     }
 
-    // CORREÇÃO 2: Captura a duração do novo dropdown
     const durationInMinutes = parseInt(form.duration.value, 10);
     if (isNaN(durationInMinutes) || durationInMinutes <= 0) {
          showToast('Por favor, selecione uma duração válida.');
@@ -50,9 +48,7 @@ async function saveAppointment(event) {
 
     const [hour, minute] = appointmentData.start_time.split(':').map(Number);
     const endTimeObject = new Date();
-    // CORREÇÃO 2: Usa a duração selecionada ao invés de 30 min fixo
     endTimeObject.setHours(hour, minute + durationInMinutes, 0, 0);
-    // Formata para "HH:MM:SS"
     appointmentData.end_time = endTimeObject.toTimeString().split(' ')[0];
 
     submitButton.disabled = true;
@@ -60,25 +56,43 @@ async function saveAppointment(event) {
 
     try {
         // =================================================================
-        // NOVA VERIFICAÇÃO: Conflito de Disponibilidade do Profissional
+        // NOVA VERIFICAÇÃO 1: STATUS FINANCEIRO DO CLIENTE
+        // =================================================================
+        const { data: clientStatus, error: statusError } = await _supabase
+            .from('clients')
+            .select('status, nome, sobrenome')
+            .eq('id', appointmentData.client_id)
+            .single();
+
+        if (statusError) throw statusError;
+
+        // Regra de Bloqueio
+        if (clientStatus.status === 'ATRASO' || clientStatus.status === 'INATIVO' || clientStatus.status === 'CANCELADO') {
+            // Log da tentativa bloqueada
+            console.warn(`Tentativa de agendamento bloqueada para ${clientStatus.nome}. Status: ${clientStatus.status}`);
+            
+            throw new Error(`🚫 AGENDAMENTO BLOQUEADO!<br>O cliente <b>${clientStatus.nome}</b> consta com status <b>${clientStatus.status}</b>.<br>Regularize o financeiro antes de agendar.`);
+        }
+
+        // =================================================================
+        // VERIFICAÇÃO 2: Conflito de Disponibilidade do Profissional
         // =================================================================
         const { data: professionalEvents, error: eventCheckError } = await _supabase
             .from('professional_events')
             .select('id, title')
             .eq('professional_id', appointmentData.professional_id)
             .eq('event_date', appointmentData.appointment_date)
-            .lt('start_time', appointmentData.end_time) // Evento começa ANTES do agendamento terminar
-            .gt('end_time', appointmentData.start_time);  // Evento termina DEPOIS do agendamento começar
+            .lt('start_time', appointmentData.end_time)
+            .gt('end_time', appointmentData.start_time);
 
         if (eventCheckError) throw eventCheckError;
 
         if (professionalEvents && professionalEvents.length > 0) {
-            // Se encontrou um evento, bloqueia o agendamento
             throw new Error(`Conflito de agenda! O profissional não está disponível neste horário (Motivo: ${professionalEvents[0].title}).`);
         }
 
         // =================================================================
-        // VERIFICAÇÃO EXISTENTE: Conflito de Sala
+        // VERIFICAÇÃO 3: Conflito de Sala
         // =================================================================
         const { data: conflictingAppointments, error: checkError } = await _supabase
             .from('appointments')
@@ -94,7 +108,7 @@ async function saveAppointment(event) {
             throw new Error(`Conflito de agendamento! O consultório já está reservado neste horário.`);
         }
 
-        // Se passou em ambas as verificações, salva o agendamento
+        // Se passou em todas as verificações, salva o agendamento
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
         const { error: insertError } = await _supabase.from('appointments').insert(appointmentData);
@@ -105,7 +119,13 @@ async function saveAppointment(event) {
         closeAppointmentModal();
         
     } catch (error) {
-        showToast(error.message); // Exibe a mensagem de erro (do conflito de sala OU do profissional)
+        // Se a mensagem contiver HTML (nosso erro personalizado), usamos innerHTML no toast se possível, ou alert
+        if (error.message.includes('<br>')) {
+             // Workaround simples: remove tags para o toast padrão ou usa alert para destaque
+             showToast(error.message.replace(/<[^>]*>?/gm, ' '), 'error');
+        } else {
+             showToast(error.message, 'error');
+        }
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Agendar';
@@ -113,9 +133,8 @@ async function saveAppointment(event) {
 }
 
 
-// =================================================================
-// FUNÇÕES PREVIAMENTE EXISTENTES (COM MODIFICAÇÕES ABAIXO)
-// =================================================================
+// ... (RESTANTE DO CÓDIGO PERMANECE O MESMO: unsubscribeSchedule, changeDay, renderMiniCalendar, etc.) ...
+// Mantendo as funções auxiliares originais para garantir compatibilidade
 
 function unsubscribeSchedule() {
     if (scheduleSubscription) {
@@ -246,25 +265,18 @@ async function loadScheduleView() {
 
     scheduleSubscription = _supabase.channel('public:appointments_agenda')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, async (payload) => {
-            
             const changedDate = (payload.new?.appointment_date || payload.old?.appointment_date || '').split('T')[0];
             const currentDateStr = currentScheduleDate.toISOString().split('T')[0];
 
-            if (changedDate !== currentDateStr) {
-                return; // Ignora alterações de outros dias
-            }
+            if (changedDate !== currentDateStr) return;
 
             if (payload.eventType === 'INSERT') {
                  const { data: newAppt, error } = await _supabase.from('appointments').select('*, professionals(name)').eq('id', payload.new.id).single();
-                 if (!error && newAppt) {
-                    placeAppointmentCard(newAppt);
-                 }
+                 if (!error && newAppt) placeAppointmentCard(newAppt);
             } else if (payload.eventType === 'UPDATE') {
                 removeAppointmentCard(payload.old.id);
                 const { data: updatedAppt, error } = await _supabase.from('appointments').select('*, professionals(name)').eq('id', payload.new.id).single();
-                 if (!error && updatedAppt) {
-                    placeAppointmentCard(updatedAppt);
-                 }
+                 if (!error && updatedAppt) placeAppointmentCard(updatedAppt);
             } else if (payload.eventType === 'DELETE') {
                 removeAppointmentCard(payload.old.id);
             }
@@ -332,9 +344,7 @@ function placeAppointmentCard(appointment) {
 
 function removeAppointmentCard(appointmentId) {
     const cardToRemove = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
-    if (cardToRemove) {
-        cardToRemove.remove();
-    }
+    if (cardToRemove) cardToRemove.remove();
 }
 
 async function loadAppointments() {
@@ -355,7 +365,6 @@ async function loadAppointments() {
                 placeAppointmentCard(appointment);
             });
         }
-        
     } catch(error) {
         console.error('Erro ao carregar agendamentos:', error);
     }
@@ -388,41 +397,23 @@ function setupPatientSearch() {
             resultsContainer.style.display = 'block';
 
             try {
-                // =================================================================
-                // CORREÇÃO: Lógica de Busca Aprimorada (Nome + Sobrenome)
-                // =================================================================
-                
-                // Divide o termo de busca em palavras individuais
                 const searchWords = query.split(/\s+/).filter(w => w.length > 0);
-                
-                // Constrói filtro para Nome/Sobrenome: (nome LIKE w1 OR sobrenome LIKE w1) AND (nome LIKE w2 OR sobrenome LIKE w2)...
-                // Isso permite encontrar "João Silva" mesmo que "João" esteja no nome e "Silva" no sobrenome
                 const nameMatchConditions = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
-                
-                // Combina com a busca por CPF. A estrutura final do .or() será:
-                // "and(condicaoNome1, condicaoNome2, ...), cpf.ilike.%query%"
-                // Isso significa: (Nome/Sobrenome batem com todas as palavras) OU (CPF bate)
                 const searchFilter = `and(${nameMatchConditions}),cpf.ilike.%${query}%`;
 
                 const [titularesRes, dependentesRes] = await Promise.all([
-                    _supabase.from('clients')
-                        .select('id, nome, sobrenome, cpf')
-                        .or(searchFilter)
-                        .limit(5),
-                    _supabase.from('dependents')
-                        .select('nome, sobrenome, cpf, titular_id, clients!inner(nome, sobrenome)')
-                        .or(searchFilter)
-                        .limit(5)
+                    _supabase.from('clients').select('id, nome, sobrenome, cpf, status').or(searchFilter).limit(5),
+                    _supabase.from('dependents').select('nome, sobrenome, cpf, titular_id, clients!inner(nome, sobrenome, status)').or(searchFilter).limit(5)
                 ]);
 
                 if (titularesRes.error) throw titularesRes.error;
                 if (dependentesRes.error) throw dependentesRes.error;
 
                 const combinedResults = [
-                    ...(titularesRes.data || []).map(t => ({ ...t, type: 'Titular', clientId: t.id })),
+                    ...(titularesRes.data || []).map(t => ({ ...t, type: 'Titular', clientId: t.id, status: t.status })),
                     ...(dependentesRes.data || []).map(d => {
                         const titularName = d.clients ? `${d.clients.nome} ${d.clients.sobrenome}`.trim() : 'N/A';
-                        return { ...d, type: `Dependente de ${titularName}`, clientId: d.titular_id };
+                        return { ...d, type: `Dependente de ${titularName}`, clientId: d.titular_id, status: d.clients?.status };
                     })
                 ];
 
@@ -440,7 +431,17 @@ function setupPatientSearch() {
                         div.dataset.name = fullName;
                         div.dataset.cpf = person.cpf || '';
                         div.dataset.clientId = person.clientId;
-                        div.innerHTML = `${fullName} <br><small>${person.cpf || 'CPF não cadastrado'} - <strong>${person.type}</strong></small>`;
+                        
+                        // Visual de Status no Autocomplete
+                        const statusColor = person.status === 'ATIVO' ? '#2ecc71' : '#e74c3c';
+                        const statusLabel = person.status === 'ATIVO' ? '' : `(${person.status})`;
+                        
+                        div.innerHTML = `
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>${fullName} <small style="color:${statusColor}; font-weight:bold;">${statusLabel}</small></span>
+                            </div>
+                            <small>${person.cpf || 'CPF N/A'} - <strong>${person.type}</strong></small>
+                        `;
                         resultsContainer.appendChild(div);
                     });
                 } else {
@@ -455,7 +456,7 @@ function setupPatientSearch() {
     });
     
     resultsContainer.addEventListener('click', (e) => {
-        const targetDiv = e.target.closest('div');
+        const targetDiv = e.target.closest('div[data-name]') || e.target.closest('.add-new-patient');
         if (!targetDiv) return;
 
         if (targetDiv.classList.contains('add-new-patient')) {
@@ -485,7 +486,6 @@ async function openNewAppointmentModal() {
     form.reset();
     document.getElementById('patientSearchResults').innerHTML = '';
     
-    // CORREÇÃO 2: Define 30 min como padrão ao abrir
     document.getElementById('appointmentDuration').value = '30';
 
     const professionalSelect = document.getElementById('appointmentProfessional');
@@ -523,37 +523,23 @@ async function openAppointmentDetails(appointmentId) {
         if (error) throw error;
         
         let patientData = null;
-
-        // Função helper para normalizar strings (remove espaços extras e converte para minusculo)
         const normalize = (str) => str ? str.trim().toLowerCase().replace(/\s+/g, ' ') : '';
 
         if (appointment.client_id) {
             const { data: titular, error: titularError } = await _supabase.from('clients').select('*, dependents(*)').eq('id', appointment.client_id).single();
             if (titularError) throw titularError;
 
-            // Prepara nomes para comparação
             const apptPatientName = normalize(appointment.patient_name);
             const titularName = normalize(`${titular.nome} ${titular.sobrenome || ''}`);
 
-            // 1. Tenta casar com o Titular
             if (titularName === apptPatientName) {
                 patientData = titular;
-            } 
-            // 2. Tenta casar com algum Dependente
-            else {
+            } else {
                 const dependent = titular.dependents.find(d => normalize(`${d.nome} ${d.sobrenome || ''}`) === apptPatientName);
                 if (dependent) {
-                    patientData = { 
-                        ...dependent, 
-                        plano: titular.plano, 
-                        status: titular.status,
-                        // Se o dependente não tiver telefone, usa o do titular
-                        telefone: dependent.telefone || titular.telefone 
-                    };
+                    patientData = { ...dependent, plano: titular.plano, status: titular.status, telefone: dependent.telefone || titular.telefone };
                 }
             }
-        } else {
-            console.warn(`Agendamento ${appointment.id} sem client_id. A busca por nome pode ser imprecisa.`);
         }
 
         document.getElementById('detailsPatientName').textContent = appointment.patient_name;
@@ -567,7 +553,6 @@ async function openAppointmentDetails(appointmentId) {
         document.getElementById('detailsAppointmentTime').value = appointment.start_time.substring(0, 5);
         document.getElementById('detailsAppointmentRoom').value = appointment.room;
 
-        // --- CORREÇÃO 2: Cálculo de Duração ao abrir detalhes ---
         const [startHour, startMinute] = appointment.start_time.split(':').map(Number);
         const [endHour, endMinute] = appointment.end_time.split(':').map(Number);
         
@@ -576,15 +561,13 @@ async function openAppointmentDetails(appointmentId) {
         
         let diffInMinutes = (endDate.getTime() - startDate.getTime()) / 60000;
         
-        // Arredonda para os valores do dropdown
         if (diffInMinutes <= 15) diffInMinutes = 15;
         else if (diffInMinutes <= 30) diffInMinutes = 30;
         else if (diffInMinutes <= 45) diffInMinutes = 45;
         else if (diffInMinutes <= 60) diffInMinutes = 60;
-        else diffInMinutes = 30; // Padrão se for um valor estranho
+        else diffInMinutes = 30;
 
         document.getElementById('detailsAppointmentDuration').value = diffInMinutes;
-        // --- FIM DA CORREÇÃO ---
 
         const profSelect = document.getElementById('detailsAppointmentProfessional');
         profSelect.innerHTML = '';
@@ -621,11 +604,9 @@ async function updateAppointment(event) {
         room: form.room.value,
     };
     
-    // CORREÇÃO 2: Pega a duração do dropdown de detalhes
     const durationInMinutes = parseInt(form.duration.value, 10);
     const [hour, minute] = updatedData.start_time.split(':').map(Number);
     const endTime = new Date();
-    // CORREÇÃO 2: Usa a duração selecionada
     endTime.setHours(hour, minute + durationInMinutes, 0, 0);
     updatedData.end_time = endTime.toTimeString().split(' ')[0];
     
@@ -633,9 +614,6 @@ async function updateAppointment(event) {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
     try {
-        // =================================================================
-        // NOVA VERIFICAÇÃO: Conflito de Disponibilidade do Profissional (na ATUALIZAÇÃO)
-        // =================================================================
         const { data: professionalEvents, error: eventCheckError } = await _supabase
             .from('professional_events')
             .select('id, title')
@@ -650,8 +628,6 @@ async function updateAppointment(event) {
             throw new Error(`Conflito de agenda! O profissional não está disponível neste horário (Motivo: ${professionalEvents[0].title}).`);
         }
         
-        // (Aqui você também deve re-verificar o conflito de SALA, se desejar)
-
         const { error } = await _supabase.from('appointments').update(updatedData).eq('id', appointmentId);
         if (error) throw error;
 
@@ -670,7 +646,6 @@ async function updateAppointment(event) {
 async function deleteAppointment() {
     const appointmentId = document.getElementById('detailsAppointmentId').value;
     
-    // ATUALIZADO: Substitui confirm() por showConfirm()
     const confirmed = await showConfirm('Tem certeza que deseja excluir este agendamento?');
     if (!confirmed) return;
 
@@ -681,11 +656,7 @@ async function deleteAppointment() {
         const { error } = await _supabase.from('appointments').delete().eq('id', appointmentId);
         if (error) throw error;
         
-        // <<< MODIFICAÇÃO ADICIONADA >>>
-        // Remove o card da UI imediatamente para refletir a exclusão em tempo real,
-        // sem depender que a inscrição do Supabase (listener) o capture.
         removeAppointmentCard(appointmentId);
-        // <<< FIM DA MODIFICAÇÃO >>>
 
         await logAction('DELETE_APPOINTPOINTMENT', { appointmentId: appointmentId, patient: apptToDelete.patient_name, date: apptToDelete.appointment_date });
         showToast('Agendamento excluído com sucesso!');

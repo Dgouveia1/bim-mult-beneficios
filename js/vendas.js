@@ -229,7 +229,7 @@ async function handleNewSaleSubmit(event) {
                 // --- LÓGICA DE WHATSAPP ---
                 if (asaasResponse.payment_link) {
                     const firstName = titularData.nome.split(' ')[0];
-                    const whatsappMessage = `Olá ${firstName}, seja bem-vindo(a) à Bim Benefícios! 🧡\n\nAqui está o link seguro para ativar sua assinatura e escolher a forma de pagamento (Pix, Boleto ou Cartão):\n${asaasResponse.payment_link}`;
+                    const whatsappMessage = `Olá, ${firstName}. É um prazer atendê-lo(a) na Bim Benefícios! 🧡\n\nAqui está o link seguro para ativar do seu plano e escolher a forma de pagamento (Pix, Boleto ou Cartão):\n${asaasResponse.payment_link}`;
                     
                     // Garante formato 55 + DDD + Numero
                     const rawPhone = titularData.telefone.replace(/\D/g, '');
