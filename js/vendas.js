@@ -1,5 +1,7 @@
 import { _supabase } from './supabase.js';
-import { showToast, fetchAddressByCEP } from './utils.js';
+import { showToast, fetchAddressByCEP, showConfirm } from './utils.js';
+// Importamos o getCurrentUserProfile para obter o vendedor logado
+import { getCurrentUserProfile } from './auth.js'; 
 
 let availablePlans = [];
 
@@ -10,11 +12,9 @@ export function setupVendasPage() {
     const form = document.getElementById('newSaleForm');
     
     if (form) {
-        // Remove listener antigo para evitar duplicação
         form.removeEventListener('submit', handleSaleSubmit);
         form.addEventListener('submit', handleSaleSubmit);
         
-        // Listener de CEP
         const cepInput = form.querySelector('input[name="cep"]');
         if (cepInput) {
             cepInput.addEventListener('blur', async (e) => {
@@ -26,19 +26,17 @@ export function setupVendasPage() {
             });
         }
 
-        // Botão de Adicionar Dependente
         const addDepBtn = document.getElementById('addVendaDependenteBtn');
         if (addDepBtn) {
             addDepBtn.onclick = () => addDependenteField();
         }
     }
     
-    // Carrega os planos dinamicamente do banco
     loadPlansIntoSelect();
 }
 
 /**
- * Busca planos ativos no Supabase e preenche o select
+ * Busca planos ativos no Supabase
  */
 async function loadPlansIntoSelect() {
     const planSelect = document.querySelector('#newSaleForm select[name="plano"]');
@@ -53,9 +51,7 @@ async function loadPlansIntoSelect() {
 
         if (error) throw error;
 
-        availablePlans = plans; // Armazena em memória para usar preço/descrição no submit
-
-        // Limpa opções (mantendo a primeira "Selecione...")
+        availablePlans = plans;
         planSelect.innerHTML = '<option value="">Selecione...</option>';
 
         if (plans.length === 0) {
@@ -68,31 +64,27 @@ async function loadPlansIntoSelect() {
 
         plans.forEach(plan => {
             const option = document.createElement('option');
-            // Usamos o NOME como value para compatibilidade com o campo 'plano' da tabela 'clients' (que é texto)
             option.value = plan.name; 
-            
-            // Guardamos ID e Preço nos atributos de dados para acesso rápido
             option.dataset.planId = plan.id;
             option.dataset.price = plan.price;
             
             const priceFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price);
             option.textContent = `${plan.name} - ${priceFormatted}`;
-            
             planSelect.appendChild(option);
         });
 
     } catch (error) {
-        console.error('Erro ao carregar planos na venda:', error);
+        console.error('Erro ao carregar planos:', error);
         showToast('Erro ao carregar lista de planos.', 'error');
     }
 }
 
 /**
- * Adiciona campos de dependente dinamicamente
+ * Adiciona campos de dependente
  */
 function addDependenteField() {
     const container = document.getElementById('vendasDependentesContainer');
-    const index = container.children.length; // Usa índice para nomes únicos
+    const index = container.children.length; 
     
     const div = document.createElement('div');
     div.className = 'dependente-row form-row';
@@ -149,27 +141,50 @@ async function handleSaleSubmit(event) {
         return;
     }
 
+    const cpfRaw = formData.get('cpf');
+    const cpfClean = cpfRaw ? cpfRaw.replace(/\D/g, '') : '';
+    
+    if (!cpfClean || cpfClean.length !== 11) {
+        showToast('CPF inválido. Verifique os dados.', 'warning');
+        return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
 
     try {
-        // 1. Prepara dados do Cliente
+        // Captura usuário atual para registro do vendedor
+        const currentUser = getCurrentUserProfile();
+        const sellerName = currentUser ? currentUser.full_name : 'Sistema';
+
+        // 0. Verifica se cliente já existe
+        const { data: existingClient } = await _supabase
+            .from('clients')
+            .select('id')
+            .eq('cpf', cpfClean)
+            .maybeSingle();
+
+        if (existingClient) {
+            throw new Error('CPF já cadastrado no sistema!');
+        }
+
+        // 1. Criação do Cliente
         const clientData = {
             nome: formData.get('nome'),
             sobrenome: formData.get('sobrenome'),
-            cpf: formData.get('cpf')?.replace(/\D/g, ''),
+            cpf: cpfClean,
             telefone: formData.get('telefone'),
             email: formData.get('email'),
             data_nascimento: formData.get('data_nascimento'),
             cep: formData.get('cep'),
             endereco: formData.get('endereco'),
             municipio: formData.get('municipio'),
-            plano: selectedPlanName, // Salva o nome do plano
+            plano: selectedPlanName, 
             status: formData.get('status') || 'ATIVO',
+            vendedor: sellerName, // REGISTRA O VENDEDOR AQUI
             created_at: new Date()
         };
 
-        // Inserção do Cliente
         const { data: client, error: clientError } = await _supabase
             .from('clients')
             .insert([clientData])
@@ -178,9 +193,8 @@ async function handleSaleSubmit(event) {
 
         if (clientError) throw clientError;
 
-        // 2. Prepara e Insere Dependentes
+        // 2. Criação dos Dependentes
         const dependentsToInsert = [];
-        // Itera sobre os inputs para encontrar dependentes (baseado no prefixo dep_nome_)
         for (const [key, value] of formData.entries()) {
             if (key.startsWith('dep_nome_')) {
                 const index = key.split('_')[2];
@@ -200,53 +214,81 @@ async function handleSaleSubmit(event) {
             const { error: depError } = await _supabase
                 .from('dependents')
                 .insert(dependentsToInsert);
-            
-            if (depError) console.error('Erro ao salvar dependentes:', depError); // Não bloqueia o fluxo principal
+            if (depError) console.error('Erro não fatal dependentes:', depError);
         }
 
-        // 3. Integração Financeira (Simulação Asaas)
-        // Usa os dados REAIS da tabela de planos
-        const financeData = {
-            client_id: client.id,
-            description: `Assinatura ${selectedPlan.name}`, 
-            value: selectedPlan.price,                      
-            status: 'PENDING',
-            due_date: new Date().toISOString().split('T')[0], // Vencimento hoje (primeira parcela)
-            created_at: new Date()
-        };
+        // 3. INTEGRAÇÃO ASAAS VIA EDGE FUNCTION
+        showToast('Gerando cobrança no Asaas...', 'info');
 
-        // Tenta inserir na tabela de assinaturas (fallback para history se não existir)
-        const { error: financeError } = await _supabase
-            .from('asaas_subscriptions') 
-            .insert([{
-                ...financeData,
-                plan_id: selectedPlan.id,
-                cycle: 'MONTHLY'
-            }]);
+        const { data: asaasResult, error: asaasError } = await _supabase.functions.invoke('create-asaas-subscription', {
+            body: {
+                record: { id: client.id },
+                titularData: clientData,
+                seller: sellerName // Envia nome do vendedor para metadados se a função suportar
+            }
+        });
 
-        if (financeError) {
-            console.warn('Fallback financeiro:', financeError);
-             await _supabase.from('financial_history').insert([{
+        if (asaasError) {
+            console.error('Erro na Edge Function:', asaasError);
+            throw new Error('Falha ao conectar com servidor de pagamentos.');
+        }
+
+        if (!asaasResult || !asaasResult.success) {
+            console.error('Erro Asaas:', asaasResult);
+            showToast(asaasResult?.error || 'Erro ao criar assinatura no Asaas.', 'warning');
+        }
+
+        const paymentLink = asaasResult?.payment_link;
+
+        // 4. Registro do Histórico Financeiro com Vendedor (Local, para comissões)
+        try {
+            await _supabase.from('financial_history').insert([{
                 client_id: client.id,
-                type: 'Mensalidade',
+                type: 'Receita',
+                category: 'Venda de Plano', // Categoria específica
                 amount: selectedPlan.price,
-                status: 'Pendente',
-                description: `Primeira mensalidade - ${selectedPlan.name}`
-             }]);
+                status: 'Pendente', 
+                description: `Venda Plano ${selectedPlan.name} - Vendedor: ${sellerName}`,
+                due_date: new Date().toISOString().split('T')[0]
+            }]);
+        } catch (finErr) {
+            console.warn('Erro ao salvar histórico financeiro local:', finErr);
         }
 
-        showToast('Venda realizada e cliente cadastrado!', 'success');
+        showToast('Venda realizada com sucesso!', 'success');
         
-        // 4. Geração de Contrato Automática (Chamada local)
+        // 5. Geração do Contrato
         await generateContractPDF(client.id);
 
-        // Limpeza
+        // 6. WhatsApp
+        if (paymentLink) {
+            const confirmed = await showConfirm(`Venda Concluída! Enviar link de pagamento via WhatsApp?`);
+            
+            if (confirmed) {
+                const phoneRaw = clientData.telefone || '';
+                const phoneClean = phoneRaw.replace(/\D/g, '');
+                
+                if (phoneClean) {
+                    const phoneFull = phoneClean.length <= 11 ? `55${phoneClean}` : phoneClean;
+                    const firstName = clientData.nome.split(' ')[0];
+                    const msg = `Olá ${firstName}, seja bem-vindo(a) à Bim Benefícios! Segue o link para pagamento da sua adesão: ${paymentLink}`;
+                    const wppUrl = `https://wa.me/${phoneFull}?text=${encodeURIComponent(msg)}`;
+                    
+                    window.open(wppUrl, '_blank');
+                } else {
+                    showToast('Cliente sem telefone cadastrado.', 'warning');
+                }
+            }
+        } else if (asaasResult && asaasResult.success && !paymentLink) {
+            showToast('Assinatura criada, mas link não gerado imediatamente. Verifique no painel.', 'warning');
+        }
+
         form.reset();
         document.getElementById('vendasDependentesContainer').innerHTML = '';
 
     } catch (error) {
         console.error('Erro crítico na venda:', error);
-        showToast('Erro ao processar venda: ' + (error.message || 'Erro desconhecido'), 'error');
+        showToast(error.message || 'Erro desconhecido ao processar venda.', 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
@@ -254,103 +296,58 @@ async function handleSaleSubmit(event) {
 }
 
 /**
- * Função LOCAL para gerar o contrato (restaurada)
+ * Função para gerar contrato PDF (Cópia local para garantir funcionamento)
  */
 export async function generateContractPDF(titularId) {
     try {
-        showToast('Gerando contrato...', 'info');
+        const { data: client } = await _supabase.from('clients').select(`*, dependents(*)`).eq('id', titularId).single();
+        if (!client) return;
 
-        // 1. Buscar dados do Cliente + Dependentes
-        const { data: client, error: clientError } = await _supabase
-            .from('clients')
-            .select(`*, dependents(*)`)
-            .eq('id', titularId)
-            .single();
-
-        if (clientError) throw clientError;
-
-        // 2. Buscar o Texto do Contrato do Plano correspondente
-        const { data: plan, error: planError } = await _supabase
-            .from('plans')
-            .select('contract_text, price')
-            .ilike('name', client.plano)
-            .single();
-
-        let contractText = plan?.contract_text;
+        const { data: plan } = await _supabase.from('plans').select('contract_text, price').ilike('name', client.plano).maybeSingle();
         
+        let contractText = plan?.contract_text;
         if (!contractText) {
-            showToast('Modelo de contrato não encontrado. Verifique a Gestão de Planos.', 'warning');
+            showToast('Contrato não configurado para este plano.', 'warning');
             return;
         }
 
-        // 3. Substituição de Variáveis
         const today = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const dataAtual = today.toLocaleDateString('pt-BR', options);
-
+        
         let listaDependentes = "";
         if (client.dependents && client.dependents.length > 0) {
-            // Formata a lista de dependentes para ficar alinhada (Nome | CPF | Nasc)
-            listaDependentes = client.dependents.map(d => 
-                `${d.nome} | ${formatCPF(d.cpf)} | ${d.data_nascimento || ''} | ${d.parentesco || 'DEPENDENTE'}`
-            ).join('\n');
+            listaDependentes = client.dependents.map(d => `${d.nome} | CPF: ${d.cpf || 'N/A'}`).join('\n');
         } else {
-            listaDependentes = "Nenhum dependente cadastrado.";
+            listaDependentes = "Nenhum dependente.";
         }
 
         contractText = contractText
             .replace(/{{NOME_TITULAR}}/g, `${client.nome} ${client.sobrenome}`)
-            .replace(/{{CPF_TITULAR}}/g, formatCPF(client.cpf) || '__________________')
-            .replace(/{{DATA_NASCIMENTO_TITULAR}}/g, client.data_nascimento || '___/___/____')
+            .replace(/{{CPF_TITULAR}}/g, client.cpf || '')
+            .replace(/{{DATA_NASCIMENTO_TITULAR}}/g, client.data_nascimento || '')
             .replace(/{{TELEFONE_TITULAR}}/g, client.telefone || '')
-            .replace(/{{ENDERECO_TITULAR}}/g, `${client.endereco || ''}, ${client.municipio || ''} - ${client.cep || ''}`)
+            .replace(/{{ENDERECO_TITULAR}}/g, client.endereco || '')
             .replace(/{{NOME_PLANO}}/g, client.plano || '')
-            .replace(/{{VALOR_PLANO}}/g, plan?.price ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price) : 'R$ 0,00')
+            .replace(/{{VALOR_PLANO}}/g, plan?.price ? `R$ ${plan.price}` : '')
             .replace(/{{LISTA_DEPENDENTES}}/g, listaDependentes)
-            .replace(/{{DATA_ATUAL}}/g, dataAtual);
+            .replace(/{{DATA_ATUAL}}/g, today.toLocaleDateString('pt-BR', options));
 
-        // 4. Geração do PDF com jsPDF
-        if (!window.jspdf) {
-            showToast('Biblioteca PDF não carregada. Tente recarregar a página.', 'error');
-            return;
-        }
-        
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.setFont("helvetica");
-        doc.setFontSize(10);
-
-        // Quebra o texto automaticamente para não estourar a margem
-        const splitText = doc.splitTextToSize(contractText, 180);
-        let y = 20;
-        
-        for (let i = 0; i < splitText.length; i++) {
-            if (y > 280) { // Nova página se passar do limite vertical
-                doc.addPage();
-                y = 20;
+        if (window.jspdf) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica");
+            doc.setFontSize(10);
+            
+            const splitText = doc.splitTextToSize(contractText, 180);
+            let y = 20;
+            for (let i = 0; i < splitText.length; i++) {
+                if (y > 280) { doc.addPage(); y = 20; }
+                doc.text(splitText[i], 15, y);
+                y += 5;
             }
-            doc.text(splitText[i], 15, y);
-            y += 5;
+            doc.save(`Contrato_${client.nome}.pdf`);
         }
-
-        doc.save(`Contrato_${client.nome}_${client.plano}.pdf`);
-        showToast('Contrato gerado com sucesso!', 'success');
-
-    } catch (error) {
-        console.error('Erro ao gerar contrato (vendas):', error);
-        showToast('Erro ao gerar contrato.', 'error');
+    } catch (e) {
+        console.error("Erro PDF:", e);
     }
-}
-
-/**
- * Função Auxiliar de Formatação CPF
- */
-function formatCPF(v) {
-    if (!v) return '';
-    v = v.replace(/\D/g, "");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    return v;
 }
