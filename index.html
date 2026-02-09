@@ -71,6 +71,7 @@
                         <a href="#" class="submenu-item" data-page="cronograma">Cronograma da Semana</a>
                         <a href="#" class="submenu-item" data-page="laboratorio">Laboratório</a>
                         <a href="#" class="submenu-item" data-page="profissionais">Profissionais</a>
+                        <a href="#" class="submenu-item" data-page="plans">Gestão de Planos</a>
                         <a href="#" class="submenu-item" data-page="financeiro">Financeiro</a>
                         <a href="#" class="submenu-item" data-page="dashboard">Dashboard</a>
                         <a href="#" class="submenu-item" data-page="usuarios">Usuários</a>
@@ -478,6 +479,31 @@
                     </div>
                 </div>
 
+                                <div class="page-content" id="plansPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Gestão de Planos</h2>
+                        <button class="btn" id="addPlanBtn"><i class="fas fa-plus"></i> Novo Plano</button>
+                    </div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table id="plansTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nome do Plano</th>
+                                        <th>Valor (R$)</th>
+                                        <th>Limite Dependentes</th>
+                                        <th>Status</th>
+                                        <th>Contrato</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="plansTableBody">
+                                    <!-- Carregado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <div class="page-content" id="laboratorioPage">
                     <div class="content-header">
                         <h2 class="page-title">Laboratório - Tabela de Exames</h2>
@@ -1276,6 +1302,49 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-close-modal="printPreviewModal">Fechar</button>
                 <button type="button" class="btn btn-success" id="confirmPrintBtn"><i class="fas fa-print"></i> Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+        <div class="modal" id="planModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="planModalTitle">Novo Plano</h2>
+                <button class="close-btn" data-close-modal="planModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="planForm">
+                    <input type="hidden" id="planId">
+                    <div class="form-group">
+                        <label for="planName">Nome do Plano</label>
+                        <input type="text" id="planName" name="name" required placeholder="Ex: Bim Familiar">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="planPrice">Valor (R$)</label>
+                            <input type="number" id="planPrice" name="price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="planDependents">Limite de Dependentes</label>
+                            <input type="number" id="planDependents" name="dependents" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="planActive">Status</label>
+                        <select id="planActive" name="active">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="planContract">Texto do Contrato</label>
+                        <textarea id="planContract" name="contract" placeholder="Digite o contrato aqui..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-close-modal="planModal">Cancelar</button>
+                        <button type="submit" class="btn">Salvar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

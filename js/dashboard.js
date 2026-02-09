@@ -13,12 +13,11 @@ function hexToRgba(hex, alpha = 1) {
 
 // --- ESTATÍSTICA E PROJEÇÕES ---
 
-// Calcula Regressão Linear Simples (y = mx + b)
 function calculateLinearRegression(values) {
     const n = values.length;
     if (n === 0) return { slope: 0, intercept: 0 };
     
-    const x = Array.from({length: n}, (_, i) => i); // [0, 1, 2...]
+    const x = Array.from({length: n}, (_, i) => i); 
     const y = values;
     
     const sumX = x.reduce((a, b) => a + b, 0);
@@ -32,54 +31,41 @@ function calculateLinearRegression(values) {
     return { slope, intercept };
 }
 
-// Gera projeção avançada combinando tendência de aquisição e taxa de interesse (coorte)
 function generateAdvancedForecasts(weeklyActiveClients, weeklyConsultations) {
-    // 1. Preparar dados históricos (últimas 12 semanas)
-    // Precisamos alinhar os arrays. Assumindo que ambos têm o mesmo tamanho e ordenação.
     const weeksCount = Math.min(weeklyActiveClients.length, weeklyConsultations.length);
     const activeClientsSlice = weeklyActiveClients.slice(-weeksCount);
     const consultationsSlice = weeklyConsultations.slice(-weeksCount);
 
-    // 2. Calcular Taxa de Interesse Semanal (% de ativos que consultam)
     const interestRates = activeClientsSlice.map((clients, i) => {
         return clients > 0 ? (consultationsSlice[i] / clients) : 0;
     });
     
-    // Média ponderada das últimas 4 semanas (dando mais peso ao recente) para a taxa
     const recentRates = interestRates.slice(-4);
     const avgInterestRate = recentRates.reduce((a, b) => a + b, 0) / (recentRates.length || 1);
 
-    // 3. Projeção de Aquisição (Novos Clientes)
-    // Derivar novos clientes por semana a partir do acumulado
     const newClientsPerWeek = [];
     for(let i = 1; i < activeClientsSlice.length; i++) {
         newClientsPerWeek.push(Math.max(0, activeClientsSlice[i] - activeClientsSlice[i-1]));
     }
     
-    // Tendência de Novos Clientes
     const acquisitionTrend = calculateLinearRegression(newClientsPerWeek);
     
-    // 4. Gerar Projeções (Próximas 4 semanas)
     const acquisitionForecast = [];
     const consultationForecast = [];
     
     let lastActiveCount = activeClientsSlice[activeClientsSlice.length - 1];
     
-    const lastDate = new Date(); // Data base para projeção
-    // Ajusta para o início da próxima semana
+    const lastDate = new Date(); 
     lastDate.setDate(lastDate.getDate() + (7 - lastDate.getDay())); 
 
     for (let i = 0; i < 4; i++) {
-        // Data da semana projetada
         const projDate = new Date(lastDate);
         projDate.setDate(projDate.getDate() + (i * 7));
         const dateStr = projDate.toISOString().split('T')[0];
 
-        // A. Previsão de Novos Clientes (Baseado na tendência)
-        // x para projeção é (length + i)
         const nextX = newClientsPerWeek.length + i;
         let projectedNewClients = (acquisitionTrend.slope * nextX) + acquisitionTrend.intercept;
-        projectedNewClients = Math.max(0, Math.round(projectedNewClients)); // Não pode ser negativo
+        projectedNewClients = Math.max(0, Math.round(projectedNewClients)); 
 
         acquisitionForecast.push({
             week_start: dateStr,
@@ -87,11 +73,8 @@ function generateAdvancedForecasts(weeklyActiveClients, weeklyConsultations) {
             is_forecast: true
         });
 
-        // B. Atualiza base ativa projetada
         lastActiveCount += projectedNewClients;
 
-        // C. Previsão de Consultas (Base Ativa Projetada * Taxa de Interesse Média)
-        // Isso considera o "Coorte": se a base cresce, as consultas crescem proporcionalmente ao interesse.
         const projectedConsultations = Math.round(lastActiveCount * avgInterestRate);
 
         consultationForecast.push({
@@ -109,13 +92,13 @@ function generateAdvancedForecasts(weeklyActiveClients, weeklyConsultations) {
 
 
 // --- DATA FETCHING SEGURO ---
-// Helper para fazer chamadas RPC seguras que não quebram o Promise.all se falharem
+
 async function safeRpc(rpcName, params = {}) {
     try {
         const { data, error } = await _supabase.rpc(rpcName, params);
         if (error) {
             console.warn(`⚠️ Erro na métrica ${rpcName}:`, error.message);
-            return []; // Retorna array vazio em caso de erro para não quebrar o gráfico
+            return [];
         }
         return data || [];
     } catch (err) {
@@ -208,10 +191,10 @@ async function fetchClinicOverviewManual(planFilter = 'all') {
 // SUBSTITUIÇÃO: Busca Manual para Overview Cartão (Cards KPI)
 async function fetchCardOverviewManual() {
     try {
-        const planFilter = 'Bim Familiar'; // REGRA: Sempre fixo para métricas do cartão
-        const today = new Date();
+        // REGRA DE NEGÓCIO: Inclui Bim Familiar e Bim Individual
+        const targetPlans = ['Bim Familiar', 'Bim Individual'];
         
-        // Definição de períodos
+        const today = new Date();
         const startCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const startLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const endLastMonth = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59);
@@ -226,15 +209,17 @@ async function fetchCardOverviewManual() {
         lastWeekEnd.setDate(lastWeekEnd.getDate() - 1);
         lastWeekEnd.setHours(23,59,59,999);
 
-        // Busca clientes filtrando APENAS o plano Bim Familiar
+        // Busca clientes filtrando APENAS os planos pagantes
         const { data, error } = await _supabase
             .from('clients')
             .select('id, status, created_at, plano')
-            .eq('plano', planFilter);
+            .in('plano', targetPlans);
 
         if (error) throw error;
 
         let totalAtivos = 0;
+        let totalFamiliar = 0;
+        let totalIndividual = 0;
         let newWeekCurr = 0;
         let newWeekPrev = 0;
         let newMonthCurr = 0;
@@ -244,16 +229,17 @@ async function fetchCardOverviewManual() {
         let statusAtraso = 0;
         let statusCancelados = 0;
         
-        // Mapeamento de status para os contadores
         data.forEach(client => {
             const createdAt = new Date(client.created_at);
             const status = client.status ? client.status.toUpperCase() : '';
 
-            // --- CORREÇÃO: Unificação de Lógica de Ativos ---
-            // 'ATIVO' e 'DOACAO' contam para o TOTAL e para a lista de ATIVOS
-            if (status === 'ATIVO' || status === 'DOACAO') {
-                totalAtivos++; // Agora inclui Doação no Card Principal
-                statusAtivos++; // Já incluía Doação na lista
+            // --- REGRA ESTRITA: Apenas 'ATIVO' conta como receita/base ---
+            // 'DOACAO' foi removido da contagem
+            if (status === 'ATIVO') {
+                totalAtivos++; 
+                statusAtivos++;
+                if(client.plano === 'Bim Familiar') totalFamiliar++;
+                if(client.plano === 'Bim Individual') totalIndividual++;
             } else if (status === 'INATIVO' || status === 'CANCELADO') {
                 statusCancelados++;
             } else if (status === 'ATRASO') {
@@ -261,6 +247,7 @@ async function fetchCardOverviewManual() {
             }
 
             // Novos Clientes (Aquisição)
+            // Consideramos aquisição independente do status momentâneo para medir vendas
             if (createdAt >= currentWeekStart) newWeekCurr++;
             else if (createdAt >= lastWeekStart && createdAt <= lastWeekEnd) newWeekPrev++;
 
@@ -268,20 +255,20 @@ async function fetchCardOverviewManual() {
             else if (createdAt >= startLastMonth && createdAt <= endLastMonth) newMonthPrev++;
         });
 
-        // Churn Percentual (Baseado no total acumulado de cancelados vs ativos, já que não temos log mensal)
-        // Se houver histórico, idealmente seria (Cancelados no Mês / Ativos Início Mês).
-        // Como proxy, usamos a taxa atual.
+        // Churn Percentual (Baseado no total acumulado)
         const totalBase = totalAtivos + statusCancelados + statusAtraso;
         const churnRate = totalBase > 0 ? (statusCancelados / totalBase) * 100 : 0;
 
         return {
-            titulares_ativos: totalAtivos, // Agora bate com Status (Inclui Doação)
+            titulares_ativos: totalAtivos,
+            total_familiar: totalFamiliar,
+            total_individual: totalIndividual,
             novos_titulares_semana: { current: newWeekCurr, previous: newWeekPrev },
             novos_titulares_mes: { current: newMonthCurr, previous: newMonthPrev },
             status_ativos: statusAtivos,
             status_atraso: statusAtraso,
             status_cancelados: statusCancelados,
-            churn_total: statusCancelados, // Total acumulado
+            churn_total: statusCancelados, 
             churn_percentual: { current: churnRate, previous: 0 }
         };
 
@@ -291,7 +278,7 @@ async function fetchCardOverviewManual() {
     }
 }
 
-// NOVO: Busca Manual para Vendas por Vendedor (Bim Familiar)
+// NOVO: Busca Manual para Vendas por Vendedor (Bim Familiar + Individual)
 async function fetchSalesBySellerManual() {
     try {
         const today = new Date();
@@ -299,11 +286,11 @@ async function fetchSalesBySellerManual() {
         const startLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const endLastMonth = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59);
 
-        // Busca clientes 'Bim Familiar' criados nos últimos 2 meses
+        // Busca clientes dos planos alvo criados nos últimos 2 meses
         const { data, error } = await _supabase
             .from('clients')
             .select('vendedor, created_at, plano')
-            .eq('plano', 'Bim Familiar')
+            .in('plano', ['Bim Familiar', 'Bim Individual'])
             .gte('created_at', startLastMonth.toISOString());
 
         if (error) throw error;
@@ -325,7 +312,6 @@ async function fetchSalesBySellerManual() {
             }
         });
 
-        // Determinar Top Vendedor
         let topSellerName = '-';
         let topSellerCount = 0;
         
@@ -336,10 +322,9 @@ async function fetchSalesBySellerManual() {
             }
         });
 
-        // Preparar dados para o gráfico (Ranking)
         const chartData = Object.entries(sellerCountsCurrentMonth)
             .map(([name, count]) => ({ name, count }))
-            .sort((a, b) => b.count - a.count); // Ordem decrescente
+            .sort((a, b) => b.count - a.count); 
 
         return {
             kpi: {
@@ -402,27 +387,22 @@ async function fetchMonthlyConsultationsManual(planFilter = 'all') {
     }
 }
 
-// NOVO: Busca Semanal Manual para Projeções (Últimas 12 semanas)
 async function fetchWeeklyDataForProjections(planFilter = 'all') {
     try {
-        // Data de 12 semanas atrás
         const weeksAgo12 = new Date();
         weeksAgo12.setDate(weeksAgo12.getDate() - (12 * 7));
         const dateStr = weeksAgo12.toISOString().split('T')[0];
 
-        // 1. Consultas Semanais
         let consultQuery = _supabase
             .from('appointments')
             .select(`appointment_date, status, clients!inner(plano)`)
             .gte('appointment_date', dateStr)
             .neq('status', 'cancelado');
 
-        // 2. Clientes Ativos (Acumulado) Semanais
-        // Como não temos histórico diário de status, usaremos created_at para simular o crescimento da base
         let clientQuery = _supabase
             .from('clients')
             .select(`created_at, plano`)
-            .gte('created_at', dateStr) // Pegamos novos para calcular delta, e faremos count total separado
+            .gte('created_at', dateStr) 
             .eq('status', 'ATIVO');
 
         const [consultRes, clientRes] = await Promise.all([consultQuery, clientQuery]);
@@ -430,14 +410,11 @@ async function fetchWeeklyDataForProjections(planFilter = 'all') {
         if (consultRes.error) throw consultRes.error;
         if (clientRes.error) throw clientRes.error;
 
-        // --- Processamento Semanal ---
         const weeklyConsultations = Array(12).fill(0);
         const weeklyNewClients = Array(12).fill(0);
         const labels = [];
 
-        // Definir buckets de semanas
         const now = new Date();
-        // Ajusta para o domingo da semana atual
         const currentWeekEnd = new Date(now);
         currentWeekEnd.setDate(now.getDate() + (6 - now.getDay()));
         
@@ -447,9 +424,8 @@ async function fetchWeeklyDataForProjections(planFilter = 'all') {
             const start = new Date(end);
             start.setDate(start.getDate() - 6);
             
-            labels.push(start.toISOString().split('T')[0]); // Data de início da semana
+            labels.push(start.toISOString().split('T')[0]); 
 
-            // Filtrar Consultas nesta semana
             const countConsults = consultRes.data.filter(c => {
                 const d = new Date(c.appointment_date);
                 const matchPlan = planFilter === 'all' || c.clients?.plano === planFilter;
@@ -457,19 +433,14 @@ async function fetchWeeklyDataForProjections(planFilter = 'all') {
             }).length;
             weeklyConsultations[11 - i] = countConsults;
 
-            // Filtrar Novos Clientes nesta semana
             const countClients = clientRes.data.filter(c => {
                 const d = new Date(c.created_at);
-                // NOTA: Para projeção de aquisição, geralmente olhamos o cartão (Bim Familiar)
-                // Mas seguiremos o filtro se for aplicável
                 const matchPlan = planFilter === 'all' || c.plano === planFilter; 
                 return d >= start && d <= end && matchPlan;
             }).length;
             weeklyNewClients[11 - i] = countClients;
         }
 
-        // Precisamos do TOTAL acumulado por semana para calcular a taxa de uso
-        // Pegamos o total geral ANTES das 12 semanas
         const { count: totalPrior, error: countError } = await _supabase
             .from('clients')
             .select('*', { count: 'exact', head: true })
@@ -496,37 +467,30 @@ async function fetchWeeklyDataForProjections(planFilter = 'all') {
     }
 }
 
-// NOVO: Busca Manual para o Gráfico de Titulares (Substitui RPC bugada)
+// NOVO: Busca Manual para o Gráfico de Titulares (Estrito: Apenas Ativos)
 async function fetchWeeklyTitularesManual() {
     try {
-        const planFilter = 'Bim Familiar';
+        const targetPlans = ['Bim Familiar', 'Bim Individual'];
         
-        // Data de 12 semanas atrás (aproximada)
         const weeksAgo13 = new Date();
-        weeksAgo13.setDate(weeksAgo13.getDate() - (13 * 7)); // Pegamos um pouco mais para garantir
+        weeksAgo13.setDate(weeksAgo13.getDate() - (13 * 7)); 
         const dateStr = weeksAgo13.toISOString().split('T')[0];
 
-        // --- CORREÇÃO: Filtro Unificado e Tratamento de Nulos ---
-        
-        // 1. Clientes criados recentemente (ATIVO ou DOACAO)
+        // 1. Clientes criados recentemente (APENAS ATIVO)
         let clientQuery = _supabase
             .from('clients')
             .select(`created_at`)
             .gte('created_at', dateStr) 
-            .in('status', ['ATIVO', 'DOACAO']) // Inclui Doação
-            .eq('plano', planFilter);
+            .eq('status', 'ATIVO') // Estrito
+            .in('plano', targetPlans);
 
-        // 2. Contagem total anterior a data de corte (Base acumulada)
-        // Deve incluir: 
-        // a) Criados antes da data corte 
-        // b) OU com data NULA (migração antiga)
-        // E status ATIVO ou DOACAO
+        // 2. Base acumulada anterior (APENAS ATIVO)
         let countQuery = _supabase
             .from('clients')
             .select('*', { count: 'exact', head: true })
-            .in('status', ['ATIVO', 'DOACAO']) // Inclui Doação
-            .eq('plano', planFilter)
-            .or(`created_at.lt.${dateStr},created_at.is.null`); // Inclui nulos na base inicial
+            .eq('status', 'ATIVO') // Estrito
+            .in('plano', targetPlans)
+            .or(`created_at.lt.${dateStr},created_at.is.null`); 
 
         const [clientRes, countRes] = await Promise.all([clientQuery, countQuery]);
         
@@ -536,14 +500,11 @@ async function fetchWeeklyTitularesManual() {
         let runningTotal = countRes.count || 0;
         const resultData = [];
 
-        // Definir buckets de semanas
         const now = new Date();
         const currentWeekEnd = new Date(now);
-        // Ajusta para o próximo Sábado (fim da semana)
         currentWeekEnd.setDate(now.getDate() + (6 - now.getDay()));
         currentWeekEnd.setHours(23, 59, 59, 999);
 
-        // Gera 12 semanas (11 passadas + atual)
         for (let i = 11; i >= 0; i--) {
             const end = new Date(currentWeekEnd);
             end.setDate(end.getDate() - (i * 7));
@@ -552,16 +513,14 @@ async function fetchWeeklyTitularesManual() {
             start.setDate(start.getDate() - 6);
             start.setHours(0, 0, 0, 0);
             
-            // Filtra clientes nesta semana
             const countNew = clientRes.data.filter(c => {
-                if (!c.created_at) return false; // Ignora nulos aqui pois já foram contados na base inicial
+                if (!c.created_at) return false; 
                 const d = new Date(c.created_at);
                 return d >= start && d <= end;
             }).length;
 
             runningTotal += countNew;
 
-            // Formata label DD/MM
             const day = String(start.getDate()).padStart(2, '0');
             const month = String(start.getMonth() + 1).padStart(2, '0');
             
@@ -581,48 +540,43 @@ async function fetchWeeklyTitularesManual() {
 
 
 async function fetchChartData(planFilter = 'all') {
-    // REGRA DE NEGÓCIO: 
-    // Métricas de Agenda/Clínica seguem o filtro selecionado.
-    // Métricas do Cartão são FIXAS no "Bim Familiar".
     const clinicParams = { plan_filter: planFilter };
-    const cardParams = { plan_filter: 'Bim Familiar' }; 
+    // Passa lista separada por vírgula para os RPCs que aceitam string_to_array
+    const cardParams = { plan_filter: 'Bim Familiar,Bim Individual' }; 
     
     const [
         titularesData, consultasProfissionalData,
-        cohortData, // forecastData (RPC antigo ignorado)
-        funnelData, // acquisitionForecastData (RPC antigo ignorado)
+        cohortData,
+        funnelData,
         churnRiskData, consultasPlanoData,
         churnData, inadimplenciaData,
         tempoMedioData, ocupacaoData,
         consultasChartData,
-        weeklyData, // NOVO: Dados semanais para projeção inteligente
-        salesData // NOVO: Dados de Vendas por Vendedor
+        weeklyData, 
+        salesData 
     ] = await Promise.all([
-        fetchWeeklyTitularesManual(), // CORREÇÃO: Substitui RPC get_weekly_titulares
-        safeRpc('get_consultations_by_professional', clinicParams), // CLÍNICA
-        safeRpc('get_monthly_cohorts', cardParams), // CARTÃO
-        safeRpc('get_today_funnel_status', clinicParams), // CLÍNICA
-        safeRpc('get_churn_risk_clients'), // GERAL
-        safeRpc('get_consultations_by_plan', clinicParams), // CLÍNICA
-        safeRpc('get_churn_data', cardParams), // CARTÃO
-        safeRpc('get_inadimplencia_data', cardParams), // CARTÃO
-        safeRpc('get_tempo_medio_consultas', clinicParams), // CLÍNICA
-        safeRpc('get_taxa_ocupacao', clinicParams), // CLÍNICA (Gráfico de barras)
-        fetchMonthlyConsultationsManual(planFilter), // CLÍNICA (Histórico Mensal)
-        fetchWeeklyDataForProjections(planFilter), // CLÍNICA/CARTÃO (Dados para projeção)
-        fetchSalesBySellerManual() // NOVO
+        fetchWeeklyTitularesManual(), 
+        safeRpc('get_consultations_by_professional', clinicParams), 
+        safeRpc('get_monthly_cohorts', cardParams), 
+        safeRpc('get_today_funnel_status', clinicParams), 
+        safeRpc('get_churn_risk_clients'), 
+        safeRpc('get_consultations_by_plan', clinicParams), 
+        safeRpc('get_churn_data', cardParams), 
+        safeRpc('get_inadimplencia_data', cardParams), 
+        safeRpc('get_tempo_medio_consultas', clinicParams), 
+        safeRpc('get_taxa_ocupacao', clinicParams), 
+        fetchMonthlyConsultationsManual(planFilter), 
+        fetchWeeklyDataForProjections(planFilter), 
+        fetchSalesBySellerManual() 
     ]);
 
-    // --- PROCESSAMENTO DA PROJEÇÃO INTELIGENTE ---
     let smartForecasts = { acquisition: [], consultation: [] };
     let historicalConsultations = [];
     let historicalAcquisition = [];
 
     if (weeklyData) {
-        // Gera projeções matemáticas baseadas no histórico
         smartForecasts = generateAdvancedForecasts(weeklyData.activeClients, weeklyData.consultations);
         
-        // Formata histórico para os gráficos (Realizado)
         historicalConsultations = weeklyData.weekLabels.map((date, i) => ({
             week_start: date,
             count: weeklyData.consultations[i],
@@ -636,20 +590,19 @@ async function fetchChartData(planFilter = 'all') {
         }));
     }
 
-    // Combina Histórico + Projeção
     const finalConsultationForecast = [...historicalConsultations, ...smartForecasts.consultation];
     const finalAcquisitionForecast = [...historicalAcquisition, ...smartForecasts.acquisition];
 
     return { 
         titularesData, consultasProfissionalData, 
         cohortData, funnelData,
-        forecastData: finalConsultationForecast, // Substitui RPC antigo
-        acquisitionForecastData: finalAcquisitionForecast, // Substitui RPC antigo
+        forecastData: finalConsultationForecast, 
+        acquisitionForecastData: finalAcquisitionForecast, 
         churnRiskData, consultasPlanoData,
         churnData, inadimplenciaData,
         tempoMedioData, ocupacaoData,
         consultasChartData,
-        salesData // Retorna dados de vendas
+        salesData 
     };
 }
 
@@ -657,35 +610,6 @@ async function fetchReportData() {
     const { data, error } = await _supabase.rpc('get_client_report_data');
     if (error) { showToast('Falha ao gerar relatório.', 'error'); return null; }
     return data;
-}
-
-// --- NEW FUNCTION: POPULATE PLAN FILTER ---
-async function populatePlanFilter() {
-    const filterSelect = document.getElementById('dashboardPlanFilter');
-    if (!filterSelect) return;
-
-    if (filterSelect.options.length > 1) return;
-
-    try {
-        const { data, error } = await _supabase
-            .from('clients')
-            .select('plano')
-            .not('plano', 'is', null);
-
-        if (error) throw error;
-
-        const uniquePlans = [...new Set(data.map(item => item.plano?.trim()).filter(p => p))].sort();
-
-        uniquePlans.forEach(plan => {
-            const option = document.createElement('option');
-            option.value = plan;
-            option.textContent = plan;
-            filterSelect.appendChild(option);
-        });
-
-    } catch (error) {
-        console.error('Erro ao carregar planos para filtro:', error);
-    }
 }
 
 // --- UI UPDATES ---
@@ -755,7 +679,6 @@ function updateFinancialCard(idPrefix, data, period = 'mês') {
         return;
     }
 
-    // CORREÇÃO AQUI: Adicionei a lógica faltante e a chave de fechamento
     const percentageChange = ((current - previous) / previous) * 100;
     if (percentageChange >= 0) {
         compEl.textContent = `+${percentageChange.toFixed(1)}% vs ${period} anterior`;
@@ -774,7 +697,6 @@ function updateSalesKpi(kpiData) {
 
     if (!totalEl || !compEl || !topNameEl || !topValEl) return;
 
-    // KPI 1: Total Vendas
     const current = kpiData.total_current || 0;
     const previous = kpiData.total_previous || 0;
     
@@ -791,7 +713,6 @@ function updateSalesKpi(kpiData) {
         else compEl.classList.add('negative');
     }
 
-    // KPI 2: Top Vendedor
     topNameEl.textContent = kpiData.top_seller || '-';
     topValEl.textContent = `${kpiData.top_seller_count || 0} vendas`;
 }
@@ -811,8 +732,6 @@ function initializeSalesBySellerChart(data) {
     if (!ctx) return;
     
     const safeData = data || [];
-
-    // Cores (Laranja Bim)
     const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
 
     new Chart(ctx, {
@@ -829,7 +748,7 @@ function initializeSalesBySellerChart(data) {
             }]
         },
         options: {
-            indexAxis: 'y', // Barra horizontal para melhor leitura dos nomes
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: { 
@@ -1087,7 +1006,6 @@ function initializeConsultasChart(data) {
     new Chart(ctx, {
         type: 'bar',
         data: {
-            // Formata YYYY-MM para MM/YYYY
             labels: safeData.map(d => {
                 const parts = d.mes.split('-');
                 return `${parts[1]}/${parts[0]}`;
@@ -1140,24 +1058,18 @@ function initializeOcupacaoChart(data) {
     const ctx = document.getElementById('ocupacaoChart')?.getContext('2d');
     if (!ctx) return;
     
-    // Se não houver dados, não tenta renderizar
     if (!data || data.length === 0) return;
 
-    // 1. Extrair lista única de meses (Eixo X)
     const months = [...new Set(data.map(d => d.mes))].sort();
     
-    // 2. Extrair lista única de salas (Legenda)
     const rooms = [...new Set(data.map(d => d.sala))].sort();
 
-    // 3. Paleta de cores para diferenciar as salas
     const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#34495e'];
 
-    // 4. Montar os Datasets (uma série de dados para cada sala)
     const datasets = rooms.map((room, index) => {
         return {
             label: room,
             data: months.map(m => {
-                // Procura o valor específico para este Mês e Sala
                 const record = data.find(d => d.mes === m && d.sala === room);
                 return record ? record.taxa_ocupacao : 0;
             }),
@@ -1171,7 +1083,6 @@ function initializeOcupacaoChart(data) {
         type: 'bar',
         data: {
             labels: months.map(m => {
-                // Formata 'YYYY-MM' para 'MM/YYYY'
                 const [year, month] = m.split('-');
                 return `${month}/${year}`;
             }),
@@ -1181,7 +1092,7 @@ function initializeOcupacaoChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: { 
-                legend: { position: 'top' }, // Mostra a legenda para identificar as salas
+                legend: { position: 'top' }, 
                 tooltip: { 
                     mode: 'index', 
                     intersect: false 
@@ -1190,14 +1101,14 @@ function initializeOcupacaoChart(data) {
             scales: { 
                 y: { 
                     beginAtZero: true, 
-                    max: 100, // Limite visual de 100%, embora possa passar se houver overbooking
+                    max: 100, 
                     title: {
                         display: true,
                         text: 'Ocupação (%)'
                     }
                 },
                 x: {
-                    stacked: false // Garante que as barras fiquem lado a lado para comparação
+                    stacked: false 
                 }
             }
         }
@@ -1255,7 +1166,6 @@ function downloadCSV(csvString, fileName) {
     document.body.removeChild(link);
 }
 
-// Função principal exportada para carregar o dashboard
 export async function loadDashboardView() {
     const dashboardPage = document.getElementById('dashboardPage');
     if (!dashboardPage) return;
@@ -1263,14 +1173,18 @@ export async function loadDashboardView() {
     console.log('📊 Carregando Dashboard...');
     clearCharts();
 
-    // Carrega as opções do filtro dinamicamente
-    await populatePlanFilter();
+    const filterSelect = document.getElementById('dashboardPlanFilter');
+    if (filterSelect) filterSelect.style.display = 'none';
+    const labelFilter = document.querySelector('.filter-title');
+    if (labelFilter) labelFilter.style.display = 'none';
 
-    // Setup Listeners se ainda não foram adicionados
     const filterBtn = document.getElementById('filter-dashboard-btn');
-    if (filterBtn && !filterBtn.dataset.listening) {
-        filterBtn.dataset.listening = 'true';
-        filterBtn.addEventListener('click', () => runDashboardUpdate());
+    if (filterBtn) {
+        filterBtn.style.display = 'none';
+        if (!filterBtn.dataset.listening) {
+            filterBtn.dataset.listening = 'true';
+            filterBtn.addEventListener('click', () => runDashboardUpdate());
+        }
     }
 
     const exportGeralBtn = document.getElementById('export-geral-btn');
@@ -1305,22 +1219,19 @@ export async function loadDashboardView() {
 }
 
 async function runDashboardUpdate() {
-    // NOVA LÓGICA DE FILTRO (Dropdown)
-    const filterSelect = document.getElementById('dashboardPlanFilter');
-    const planFilter = filterSelect ? filterSelect.value : 'all';
+    const planFilter = 'all';
 
     const filterBtn = document.getElementById('filter-dashboard-btn');
     if(filterBtn) { filterBtn.disabled = true; filterBtn.textContent = 'Carregando...'; }
 
     try {
         const [financialData, clinicData, cardData, chartsData] = await Promise.all([
-            fetchFinancialData(planFilter), // Financeiro segue a regra da clínica/agenda
-            fetchClinicOverviewManual(planFilter), // Clínica segue o filtro, agora com cálculo manual ajustado
-            fetchCardOverviewManual(), // REGRA: Cartão SEMPRE "Bim Familiar", calculado manualmente
-            fetchChartData(planFilter) // Passa o filtro, mas dentro ele separa Card vs Clínica
+            fetchFinancialData(planFilter), 
+            fetchClinicOverviewManual(planFilter), 
+            fetchCardOverviewManual(), 
+            fetchChartData(planFilter) 
         ]);
 
-        // Update Financial KPIs
         updateFinancialCard('faturamento-bruto', financialData.faturamento_bruto);
         updateFinancialCard('faturamento-liquido', financialData.faturamento_liquido);
         
@@ -1332,37 +1243,49 @@ async function runDashboardUpdate() {
                 : 'R$ 0,00';
         }
 
-        // Update Clinic Overview
         const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
         setTxt('consultas-hoje', clinicData.consultas_hoje || 0);
         updateKpiCard('consultas-semana', clinicData.consultas_semana, 'semana');
         updateKpiCard('consultas-mes', clinicData.consultas_mes, 'mês');
         updateKpiCardPercentage('ocupacao-salas', clinicData.ocupacao_salas, 'mês');
 
-        // Update Card Overview (Agora fixo em Bim Familiar)
         setTxt('titulares-ativos', cardData.titulares_ativos || 0);
+        
+        // Exibindo segmentação por plano no card "Total de Titulares Ativos"
+        const titularesAtivosCard = document.getElementById('titulares-ativos')?.parentElement;
+        if (titularesAtivosCard) {
+            let segmentationEl = document.getElementById('titulares-segmentacao');
+            if (!segmentationEl) {
+                segmentationEl = document.createElement('div');
+                segmentationEl.id = 'titulares-segmentacao';
+                segmentationEl.style.fontSize = '0.85rem';
+                segmentationEl.style.marginTop = '5px';
+                segmentationEl.style.color = 'var(--gray-medium)';
+                titularesAtivosCard.appendChild(segmentationEl);
+            }
+            segmentationEl.innerHTML = `
+                <span style="display:block">Familiar: <strong>${cardData.total_familiar || 0}</strong></span>
+                <span style="display:block">Individual: <strong>${cardData.total_individual || 0}</strong></span>
+            `;
+        }
+
         updateKpiCard('novos-titulares-semana', cardData.novos_titulares_semana, 'semana');
         updateKpiCard('novos-titulares-mes', cardData.novos_titulares_mes, 'mês');
         
-        // Update Status Grid
         setTxt('status-ativos', cardData.status_ativos || 0);
         setTxt('status-atraso', cardData.status_atraso || 0);
         setTxt('status-cancelados', cardData.status_cancelados || 0);
         
-        // Update Churn
         setTxt('churn-total', cardData.churn_total || 0);
         updateKpiCardPercentage('churn-percentual', cardData.churn_percentual, 'mês');
 
-        // NOVO: Update Sales KPIs
         if (chartsData.salesData?.kpi) {
             updateSalesKpi(chartsData.salesData.kpi);
         }
 
-        // Initialize Charts
         initializeTitularesChart(chartsData.titularesData);
         initializeCohortChart(chartsData.cohortData);
         initializeFunnelChart(chartsData.funnelData);
-        // Agora usa dados com inteligência preditiva
         initializeForecastChart(chartsData.forecastData, 'forecastChart');
         initializeForecastChart(chartsData.acquisitionForecastData, 'acquisitionForecastChart');
         initializeConsultasProfissionalChart(chartsData.consultasProfissionalData);
@@ -1370,10 +1293,8 @@ async function runDashboardUpdate() {
         initializeChurnChart(chartsData.churnData);
         initializeInadimplenciaChart(chartsData.inadimplenciaData);
         
-        // NOVO: Gráfico de Vendas
         initializeSalesBySellerChart(chartsData.salesData?.chart);
 
-        // Agora inicializamos o gráfico de consultas com dados reais processados
         initializeConsultasChart(chartsData.consultasChartData);
         
         initializeTempoMedioChart(chartsData.tempoMedioData);

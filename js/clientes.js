@@ -289,43 +289,97 @@ async function handleResendPaymentLink(event) {
     }
 }
 
-// ... (Resto das funções: handleGenerateContract, handleNewClientSubmit, etc. permanecem iguais) ...
-
 function filterAndRenderClients() {
     const searchTerm = document.getElementById('clientsSearchInput').value;
     loadClientsData(searchTerm);
 }
 
+// Função para gerar o contrato em PDF
 async function handleGenerateContract(titularId) {
-    const btn = document.querySelector(`.generate-contract-btn[data-titular-id="${titularId}"]`);
-    const originalContent = btn ? btn.innerHTML : '';
-    
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    }
-
     try {
+        showToast('Gerando contrato...', 'info');
+
+        // 1. Buscar dados do Cliente + Dependentes
         const { data: client, error: clientError } = await _supabase
             .from('clients')
-            .select('*, dependents(*)')
+            .select(`*, dependents(*)`)
             .eq('id', titularId)
             .single();
 
         if (clientError) throw clientError;
 
-        const dependents = client.dependents || [];
-        await generateContractPDF(client, dependents);
-        showToast('Contrato gerado com sucesso!');
+        // 2. Buscar o Texto do Contrato do Plano correspondente
+        // Usa 'ilike' para evitar problemas com maiúsculas/minúsculas
+        const { data: plan, error: planError } = await _supabase
+            .from('plans')
+            .select('contract_text, price')
+            .ilike('name', client.plano)
+            .single();
+
+        // Se não achar o plano ou não tiver texto, usa um fallback ou avisa
+        let contractText = plan?.contract_text;
+        
+        if (!contractText) {
+            showToast('Modelo de contrato não encontrado para este plano. Configure em Gestão de Planos.', 'warning');
+            return;
+        }
+
+        // 3. Substituição de Variáveis
+        const today = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const dataAtual = today.toLocaleDateString('pt-BR', options);
+
+        // Formata dependentes
+        let listaDependentes = "Nenhum dependente cadastrado.";
+        if (client.dependents && client.dependents.length > 0) {
+            listaDependentes = client.dependents.map(d => 
+                `- ${d.nome} ${d.sobrenome || ''} (CPF: ${d.cpf || 'N/A'}, Nasc: ${d.data_nascimento || 'N/A'})`
+            ).join('\n');
+        }
+
+        // Realiza as trocas (.replace global)
+        contractText = contractText
+            .replace(/{{NOME_TITULAR}}/g, `${client.nome} ${client.sobrenome}`)
+            .replace(/{{CPF_TITULAR}}/g, client.cpf || '')
+            .replace(/{{DATA_NASCIMENTO_TITULAR}}/g, client.data_nascimento || '')
+            .replace(/{{TELEFONE_TITULAR}}/g, client.telefone || '')
+            .replace(/{{ENDERECO_TITULAR}}/g, `${client.endereco || ''}, ${client.numero || ''} - ${client.municipio || ''} (${client.cep || ''})`)
+            .replace(/{{NOME_PLANO}}/g, client.plano || '')
+            .replace(/{{VALOR_PLANO}}/g, plan?.price ? `R$ ${plan.price}` : 'A combinar')
+            .replace(/{{LISTA_DEPENDENTES}}/g, listaDependentes)
+            .replace(/{{DATA_ATUAL}}/g, dataAtual);
+
+        // 4. Geração do PDF com jsPDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Configurações de fonte
+        doc.setFont("helvetica");
+        doc.setFontSize(11);
+
+        // Quebra o texto em linhas para caber na página (largura max ~180mm)
+        const splitText = doc.splitTextToSize(contractText, 180);
+        
+        // Adiciona texto (início em x=15, y=20)
+        let y = 20;
+        
+        // Lógica simples de paginação
+        for (let i = 0; i < splitText.length; i++) {
+            if (y > 280) { // Se chegar no fim da página
+                doc.addPage();
+                y = 20;
+            }
+            doc.text(splitText[i], 15, y);
+            y += 6; // Espaçamento entre linhas
+        }
+
+        // Salva o arquivo
+        doc.save(`Contrato_${client.nome}_${client.plano}.pdf`);
+        showToast('Contrato gerado com sucesso!', 'success');
 
     } catch (error) {
-        console.error(error);
-        showToast('Erro ao gerar contrato: ' + error.message);
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = originalContent;
-        }
+        console.error('Erro ao gerar contrato:', error);
+        showToast('Erro ao gerar contrato.', 'error');
     }
 }
 

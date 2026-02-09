@@ -19,6 +19,8 @@ import { loadDashboardView } from './dashboard.js';
 import { setupFinanceiroPage, openFinancialModal, loadFinancialHistory, emitirCarne } from './financeiro.js';
 import { setupWhatsAppAdminPage } from './whatsapp_admin.js';
 import { setupCronogramaPage } from './cronograma.js';
+// IMPORTAÇÃO DA LÓGICA DE PLANOS
+import { setupPlansPage, openPlanModal, savePlan, deletePlan } from './planos.js';
 
 const newClientModalEl = document.getElementById('newClientModal');
 
@@ -54,6 +56,8 @@ async function loadPageData(pageName) {
     else if (pageName === 'dashboard') loadDashboardView();
     else if (pageName === 'whatsapp_admin') setupWhatsAppAdminPage();
     else if (pageName === 'cronograma') setupCronogramaPage();
+    // NOVA ROTA PARA PLANOS
+    else if (pageName === 'plans') setupPlansPage();
 }                                     
 
 // --- FUNÇÕES DE NAVEGAÇÃO E EVENTOS ---
@@ -163,17 +167,17 @@ function setupEventListeners() {
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
     
-    // CORREÇÃO: Nova lógica para o botão "Gerenciar Disponibilidade" da Home
+    // LISTENER DO BOTÃO NOVO PLANO
+    document.getElementById('addPlanBtn')?.addEventListener('click', () => openPlanModal());
+
     document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
         const user = getCurrentUserProfile();
         
         if (!user) return;
 
-        // Se for médico, abre a "Minha Disponibilidade" (sem ID)
         if (user.role === 'medicos') {
             openAvailabilityModal();
         } 
-        // Se for Admin/Recepção, avisa e redireciona para a lista de profissionais
         else if (['admin', 'superadmin', 'recepcao'].includes(user.role)) {
             showToast('Para gerenciar a agenda, selecione um profissional na lista.', 'info');
             navigateToPage('profissionais');
@@ -192,6 +196,9 @@ function setupEventListeners() {
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
     document.getElementById('professionalEventForm')?.addEventListener('submit', saveProfessionalEvent);
+    
+    // LISTENER DO SUBMIT DE PLANO
+    document.getElementById('planForm')?.addEventListener('submit', savePlan);
     
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
             const container = document.getElementById('dependentesContainer');
@@ -269,6 +276,19 @@ function setupEventListeners() {
 
         const editExamButton = target.closest('.edit-exam-btn');
         if (editExamButton) openExamModal(editExamButton.dataset.id);
+
+        // LISTENERS DE AÇÃO NOS PLANOS
+        const editPlanButton = target.closest('.edit-plan-btn');
+        if (editPlanButton) openPlanModal(editPlanButton.dataset.id);
+        
+        const deletePlanButton = target.closest('.delete-plan-btn');
+        if (deletePlanButton) deletePlan(deletePlanButton.dataset.id);
+
+        const viewContractButton = target.closest('.view-contract-btn');
+        if (viewContractButton) {
+            // Reutiliza o modal de edição, mas pode ser ajustado para apenas leitura
+            openPlanModal(viewContractButton.dataset.id);
+        }
         
         const checkinButton = target.closest('.checkin-btn');
         if (checkinButton) markArrival(checkinButton.dataset.id);
@@ -312,7 +332,6 @@ function setupEventListeners() {
         const editProfessionalButton = target.closest('.edit-professional-btn');
         if (editProfessionalButton) openProfessionalModal(editProfessionalButton.dataset.id);
 
-        // Listener para o botão de gerenciar disponibilidade na tabela de profissionais
         const manageEventsButton = target.closest('.manage-events-btn');
         if (manageEventsButton) {
             openAvailabilityModal(manageEventsButton.dataset.id);

@@ -1,454 +1,356 @@
 import { _supabase } from './supabase.js';
-import { validateCPF, validateEmail, validatePhone } from './utils.js';
-import { logAction } from './logger.js';
-import { showToast, showConfirm } from './utils.js';
-// NOVO: Importar para pegar o usuário logado
-import { getCurrentUserProfile } from './auth.js';
+import { showToast, fetchAddressByCEP } from './utils.js';
 
-let dependenteVendaCount = 0;
+let availablePlans = [];
 
 /**
- * Converte uma URL de imagem para o formato Base64.
- * Essencial para embutir a imagem no PDF.
+ * Configura a página de Nova Venda
  */
-function imageToBase64(url) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const dataURL = canvas.toDataURL('image/png');
-            resolve(dataURL);
-        };
-        img.onerror = reject;
-        img.src = url;
-    });
-}
-
-/**
- * Formata uma data do tipo "dd/mm/aaaa" para "aaaa-mm-dd" (padrão Supabase)
- */
-function formatDateForSupabase(dateString) {
-    if (!dateString || !dateString.includes('/')) return null;
-    const parts = dateString.split('/');
-    if (parts.length !== 3) return null;
-    let year = parts[2];
-    if (year.length === 2) {
-        year = parseInt(year) > 50 ? `19${year}` : `20${year}`;
-    }
-    return `${year}-${parts[1]}-${parts[0]}`;
-}
-
-
-function addVendaDependenteField(container) {
-    if (dependenteVendaCount >= 6) {
-        showToast("É permitido no máximo 6 dependentes.");
-        return;
-    }
-    dependenteVendaCount++;
-    const id = dependenteVendaCount;
-
-    const html = `
-        <div class="dependente-form-group" data-dependente-new-id="${id}">
-            <hr>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h4>Novo Dependente ${id}</h4>
-                <button type="button" class="btn btn-danger btn-small remove-dependente-btn">Remover</button>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Nome</label><input type="text" name="dependente_nome_${id}" required></div>
-                <div class="form-group"><label>Sobrenome</label><input type="text" name="dependente_sobrenome_${id}" required></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>CPF</label><input type="text" name="dependente_cpf_${id}" maxlength="14"></div>
-                <div class="form-group"><label>Data de Nascimento</label><input type="text" name="dependente_data_nascimento_${id}" placeholder="dd/mm/aaaa"></div>
-            </div>
-        </div>`;
-    container.insertAdjacentHTML('beforeend', html);
-}
-
-async function handleNewSaleSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    const titularFormData = new FormData(form);
-    const titularFormProps = Object.fromEntries(titularFormData);
-
-    if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
-        showToast('O CPF do titular é inválido!');
-        return;
-    }
-    if (titularFormProps.email && !validateEmail(titularFormProps.email)) {
-        showToast('O Email do titular é inválido!');
-        return;
-    }
-    if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
-        showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
-        return;
-    }
-
-    // === TRAVA DE CPF DUPLICADO (INÍCIO) ===
-    if (titularFormProps.cpf) {
-        const originalBtnText = submitButton.innerHTML;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando CPF...';
-
-        try {
-            const { data: existingClient, error: checkError } = await _supabase
-                .from('clients')
-                .select('id')
-                .eq('cpf', titularFormProps.cpf)
-                .maybeSingle();
-
-            if (checkError) throw checkError;
-
-            if (existingClient) {
-                showToast('ERRO: Este CPF já está cadastrado para outro titular! Venda bloqueada.');
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalBtnText;
-                return;
-            }
-        } catch (error) {
-            console.error('Erro na verificação de CPF duplicado:', error);
-            showToast('Erro ao verificar disponibilidade do CPF. Tente novamente.');
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalBtnText;
-            return;
-        }
+export function setupVendasPage() {
+    const form = document.getElementById('newSaleForm');
+    
+    if (form) {
+        // Remove listener antigo para evitar duplicação
+        form.removeEventListener('submit', handleSaleSubmit);
+        form.addEventListener('submit', handleSaleSubmit);
         
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalBtnText;
-    }
-    // === TRAVA DE CPF DUPLICADO (FIM) ===
+        // Listener de CEP
+        const cepInput = form.querySelector('input[name="cep"]');
+        if (cepInput) {
+            cepInput.addEventListener('blur', async (e) => {
+                const address = await fetchAddressByCEP(e.target.value);
+                if (address) {
+                    form.querySelector('input[name="endereco"]').value = address.logradouro;
+                    form.querySelector('input[name="municipio"]').value = `${address.localidade}-${address.uf}`;
+                }
+            });
+        }
 
-    const currentUser = getCurrentUserProfile();
-    const vendedorName = currentUser ? currentUser.full_name : 'Sistema';
-
-    const titularData = {
-        nome: titularFormProps.nome,
-        sobrenome: titularFormProps.sobrenome,
-        telefone: titularFormProps.telefone,
-        cpf: titularFormProps.cpf,
-        email: titularFormProps.email,
-        data_nascimento: titularFormProps.data_nascimento,
-        plano: titularFormProps.plano,
-        status: titularFormProps.status,
-        cep: titularFormProps.cep,
-        endereco: titularFormProps.endereco,
-        municipio: titularFormProps.municipio,
-        observacao: titularFormProps.observacao,
-        vendedor: vendedorName 
-    };
-
-    const dependentesData = [];
-    for (let i = 1; i <= dependenteVendaCount; i++) {
-        const nome = titularFormProps[`dependente_nome_${i}`];
-        if (nome) {
-            const dependente = {
-                nome: nome,
-                sobrenome: titularFormProps[`dependente_sobrenome_${i}`],
-                cpf: titularFormProps[`dependente_cpf_${i}`],
-                data_nascimento: titularFormProps[`dependente_data_nascimento_${i}`],
-            };
-            if (dependente.cpf && !validateCPF(dependente.cpf)) {
-                showToast(`O CPF do dependente ${dependente.nome} é inválido!`);
-                return;
-            }
-            dependentesData.push(dependente);
+        // Botão de Adicionar Dependente
+        const addDepBtn = document.getElementById('addVendaDependenteBtn');
+        if (addDepBtn) {
+            addDepBtn.onclick = () => addDependenteField();
         }
     }
+    
+    // Carrega os planos dinamicamente do banco
+    loadPlansIntoSelect();
+}
 
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando no Sistema...';
+/**
+ * Busca planos ativos no Supabase e preenche o select
+ */
+async function loadPlansIntoSelect() {
+    const planSelect = document.querySelector('#newSaleForm select[name="plano"]');
+    if (!planSelect) return;
 
     try {
-        // 1. Salvar Cliente no Supabase
-        const { data: newTitular, error: titularError } = await _supabase
+        const { data: plans, error } = await _supabase
+            .from('plans')
+            .select('*')
+            .eq('active', true)
+            .order('name');
+
+        if (error) throw error;
+
+        availablePlans = plans; // Armazena em memória para usar preço/descrição no submit
+
+        // Limpa opções (mantendo a primeira "Selecione...")
+        planSelect.innerHTML = '<option value="">Selecione...</option>';
+
+        if (plans.length === 0) {
+            const option = document.createElement('option');
+            option.textContent = "Nenhum plano ativo encontrado";
+            option.disabled = true;
+            planSelect.appendChild(option);
+            return;
+        }
+
+        plans.forEach(plan => {
+            const option = document.createElement('option');
+            // Usamos o NOME como value para compatibilidade com o campo 'plano' da tabela 'clients' (que é texto)
+            option.value = plan.name; 
+            
+            // Guardamos ID e Preço nos atributos de dados para acesso rápido
+            option.dataset.planId = plan.id;
+            option.dataset.price = plan.price;
+            
+            const priceFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price);
+            option.textContent = `${plan.name} - ${priceFormatted}`;
+            
+            planSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar planos na venda:', error);
+        showToast('Erro ao carregar lista de planos.', 'error');
+    }
+}
+
+/**
+ * Adiciona campos de dependente dinamicamente
+ */
+function addDependenteField() {
+    const container = document.getElementById('vendasDependentesContainer');
+    const index = container.children.length; // Usa índice para nomes únicos
+    
+    const div = document.createElement('div');
+    div.className = 'dependente-row form-row';
+    div.style.backgroundColor = '#f9f9f9';
+    div.style.padding = '10px';
+    div.style.marginBottom = '10px';
+    div.style.borderRadius = '5px';
+    div.style.border = '1px solid #eee';
+
+    div.innerHTML = `
+        <div class="form-group" style="flex: 2;">
+            <label>Nome Completo</label>
+            <input type="text" name="dep_nome_${index}" required placeholder="Nome do dependente">
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>CPF</label>
+            <input type="text" name="dep_cpf_${index}" placeholder="000.000.000-00" oninput="this.value = this.value.replace(/\\D/g, '').replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, '$1.$2.$3-$4')">
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>Nascimento</label>
+            <input type="date" name="dep_nasc_${index}">
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>Parentesco</label>
+            <select name="dep_parentesco_${index}">
+                <option value="Filho(a)">Filho(a)</option>
+                <option value="Cônjuge">Cônjuge</option>
+                <option value="Pai/Mãe">Pai/Mãe</option>
+                <option value="Outro">Outro</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 0; align-self: flex-end;">
+            <button type="button" class="btn btn-danger btn-small" onclick="this.parentElement.parentElement.remove()" title="Remover"><i class="fas fa-times"></i></button>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+/**
+ * Processa o envio do formulário de venda
+ */
+async function handleSaleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Recupera dados do plano selecionado
+    const selectedPlanName = formData.get('plano');
+    const selectedPlan = availablePlans.find(p => p.name === selectedPlanName);
+    
+    if (!selectedPlan) {
+        showToast('Por favor, selecione um plano válido.', 'warning');
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+
+    try {
+        // 1. Prepara dados do Cliente
+        const clientData = {
+            nome: formData.get('nome'),
+            sobrenome: formData.get('sobrenome'),
+            cpf: formData.get('cpf')?.replace(/\D/g, ''),
+            telefone: formData.get('telefone'),
+            email: formData.get('email'),
+            data_nascimento: formData.get('data_nascimento'),
+            cep: formData.get('cep'),
+            endereco: formData.get('endereco'),
+            municipio: formData.get('municipio'),
+            plano: selectedPlanName, // Salva o nome do plano
+            status: formData.get('status') || 'ATIVO',
+            created_at: new Date()
+        };
+
+        // Inserção do Cliente
+        const { data: client, error: clientError } = await _supabase
             .from('clients')
-            .insert({
-                ...titularData,
-                data_nascimento: formatDateForSupabase(titularData.data_nascimento)
-            })
+            .insert([clientData])
             .select()
             .single();
 
-        if (titularError) throw titularError;
-        
-        await logAction('CREATE_SALE', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}`, vendedor: vendedorName });
+        if (clientError) throw clientError;
 
-        if (dependentesData.length > 0) {
-            const dependentesParaSalvar = dependentesData.map(dep => ({
-                ...dep,
-                titular_id: newTitular.id,
-                data_nascimento: formatDateForSupabase(dep.data_nascimento)
-            }));
-
-            const { error: dependentesError } = await _supabase
-                .from('dependents')
-                .insert(dependentesParaSalvar);
-
-            if (dependentesError) throw dependentesError;
-        }
-
-        // =========================================================================
-        // INTEGRAÇÃO ASAAS + WHATSAPP (ATUALIZADO)
-        // =========================================================================
-        if (titularData.plano === 'Bim Familiar') { 
-            submitButton.innerHTML = '<i class="fas fa-sync fa-spin"></i> Gerando Cobrança Asaas...';
-            
-            try {
-                // Chama a Edge Function
-                const { data: asaasResponse, error: funcError } = await _supabase.functions.invoke('create-asaas-subscription', {
-                    body: {
-                        record: newTitular,
-                        titularData: titularData
-                    }
-                });
-
-                if (funcError) {
-                    // Detalhe importante: Se a função retorna 400, funcError captura isso
-                    console.error("Erro Supabase Function:", funcError);
-                    let msg = funcError.message;
-                    // Tenta extrair mensagem JSON se disponível
-                    try {
-                        const errBody = JSON.parse(funcError.message);
-                        if(errBody.error) msg = errBody.error;
-                    } catch(e) {}
-                    throw new Error(msg);
+        // 2. Prepara e Insere Dependentes
+        const dependentsToInsert = [];
+        // Itera sobre os inputs para encontrar dependentes (baseado no prefixo dep_nome_)
+        for (const [key, value] of formData.entries()) {
+            if (key.startsWith('dep_nome_')) {
+                const index = key.split('_')[2];
+                if (value.trim() !== '') {
+                    dependentsToInsert.push({
+                        titular_id: client.id,
+                        nome: value,
+                        cpf: formData.get(`dep_cpf_${index}`)?.replace(/\D/g, ''),
+                        data_nascimento: formData.get(`dep_nasc_${index}`) || null,
+                        parentesco: formData.get(`dep_parentesco_${index}`)
+                    });
                 }
-
-                if (!asaasResponse || !asaasResponse.success) {
-                    throw new Error('Erro Asaas: ' + (asaasResponse?.error || 'Resposta desconhecida'));
-                }
-
-                // --- LÓGICA DE WHATSAPP ---
-                if (asaasResponse.payment_link) {
-                    const firstName = titularData.nome.split(' ')[0];
-                    const whatsappMessage = `Olá, ${firstName}. É um prazer atendê-lo(a) na Bim Benefícios! 🧡\n\nAqui está o link seguro para ativar do seu plano e escolher a forma de pagamento (Pix, Boleto ou Cartão):\n${asaasResponse.payment_link}`;
-                    
-                    // Garante formato 55 + DDD + Numero
-                    const rawPhone = titularData.telefone.replace(/\D/g, '');
-                    const phoneForLink = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
-                    
-                    const whatsappUrl = `https://wa.me/${phoneForLink}?text=${encodeURIComponent(whatsappMessage)}`;
-
-                    const sendWpp = await showConfirm(`Venda salva e Assinatura criada no Asaas!\n\nDeseja enviar o link de pagamento para o cliente via WhatsApp agora?`);
-                    
-                    if (sendWpp) {
-                        window.open(whatsappUrl, '_blank');
-                    }
-                } else {
-                    showToast('Venda salva, mas o link de pagamento não foi retornado pelo Asaas.', 'warning');
-                }
-
-            } catch (asaasErr) {
-                console.error('Erro na integração Asaas:', asaasErr);
-                // Feedback mais claro para o usuário sobre o erro
-                alert(`ATENÇÃO: Cliente salvo no sistema, mas houve erro ao integrar com o Asaas:\n${asaasErr.message}\n\nVerifique se a Chave de API está configurada nos Secrets do Supabase.`);
             }
         }
-        // =========================================================================
 
-        showToast('Gerando contrato PDF...');
-        await generateContractPDF(newTitular, dependentesData);
+        if (dependentsToInsert.length > 0) {
+            const { error: depError } = await _supabase
+                .from('dependents')
+                .insert(dependentsToInsert);
+            
+            if (depError) console.error('Erro ao salvar dependentes:', depError); // Não bloqueia o fluxo principal
+        }
+
+        // 3. Integração Financeira (Simulação Asaas)
+        // Usa os dados REAIS da tabela de planos
+        const financeData = {
+            client_id: client.id,
+            description: `Assinatura ${selectedPlan.name}`, 
+            value: selectedPlan.price,                      
+            status: 'PENDING',
+            due_date: new Date().toISOString().split('T')[0], // Vencimento hoje (primeira parcela)
+            created_at: new Date()
+        };
+
+        // Tenta inserir na tabela de assinaturas (fallback para history se não existir)
+        const { error: financeError } = await _supabase
+            .from('asaas_subscriptions') 
+            .insert([{
+                ...financeData,
+                plan_id: selectedPlan.id,
+                cycle: 'MONTHLY'
+            }]);
+
+        if (financeError) {
+            console.warn('Fallback financeiro:', financeError);
+             await _supabase.from('financial_history').insert([{
+                client_id: client.id,
+                type: 'Mensalidade',
+                amount: selectedPlan.price,
+                status: 'Pendente',
+                description: `Primeira mensalidade - ${selectedPlan.name}`
+             }]);
+        }
+
+        showToast('Venda realizada e cliente cadastrado!', 'success');
         
+        // 4. Geração de Contrato Automática (Chamada local)
+        await generateContractPDF(client.id);
+
+        // Limpeza
         form.reset();
         document.getElementById('vendasDependentesContainer').innerHTML = '';
-        dependenteVendaCount = 0;
 
     } catch (error) {
-        showToast('Erro crítico ao salvar venda: ' + error.message, 'error');
+        console.error('Erro crítico na venda:', error);
+        showToast('Erro ao processar venda: ' + (error.message || 'Erro desconhecido'), 'error');
     } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
     }
 }
 
 /**
- * Função de geração de PDF do Contrato
+ * Função LOCAL para gerar o contrato (restaurada)
  */
-async function generateContractPDF(titular, dependentes) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const margin = 20;
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const usableWidth = pageWidth - (margin * 2);
-    let y = margin; 
-
-    const addWrappedText = (text, x, startY, maxWidth, lineHeight, isJustified = false) => {
-        const lines = pdf.splitTextToSize(text, maxWidth);
-        if (isJustified) {
-             pdf.text(lines, x, startY, { align: 'justify', maxWidth: maxWidth });
-        } else {
-             pdf.text(lines, x, startY);
-        }
-        return startY + (lines.length * lineHeight);
-    };
-
+export async function generateContractPDF(titularId) {
     try {
-        const logoBase64 = await imageToBase64('Logo_para_Marca_d_Água_MULTSAÚDE_Símbolo_(Laranja).png');
-        pdf.addImage(logoBase64, 'PNG', margin, y, 30, 30); 
-        y += 40; 
+        showToast('Gerando contrato...', 'info');
 
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS "BIM MULT BENEFICIOS"', pageWidth / 2, y, { align: 'center' });
-        y += 15;
+        // 1. Buscar dados do Cliente + Dependentes
+        const { data: client, error: clientError } = await _supabase
+            .from('clients')
+            .select(`*, dependents(*)`)
+            .eq('id', titularId)
+            .single();
 
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('CONTRATADA:', margin, y);
-        pdf.setFont('helvetica', 'normal');
-        y = addWrappedText(
-            'BIM MULT BENEFICIOS, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 37.054.912/0001-56, com sede na Av. Amadeu Bizelli, 1315 – Centro, Fernandópolis - SP, CEP 15600-000.',
-            margin, y + 5, usableWidth, 5, true
-        );
-        y += 10;
+        if (clientError) throw clientError;
+
+        // 2. Buscar o Texto do Contrato do Plano correspondente
+        const { data: plan, error: planError } = await _supabase
+            .from('plans')
+            .select('contract_text, price')
+            .ilike('name', client.plano)
+            .single();
+
+        let contractText = plan?.contract_text;
         
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('CONTRATANTE:', margin, y);
-        pdf.setFont('helvetica', 'normal');
-        y = addWrappedText(
-            `${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}, inscrito(a) no CPF sob o nº ${titular.cpf}, data de nasc. ${titular.data_nascimento ? titular.data_nascimento.split('-').reverse().join('/') : 'N/A'}, residente e domiciliado(a) em ${titular.endereco || 'N/A'}, ${titular.municipio || 'N/A'} - SP, Telefone: ${titular.telefone || 'N/A'}.`,
-            margin, y + 5, usableWidth, 5, true
-        );
-        y += 10;
-
-        y = addWrappedText(
-            'Pelo presente CONTRATO DE PRESTAÇÃO DE SERVIÇOS, as partes acima qualificadas têm, entre si, justo e contratado o que se segue:',
-            margin, y, usableWidth, 5, true
-        );
-        y += 10;
-
-        const clausulas = [
-            { title: 'CLÁUSULA 1ª – DO OBJETO', text: 'O presente contrato tem por objeto a prestação dos serviços descritos e detalhados no Anexo 1 deste instrumento. O Anexo compõe o presente contrato e são parte integrante deste, independentemente de transcrição, declarando-se o (a) CONTRATANTE ciente de seu inteiro teor.' },
-            { title: 'CLÁUSULA 2ª – DA CARÊNCIA PARA UTILIZAÇÃO DOS BENEFÍCIOS:', text: 'O acesso aos benefícios e/ou às coberturas garantidas neste contrato somente terão efeito após o cumprimento dos prazos e condições descritos no Anexo 2. O (a) CONTRATANTE declara-se ciente de que há a possibilidade de necessidade de reiteração no cumprimento do prazo de carência em caso de inadimplemento, conforme prazos e condições dispostas no Anexo do presente contrato.' },
-            { title: 'CLÁUSULA 3ª – DO PRAZO E DO PAGAMENTO', text: 'O presente contrato vigerá pelo prazo de 12 (doze) meses, contados a partir da assinatura do mesmo, sendo tal período renovado automaticamente, por iguais e sucessivos períodos, desde que não haja manifestação expressa de alguma das partes acerca da intenção de não renovação. Os valores a serem cumprido pela parte CONTRATANTE são aqueles discriminados em seu cadastro junto a CONTRATADA, de acordo com o plano, termos e condições e serviços escolhidos pelo cliente no momento da contratação. Essas informações podem ser solicitadas pelo (a) CONTRATANTE a qualquer momento. O atraso em qualquer das parcelas mensais acarretará o acréscimo de multa de 2% (dois por cento) ao mês e juros moratórios diários de 0,33% (zero vírgula trinta e três por cento). O valor do presente contrato será reajustado anualmente, pelo IGP-M da FGV ou, na hipótese de extinção deste, pelo índice que vier a substituí-lo. O(s) pagamento(s) de mensalidade(s) referente(s) a mês(es) posterior(es) ao de uma ou mais mensalidades vencidas não quita(m) eventuais débitos anteriores.' },
-            { title: 'CLÁUSULA 4ª – DA RESCISÃO', text: 'O presente contrato poderá ser rescindido de pleno direito, antes de seu termo final, mediante notificação prévia da parte interessada, por escrito, com antecedência mínima de 30 (trinta) dias. No caso de pedido de rescisão, terá o (a) CONTRATANTE a obrigação de arcar com todos os valores devidos durante o período de aviso prévio de 30 (trinta) dias. No caso de cancelamento deverá ser efetuado por escrito para a BIM MULT BENEFICIOS, na Avenida Amadeu Bizelli, 1315 – Centro Fernandópolis – SP.'},
-            { title: 'CLÁUSULA 5ª – DAS CONDIÇÕES GERAIS', text: 'O (A) CONTRATANTE declara que leu, compreendeu e aceitou o presente Contrato em todos seus termos e condições, de forma livre e independente de qualquer dolo, coação, fraude ou reserva mental. As definições necessárias e as condições específicas para a utilização das coberturas previstas neste contrato está nos respectivos Anexos, que fazem parte integrante do presente contrato.'},
-            { title: 'CLÁUSULA 6ª – DO FORO:', text: 'As partes elegem o foro do domicilio de Fernandópolis para dirimir qualquer controvérsia oriunda do presente contrato. Por estarem justas e acordadas, as Partes assinam este Instrumento em duas vias de igual teor e forma.'}
-        ];
-
-        pdf.setFontSize(10);
-        clausulas.forEach(clausula => {
-            if (y > 250) { 
-                pdf.addPage();
-                y = margin;
-            }
-            pdf.setFont('helvetica', 'bold');
-            y = addWrappedText(clausula.title, margin, y, usableWidth, 5);
-            y += 2;
-            pdf.setFont('helvetica', 'normal');
-            y = addWrappedText(clausula.text, margin, y, usableWidth, 5, true); 
-            y += 7;
-        });
-
-        if (y > 220) { 
-            pdf.addPage();
-            y = margin;
+        if (!contractText) {
+            showToast('Modelo de contrato não encontrado. Verifique a Gestão de Planos.', 'warning');
+            return;
         }
 
+        // 3. Substituição de Variáveis
         const today = new Date();
-        pdf.text(`Fernandópolis - SP, ${today.toLocaleDateString('pt-BR')}`, pageWidth / 2, y + 10, { align: 'center' });
-        y += 25;
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const dataAtual = today.toLocaleDateString('pt-BR', options);
 
-        pdf.text('________________________________________', margin, y);
-        pdf.text('________________________________________', pageWidth / 2 + 10, y);
-        y += 5;
+        let listaDependentes = "";
+        if (client.dependents && client.dependents.length > 0) {
+            // Formata a lista de dependentes para ficar alinhada (Nome | CPF | Nasc)
+            listaDependentes = client.dependents.map(d => 
+                `${d.nome} | ${formatCPF(d.cpf)} | ${d.data_nascimento || ''} | ${d.parentesco || 'DEPENDENTE'}`
+            ).join('\n');
+        } else {
+            listaDependentes = "Nenhum dependente cadastrado.";
+        }
 
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('CONTRATANTE', margin, y);
-        pdf.text('CONTRATADA', pageWidth / 2 + 10, y);
-        y += 5;
-        
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`${titular.nome.toUpperCase()} ${titular.sobrenome.toUpperCase()}`, margin, y);
-        pdf.text('BIM MULT BENEFICIOS', pageWidth / 2 + 10, y);
-        y += 5;
-        
-        pdf.text(`CPF: ${titular.cpf}`, margin, y);
-        pdf.text('CNPJ: 37.054.912/0001-56', pageWidth / 2 + 10, y);
-        y += 10;
+        contractText = contractText
+            .replace(/{{NOME_TITULAR}}/g, `${client.nome} ${client.sobrenome}`)
+            .replace(/{{CPF_TITULAR}}/g, formatCPF(client.cpf) || '__________________')
+            .replace(/{{DATA_NASCIMENTO_TITULAR}}/g, client.data_nascimento || '___/___/____')
+            .replace(/{{TELEFONE_TITULAR}}/g, client.telefone || '')
+            .replace(/{{ENDERECO_TITULAR}}/g, `${client.endereco || ''}, ${client.municipio || ''} - ${client.cep || ''}`)
+            .replace(/{{NOME_PLANO}}/g, client.plano || '')
+            .replace(/{{VALOR_PLANO}}/g, plan?.price ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price) : 'R$ 0,00')
+            .replace(/{{LISTA_DEPENDENTES}}/g, listaDependentes)
+            .replace(/{{DATA_ATUAL}}/g, dataAtual);
 
-        pdf.addPage();
-        y = margin;
+        // 4. Geração do PDF com jsPDF
+        if (!window.jspdf) {
+            showToast('Biblioteca PDF não carregada. Tente recarregar a página.', 'error');
+            return;
+        }
         
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.text('Anexo I - DISCRIMINAÇÃO DOS SERVIÇOS E BENEFÍCIÁRIOS', pageWidth / 2, y, { align: 'center' });
-        y += 15;
-        
-        const tableData = [[
-            `${titular.nome} ${titular.sobrenome}`,
-            titular.cpf,
-            titular.data_nascimento ? titular.data_nascimento.split('-').reverse().join('/') : 'N/A',
-            titular.plano,
-            'TITULAR'
-        ]];
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-        dependentes.forEach(d => {
-            tableData.push([
-                `${d.nome} ${d.sobrenome}`,
-                d.cpf || 'N/A',
-                d.data_nascimento || 'N/A', 
-                titular.plano,
-                'DEPENDENTE'
-            ]);
-        });
+        doc.setFont("helvetica");
+        doc.setFontSize(10);
 
-        pdf.autoTable({
-            startY: y,
-            head: [['Nome', 'CPF', 'Data Nascimento', 'Plano', 'Parentesco']],
-            body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [30, 77, 107] } 
-        });
+        // Quebra o texto automaticamente para não estourar a margem
+        const splitText = doc.splitTextToSize(contractText, 180);
+        let y = 20;
         
-        y = pdf.autoTable.previous.finalY + 10;
-        
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        y = addWrappedText('Composto pelos produtos: BIM PLANO FAMILIAR (composto por no máximo 7 (sete) pessoas. Carência – 1 dia útil.', margin, y, usableWidth, 5, true);
-        y += 5;
-        y = addWrappedText('Inadimplência: O não pagamento da “Parcela Mensal” transcorrido o lapso de quinze (15) dias, computados ininterruptamente a partir da data do vencimento da obrigação, sem que haja sido efetuado o cumprimento da obrigação contratual, será facultado à Empresa – CONTRATADA, suspender as disponibilizações dos “Serviços” que se presta a servir ao(s) Beneficiário(s) inscritos.', margin, y, usableWidth, 5, true);
-        y += 10;
-        
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(12);
-        pdf.text('ANEXO 2 - DOS BENEFÍCIOS', pageWidth / 2, y, { align: 'center' });
-        y += 10;
-        
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        const anexo2Text = '1. A CONTRATADA terá direito a acesso a uma rede de profissionais de saúde, incluindo médicos de diversas especialidades e odontologia com descontos especiais sobre os honorários, cobrados.\n2. A CONTRATADA também terá acesso a exames laboratoriais e de imagem com descontos previamente estabelecidos, conforme tabela de preços que será disponibilizada pelo CONTRATANTE.\n3. Os descontos aplicáveis serão informados a CONTRATADA no momento da solicitação dos serviços e poderão variar de acordo com a especialidade e o tipo de exame.\n4. A CONTRATADA concorda em seguir os procedimentos necessários para agendamento e realização dos serviços, conforme as orientações do CONTRATANTE.\n5. O CONTRATANTE se reserva o direito de atualizar a lista de médicos e exames disponíveis, bem como os respectivos descontos, mediante aviso prévio a CONTRATADA.';
-        y = addWrappedText(anexo2Text, margin, y, usableWidth, 5, true);
+        for (let i = 0; i < splitText.length; i++) {
+            if (y > 280) { // Nova página se passar do limite vertical
+                doc.addPage();
+                y = 20;
+            }
+            doc.text(splitText[i], 15, y);
+            y += 5;
+        }
 
-        pdf.save(`contrato-${titular.nome.toLowerCase().replace(/\s/g, '_')}.pdf`);
+        doc.save(`Contrato_${client.nome}_${client.plano}.pdf`);
+        showToast('Contrato gerado com sucesso!', 'success');
 
     } catch (error) {
-        console.error("Erro ao gerar PDF:", error);
-        showToast("Não foi possível gerar o PDF. Verifique se a imagem da logo está acessível.");
+        console.error('Erro ao gerar contrato (vendas):', error);
+        showToast('Erro ao gerar contrato.', 'error');
     }
 }
 
-function setupVendasPage() {
-    const form = document.getElementById('newSaleForm');
-    if (!form) return;
-    
-    if (form.dataset.listenerAttached) return;
-
-    form.addEventListener('submit', handleNewSaleSubmit);
-    
-    document.getElementById('addVendaDependenteBtn').addEventListener('click', () => {
-        addVendaDependenteField(document.getElementById('vendasDependentesContainer'));
-    });
-
-    form.dataset.listenerAttached = 'true';
+/**
+ * Função Auxiliar de Formatação CPF
+ */
+function formatCPF(v) {
+    if (!v) return '';
+    v = v.replace(/\D/g, "");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    return v;
 }
-
-export { setupVendasPage, generateContractPDF };

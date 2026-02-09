@@ -1,0 +1,37 @@
+/* Estilos específicos para a gestão de planos */
+
+#plansPage .table-container {
+    max-height: calc(100vh - 200px);
+}
+
+.status-badge.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Modal de Planos - Ajuste para o Textarea de Contrato */
+#planContract {
+    font-family: monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    min-height: 200px;
+    resize: vertical;
+}
+
+/* Botão de Ver Contrato */
+.view-contract-btn {
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    background: transparent;
+}
+
+.view-contract-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
