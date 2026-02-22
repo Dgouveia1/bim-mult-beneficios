@@ -13,7 +13,7 @@ const professionalColors = ['#3498db', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6
 
 
 // =================================================================
-// MODIFICAÇÃO: saveAppointment COM TRAVA FINANCEIRA
+// MODIFICAÇÃO: saveAppointment SEM TRAVA FINANCEIRA
 // =================================================================
 async function saveAppointment(event) {
     event.preventDefault();
@@ -56,26 +56,7 @@ async function saveAppointment(event) {
 
     try {
         // =================================================================
-        // NOVA VERIFICAÇÃO 1: STATUS FINANCEIRO DO CLIENTE
-        // =================================================================
-        const { data: clientStatus, error: statusError } = await _supabase
-            .from('clients')
-            .select('status, nome, sobrenome')
-            .eq('id', appointmentData.client_id)
-            .single();
-
-        if (statusError) throw statusError;
-
-        // Regra de Bloqueio
-        if (clientStatus.status === 'ATRASO' || clientStatus.status === 'INATIVO' || clientStatus.status === 'CANCELADO') {
-            // Log da tentativa bloqueada
-            console.warn(`Tentativa de agendamento bloqueada para ${clientStatus.nome}. Status: ${clientStatus.status}`);
-            
-            throw new Error(`🚫 AGENDAMENTO BLOQUEADO!<br>O cliente <b>${clientStatus.nome}</b> consta com status <b>${clientStatus.status}</b>.<br>Regularize o financeiro antes de agendar.`);
-        }
-
-        // =================================================================
-        // VERIFICAÇÃO 2: Conflito de Disponibilidade do Profissional
+        // VERIFICAÇÃO 1: Conflito de Disponibilidade do Profissional
         // =================================================================
         const { data: professionalEvents, error: eventCheckError } = await _supabase
             .from('professional_events')
@@ -92,7 +73,7 @@ async function saveAppointment(event) {
         }
 
         // =================================================================
-        // VERIFICAÇÃO 3: Conflito de Sala
+        // VERIFICAÇÃO 2: Conflito de Sala
         // =================================================================
         const { data: conflictingAppointments, error: checkError } = await _supabase
             .from('appointments')

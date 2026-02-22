@@ -78,7 +78,7 @@ function createPatientCard(appt) {
     const isPaymentDisabled = appt.payment_status === 'pago' || appt.status === 'cancelado';
     const paymentButtonText = appt.payment_status === 'pago' ? 'Pago' : 'Registrar Pagamento';
 
-    // --- NOVA LÓGICA: Alerta de Inadimplência ---
+    // --- LÓGICA MANTIDA: Alerta de Inadimplência apenas visual na recepção ---
     // Verifica se o objeto 'clients' veio populado e se o status é ATRASO
     const isOverdue = appt.clients && appt.clients.status === 'ATRASO';
     

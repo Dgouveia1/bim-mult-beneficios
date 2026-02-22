@@ -196,3 +196,66 @@ export function showConfirm(message) {
         btnNao.addEventListener('click', () => closeDialog(false));
     });
 }
+
+// Formatação de Moeda (BRL)
+export function formatCurrency(value) {
+    // Garante que o valor é um número; se for nulo/undefined, assume 0
+    const numberValue = Number(value) || 0;
+    
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(numberValue);
+}
+
+// Formatação de Data (DD/MM/AAAA)
+export function formatDate(dateString) {
+    if (!dateString) return '-';
+    // Lida com instâncias de Date ou strings ISO
+    const date = new Date(dateString);
+    // Verifica se a data é válida
+    if (isNaN(date.getTime())) return dateString; 
+    
+    return date.toLocaleDateString('pt-BR');
+}
+
+// Formatação de Data e Hora (DD/MM/AAAA HH:mm)
+export function formatDateTime(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+
+    return date.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Utilitário de Delay (útil para simular carregamento ou esperar animações)
+export const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// Validação simples de CPF (apenas formatação visual para display)
+export function formatCPF(cpf) {
+    if (!cpf) return '';
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
+// Validação simples de Telefone
+export function formatPhone(phone) {
+    if (!phone) return '';
+    // Remove tudo que não é dígito
+    const v = phone.replace(/\D/g, "");
+    
+    // Formato (11) 99999-9999
+    if (v.length === 11) {
+        return v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
+    // Formato (11) 9999-9999
+    if (v.length === 10) {
+        return v.replace(/^(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    }
+    return phone;
+}

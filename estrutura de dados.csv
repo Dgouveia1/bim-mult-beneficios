@@ -1,319 +1,339 @@
 categoria,objeto,detalhes
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: details | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: action | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: confirmacao | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,"COLUNA: pause_history | TIPO: jsonb | NULÁVEL: YES | PADRÃO: '[]'::jsonb | DESCRIÇÃO: Armazena array de objetos {start, end} para calcular tempo líquido de atendimento"
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: checkin_time | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: details | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: action_logs,COLUNA: action | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_start_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico iniciou o atendimento.
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: confirmacao | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: checkin_time | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: patient_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: procedure | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'agendado'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: 'pendente'::text | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: appointment_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,"COLUNA: pause_history | TIPO: jsonb | NULÁVEL: YES | PADRÃO: '[]'::jsonb | DESCRIÇÃO: Armazena array de objetos {start, end} para calcular tempo líquido de atendimento"
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_end_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico finalizou o atendimento.
 1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: room | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'agendado'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: appointment_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: json_data | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: appointments,COLUNA: consultation_end_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Registra o carimbo de data/hora de quando o médico finalizou o atendimento.
 1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: asaas_payment_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: event_type | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: payment_date | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_subscription_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: json_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_payment_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_customer_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payment_events,COLUNA: json_data | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: payment_method | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: invoice_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_payment_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: json_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: payment_date | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: net_value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_subscription_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: asaas_customer_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: payment_link | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: asaas_subscription_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_payments,COLUNA: invoice_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: cycle | TIPO: text | NULÁVEL: YES | PADRÃO: 'MONTHLY'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: asaas_subscription_id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: base_para_disparos,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: payment_link | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: asaas_subscriptions,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: base_para_disparos,COLUNA: disparo | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: base_para_disparos,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: base_para_disparos,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: asaas_customer_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: observacao | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Observações gerais sobre o cliente/venda.
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: updated_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: carteirinha | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: vendedor | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: municipio | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: municipio | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: asaas_customer_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: numero | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: endereco | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cep | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: clients,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: data_nascimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: clients,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: clients,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: exame_fisico | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: conduta | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: laudo_texto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: conduta | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: exame_fisico | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: atestado | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: queixa_principal | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: procedimentos | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: autorizacao_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: cuidados_pos_cirurgia | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_auth,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: orcamento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: anexos | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: pedido_exames_imagem | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Armazena a lista de exames de imagem solicitados em formato JSON
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: receituario | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: consultations,COLUNA: laudo_texto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_auth,COLUNA: token | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_auth,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: JUROS_PAGO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: DATA_VENCIMENTO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: VALOR_PAGO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: CLIENTE | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_auth,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: DATA_CRIA��O | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: payment_form | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: CPF | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: CLIENTE | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: VALOR | TIPO: double precision | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: payment_form | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: DATA_VENCIMENTO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: JUROS_PAGO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: DATA_PAGAMENTO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: CPF | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoice_manual_data,COLUNA: VALOR_PAGO | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: registered | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: pix_emv | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: occurrence_date | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: total_paid | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: created_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: id | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: created_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: total_amount | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_document_identity | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_amount | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: fine_rate | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: interest_rate | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: cobranca_enviada | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_telephone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_document_type | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_address | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_unit | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_quantity | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_total_amount | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: due_date | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: fine_date | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: fine_amount | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: discount | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: barcode | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: digitable | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: our_number | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: registered | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: pix_emv | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_created_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_finalized_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_total_paid | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_method | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_order | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_interest | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_telephone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_fine | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: fine_date | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: total_paid | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: occurrence_date | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_interest | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_order | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_method | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_total_paid | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: cobranca_enviada | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_finalized_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_created_at | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: payment_status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_document_type | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_address | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: customer_code | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_unit | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_quantity | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: cora_invoices_lates_manual,COLUNA: service_total_amount | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: created_at | TIPO: timestamp without time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: data_nascimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: nome | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: titular_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: dependents,COLUNA: sexo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Proximo_Vencimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: CPF_CNPJ | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Valor | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Customer_ID_Asaas | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Subscription_ID_Asaas | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Status_Assinatura | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Ciclo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Criado_Em | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Proximo_Vencimento | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: duplicados_asaas,COLUNA: Valor | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: protocol_name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: type | TIPO: text | NULÁVEL: NO | PADRÃO: 'laboratorial'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: value_particular | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: exams,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: boleto_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_daily_sync,"COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: timezone('utc'::text, now()) | DESCRIÇÃO: N/A"
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: client_cpf | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: client_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: bank_slip_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: boleto_url | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_daily_sync,COLUNA: barcode | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_cpf | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: payment_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: bank_slip_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: client_cpf | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: snapshot_date | TIPO: date | NULÁVEL: YES | PADRÃO: CURRENT_DATE | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: bank_slip_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: previous_status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: amount | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history,COLUNA: payment_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: cora_invoice_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: change_date | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: new_status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: cora_invoice_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: previous_status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: financial_history_log,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: ID do profissional que criou o protocolo.
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: exams | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: Array de objetos JSON contendo os exames do protocolo.
 1. TABELAS E COLUNAS,TABELA: image_exam_protocols,COLUNA: protocol_name | TIPO: character varying(255) | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: Nome do protocolo para fácil identificação.
+1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: record_data | TIPO: jsonb | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: medical_records,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: mensagem_para_disparo,COLUNA: texto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: mensagem_para_disparo,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: mensagem_para_disparo,"COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: timezone('utc'::text, now()) | DESCRIÇÃO: N/A"
 1. TABELAS E COLUNAS,TABELA: mensagem_para_disparo,COLUNA: criado_por | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: payments,COLUNA: amount | TIPO: numeric | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: payments,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: payments,COLUNA: method | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: payments,COLUNA: appointment_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: payments,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: custo | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: dependents_limit | TIPO: integer | NULÁVEL: YES | PADRÃO: 0 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: price | TIPO: numeric | NULÁVEL: YES | PADRÃO: 0.00 | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: contract_text | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: active | TIPO: boolean | NULÁVEL: YES | PADRÃO: true | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: plans,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: tabela | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: nome_produto | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: unidade | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: grupo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: products,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'ATIVO'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: tabela | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: products,COLUNA: grupo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: custo | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: products,COLUNA: preco | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: event_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: professional_id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: specialty | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: start_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: event_date | TIPO: date | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professional_events,COLUNA: end_time | TIPO: time without time zone | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: CRM | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: name | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: specialty | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: user_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: professionals,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: full_name | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: role | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: mensagem | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: gen_random_uuid() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: profiles,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: is_client | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: cliente | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: id | TIPO: uuid | NULÁVEL: NO | PADRÃO: gen_random_uuid() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: mensagem | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: NO | PADRÃO: now() | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: from_me | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: assignee_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: is_client | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: raw_atendimentos_whatsapp,COLUNA: cliente | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: priority | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: title | TIPO: text | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: id | TIPO: bigint | NULÁVEL: NO | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: now() | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: due_date | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: assignee_id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: 'todo'::text | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: tasks,COLUNA: description | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: email | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: vendedor | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: status | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: plano | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: created_at | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clientes_ativos_pagantes,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: asaas_payment_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: data_vencimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: valor | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: sobrenome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: status_cliente | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: payment_link | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: link_boleto | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: asaas_payment_id | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: data_vencimento | TIPO: date | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: client_id | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: valor | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_clients_overdue,COLUNA: cpf | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: is_client | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tem_consulta_marcada | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tipo_vinculo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: last_msg_content | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: aguardando_resposta | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: last_msg_time | TIPO: timestamp with time zone | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tempo_medio_online | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tempo_medio_off | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: last_msg_content | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tipo_vinculo | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: id | TIPO: uuid | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: telefone | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
-2. CONSTRAINTS (CHAVES),TABELA: action_logs,CONSTRAINT: action_logs_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tem_consulta_marcada | TIPO: boolean | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: nome | TIPO: text | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: view_whatsapp_control,COLUNA: tempo_medio_online | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_cartao_metrics,COLUNA: total_beneficiarios_ativos | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_cartao_metrics,COLUNA: crescimento_percentual | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_cartao_metrics,COLUNA: faturamento_anterior | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_cartao_metrics,COLUNA: transacoes_atual | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_cartao_metrics,COLUNA: faturamento_atual | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_clinica_metrics,COLUNA: atendimentos_atual | TIPO: bigint | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_clinica_metrics,COLUNA: faturamento_atual | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_clinica_metrics,COLUNA: faturamento_anterior | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
+1. TABELAS E COLUNAS,TABELA: vw_dashboard_clinica_metrics,COLUNA: crescimento_percentual | TIPO: numeric | NULÁVEL: YES | PADRÃO: N/A | DESCRIÇÃO: N/A
 2. CONSTRAINTS (CHAVES),TABELA: action_logs,CONSTRAINT: action_logs_user_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): user_id | REFERENCIA: profiles(id)
+2. CONSTRAINTS (CHAVES),TABELA: action_logs,CONSTRAINT: action_logs_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: appointments,CONSTRAINT: appointments_client_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): client_id | REFERENCIA: clients(id)
 2. CONSTRAINTS (CHAVES),TABELA: asaas_payment_events,CONSTRAINT: asaas_payment_events_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_client_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): client_id | REFERENCIA: clients(id)
 2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_asaas_payment_id_key | TIPO: UNIQUE | COLUNA(S): asaas_payment_id
 2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_client_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): client_id | REFERENCIA: clients(id)
+2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): asaas_customer_id
+2. CONSTRAINTS (CHAVES),TABELA: asaas_payments,CONSTRAINT: asaas_payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): asaas_customer_id
 2. CONSTRAINTS (CHAVES),TABELA: asaas_subscriptions,CONSTRAINT: asaas_subscriptions_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: asaas_subscriptions,CONSTRAINT: asaas_subscriptions_client_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): client_id | REFERENCIA: clients(id)
 2. CONSTRAINTS (CHAVES),TABELA: clients,CONSTRAINT: clients_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_key | TIPO: UNIQUE | COLUNA(S): appointment_id
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
 2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+2. CONSTRAINTS (CHAVES),TABELA: consultations,CONSTRAINT: consultations_appointment_id_key | TIPO: UNIQUE | COLUNA(S): appointment_id
 2. CONSTRAINTS (CHAVES),TABELA: cora_auth,CONSTRAINT: cora_auth_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: cora_invoice_manual_data,CONSTRAINT: cora_invoice_manual_data_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: cora_invoices_lates_manual,CONSTRAINT: cora_invoices_lates_manual_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_titular_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): titular_id | REFERENCIA: clients(id)
-2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: dependents,CONSTRAINT: dependents_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
+2. CONSTRAINTS (CHAVES),TABELA: exam_protocols,CONSTRAINT: exam_protocols_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: exams,CONSTRAINT: exams_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: financial_daily_sync,CONSTRAINT: financial_daily_sync_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: financial_daily_sync,CONSTRAINT: financial_daily_sync_bank_slip_id_key | TIPO: UNIQUE | COLUNA(S): bank_slip_id
@@ -324,40 +344,41 @@ categoria,objeto,detalhes
 2. CONSTRAINTS (CHAVES),TABELA: medical_records,CONSTRAINT: medical_records_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: mensagem_para_disparo,null
 2. CONSTRAINTS (CHAVES),TABELA: mensagem_para_disparo,CONSTRAINT: mensagem_para_disparo_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_appointment_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): appointment_id | REFERENCIA: appointments(id)
+2. CONSTRAINTS (CHAVES),TABELA: payments,CONSTRAINT: payments_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: plans,CONSTRAINT: plans_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: products,CONSTRAINT: products_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: professional_events,CONSTRAINT: professional_events_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: professional_events,CONSTRAINT: professional_events_professional_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): professional_id | REFERENCIA: professionals(id)
 2. CONSTRAINTS (CHAVES),TABELA: professionals,null
 2. CONSTRAINTS (CHAVES),TABELA: professionals,CONSTRAINT: professionals_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: profiles,null
 2. CONSTRAINTS (CHAVES),TABELA: profiles,CONSTRAINT: profiles_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
+2. CONSTRAINTS (CHAVES),TABELA: profiles,null
 2. CONSTRAINTS (CHAVES),TABELA: raw_atendimentos_whatsapp,CONSTRAINT: raw_atendimentos_whatsapp_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
-2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_assignee_id_fkey | TIPO: FOREIGN KEY | COLUNA(S): assignee_id | REFERENCIA: profiles(id)
+2. CONSTRAINTS (CHAVES),TABELA: tasks,CONSTRAINT: tasks_pkey | TIPO: PRIMARY KEY | COLUNA(S): id
 3. ÍNDICES,TABELA: action_logs,ÍNDICE: action_logs_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX action_logs_pkey ON public.action_logs USING btree (id)
-3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
 3. ÍNDICES,TABELA: appointments,ÍNDICE: appointments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX appointments_pkey ON public.appointments USING btree (id)
+3. ÍNDICES,TABELA: appointments,ÍNDICE: idx_appointments_client_id | DEFINIÇÃO: CREATE INDEX idx_appointments_client_id ON public.appointments USING btree (client_id)
 3. ÍNDICES,TABELA: asaas_payment_events,ÍNDICE: idx_asaas_payment_events_pay_id | DEFINIÇÃO: CREATE INDEX idx_asaas_payment_events_pay_id ON public.asaas_payment_events USING btree (asaas_payment_id)
 3. ÍNDICES,TABELA: asaas_payment_events,ÍNDICE: asaas_payment_events_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX asaas_payment_events_pkey ON public.asaas_payment_events USING btree (id)
-3. ÍNDICES,TABELA: asaas_payments,ÍNDICE: asaas_payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX asaas_payments_pkey ON public.asaas_payments USING btree (id)
-3. ÍNDICES,TABELA: asaas_payments,ÍNDICE: idx_asaas_payments_status | DEFINIÇÃO: CREATE INDEX idx_asaas_payments_status ON public.asaas_payments USING btree (status)
 3. ÍNDICES,TABELA: asaas_payments,ÍNDICE: asaas_payments_asaas_payment_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX asaas_payments_asaas_payment_id_key ON public.asaas_payments USING btree (asaas_payment_id)
+3. ÍNDICES,TABELA: asaas_payments,"ÍNDICE: asaas_payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX asaas_payments_pkey ON public.asaas_payments USING btree (id, asaas_customer_id)"
 3. ÍNDICES,TABELA: asaas_payments,ÍNDICE: idx_asaas_payments_sub_id | DEFINIÇÃO: CREATE INDEX idx_asaas_payments_sub_id ON public.asaas_payments USING btree (asaas_subscription_id)
+3. ÍNDICES,TABELA: asaas_payments,ÍNDICE: idx_asaas_payments_status | DEFINIÇÃO: CREATE INDEX idx_asaas_payments_status ON public.asaas_payments USING btree (status)
 3. ÍNDICES,TABELA: asaas_subscriptions,ÍNDICE: asaas_subscriptions_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX asaas_subscriptions_pkey ON public.asaas_subscriptions USING btree (id)
 3. ÍNDICES,TABELA: clients,ÍNDICE: clients_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX clients_pkey ON public.clients USING btree (id)
-3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_pkey ON public.consultations USING btree (id)
 3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_appointment_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_appointment_id_key ON public.consultations USING btree (appointment_id)
+3. ÍNDICES,TABELA: consultations,ÍNDICE: consultations_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX consultations_pkey ON public.consultations USING btree (id)
 3. ÍNDICES,TABELA: cora_auth,ÍNDICE: cora_auth_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX cora_auth_pkey ON public.cora_auth USING btree (id)
 3. ÍNDICES,TABELA: cora_invoice_manual_data,ÍNDICE: cora_invoice_manual_data_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX cora_invoice_manual_data_pkey ON public.cora_invoice_manual_data USING btree (id)
 3. ÍNDICES,TABELA: cora_invoices_lates_manual,ÍNDICE: cora_invoices_lates_manual_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX cora_invoices_lates_manual_pkey ON public.cora_invoices_lates_manual USING btree (id)
 3. ÍNDICES,TABELA: dependents,ÍNDICE: dependents_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX dependents_pkey ON public.dependents USING btree (id)
 3. ÍNDICES,TABELA: exam_protocols,ÍNDICE: exam_protocols_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exam_protocols_pkey ON public.exam_protocols USING btree (id)
 3. ÍNDICES,TABELA: exams,ÍNDICE: exams_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX exams_pkey ON public.exams USING btree (id)
-3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: idx_financial_daily_cpf | DEFINIÇÃO: CREATE INDEX idx_financial_daily_cpf ON public.financial_daily_sync USING btree (client_cpf)
 3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: financial_daily_sync_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX financial_daily_sync_pkey ON public.financial_daily_sync USING btree (id)
 3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: financial_daily_sync_bank_slip_id_key | DEFINIÇÃO: CREATE UNIQUE INDEX financial_daily_sync_bank_slip_id_key ON public.financial_daily_sync USING btree (bank_slip_id)
+3. ÍNDICES,TABELA: financial_daily_sync,ÍNDICE: idx_financial_daily_cpf | DEFINIÇÃO: CREATE INDEX idx_financial_daily_cpf ON public.financial_daily_sync USING btree (client_cpf)
 3. ÍNDICES,TABELA: financial_history,ÍNDICE: idx_financial_history_cpf | DEFINIÇÃO: CREATE INDEX idx_financial_history_cpf ON public.financial_history USING btree (client_cpf)
 3. ÍNDICES,TABELA: financial_history,ÍNDICE: financial_history_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX financial_history_pkey ON public.financial_history USING btree (id)
 3. ÍNDICES,TABELA: financial_history_log,ÍNDICE: financial_history_log_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX financial_history_log_pkey ON public.financial_history_log USING btree (id)
@@ -365,6 +386,7 @@ categoria,objeto,detalhes
 3. ÍNDICES,TABELA: medical_records,ÍNDICE: medical_records_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX medical_records_pkey ON public.medical_records USING btree (id)
 3. ÍNDICES,TABELA: mensagem_para_disparo,ÍNDICE: mensagem_para_disparo_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX mensagem_para_disparo_pkey ON public.mensagem_para_disparo USING btree (id)
 3. ÍNDICES,TABELA: payments,ÍNDICE: payments_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (id)
+3. ÍNDICES,TABELA: plans,ÍNDICE: plans_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX plans_pkey ON public.plans USING btree (id)
 3. ÍNDICES,TABELA: products,ÍNDICE: products_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)
 3. ÍNDICES,TABELA: professional_events,ÍNDICE: professional_events_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX professional_events_pkey ON public.professional_events USING btree (id)
 3. ÍNDICES,TABELA: professionals,ÍNDICE: professionals_pkey | DEFINIÇÃO: CREATE UNIQUE INDEX professionals_pkey ON public.professionals USING btree (id)
@@ -464,6 +486,26 @@ begin
 end;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: daily_client_status_sync,"CREATE OR REPLACE FUNCTION public.daily_client_status_sync()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+    -- Sincronizar todos os clientes uma vez por dia
+    PERFORM public.sync_client_statuses();
+    
+    -- Registrar execução
+    INSERT INTO action_logs (action, details, user_email, created_at)
+    VALUES (
+        'DAILY_SYNC_EXECUTED',
+        jsonb_build_object('timestamp', NOW()),
+        'system',
+        NOW()
+    );
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: diagnose_name_matching,"CREATE OR REPLACE FUNCTION public.diagnose_name_matching()
  RETURNS TABLE(client_name_original text, appointment_name_original text, normalized_client_name text, normalized_appointment_name text, is_match boolean)
  LANGUAGE sql
@@ -485,82 +527,389 @@ public.appointments a ON normalize_name(c.nome || ' ' || c.sobrenome) = normaliz
 LIMIT 100; -- Limitamos a 100 resultados para facilitar a análise inicial.
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: get_card_overview,"CREATE OR REPLACE FUNCTION public.get_card_overview(plan_filter text DEFAULT 'all'::text)
+4. FUNÇÕES (RPC),FUNÇÃO: get_acquisition_vs_overdue,"CREATE OR REPLACE FUNCTION public.get_acquisition_vs_overdue(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(new_clients_current_month bigint, overdue_clients_current_month bigint)
+ LANGUAGE sql
+ SET search_path TO 'public'
+AS $function$
+    SELECT
+        (SELECT COUNT(*)::bigint
+         FROM clients
+         WHERE created_at >= date_trunc('month', CURRENT_DATE)
+           AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+        ) AS new_clients_current_month,
+        (SELECT COUNT(DISTINCT client_id)::bigint
+         FROM asaas_payments p
+         JOIN clients c ON p.client_id = c.id
+         WHERE p.status IN ('OVERDUE', 'PENDING')
+           AND p.due_date < CURRENT_DATE
+           AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+        ) AS overdue_clients_current_month;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_acquisition_forecast,"CREATE OR REPLACE FUNCTION public.get_card_acquisition_forecast()
+ RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
+ LANGUAGE plpgsql
+ STABLE
+AS $function$
+DECLARE
+    avg_last_4_weeks numeric;
+BEGIN
+    SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
+    FROM (
+        SELECT COUNT(id) AS weekly_count
+        FROM clients
+        WHERE plano IN ('Bim Familiar', 'Bim Individual')
+          AND created_at >= date_trunc('week', CURRENT_DATE - interval '4 weeks')::date
+          AND created_at < date_trunc('week', CURRENT_DATE)::date
+        GROUP BY date_trunc('week', created_at)
+    ) last_weeks;
+
+    RETURN QUERY
+    WITH historical AS (
+        SELECT
+            date_trunc('week', created_at)::date AS week_start,
+            COUNT(id) AS count,
+            FALSE AS is_forecast
+        FROM clients
+        WHERE plano IN ('Bim Familiar', 'Bim Individual')
+          AND created_at >= date_trunc('week', CURRENT_DATE - interval '8 weeks')::date
+          AND created_at < date_trunc('week', CURRENT_DATE)::date
+        GROUP BY week_start
+    ),
+    forecast AS (
+        SELECT
+            (date_trunc('week', CURRENT_DATE) + (n.week_num || ' weeks')::interval)::date AS week_start,
+            ROUND(avg_last_4_weeks)::bigint AS count,
+            TRUE AS is_forecast
+        FROM generate_series(0, 3) AS n(week_num)
+    )
+    SELECT * FROM historical
+    UNION ALL
+    SELECT * FROM forecast
+    ORDER BY week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_dashboard_metrics,"CREATE OR REPLACE FUNCTION public.get_card_dashboard_metrics()
  RETURNS json
  LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_total_ativos INT;
+    v_total_atraso INT;
+    v_total_inativos INT;
+    v_total_cancelados INT;
+    v_total_base INT;
+    
+    v_vendas_mes_atual INT;
+    v_vendas_mes_anterior INT;
+    v_vendas_semana_atual INT;
+    v_vendas_semana_anterior INT;
+    
+    v_churn_rate NUMERIC;
+    
+    -- Datas para comparações
+    d_inicio_mes_atual DATE := date_trunc('month', CURRENT_DATE);
+    d_inicio_mes_anterior DATE := date_trunc('month', CURRENT_DATE - INTERVAL '1 month');
+    d_fim_mes_anterior DATE := date_trunc('month', CURRENT_DATE) - INTERVAL '1 second';
+    
+    d_inicio_semana_atual DATE := date_trunc('week', CURRENT_DATE) - INTERVAL '1 day'; -- Ajuste para Domingo se necessário
+    d_inicio_semana_anterior DATE := d_inicio_semana_atual - INTERVAL '7 days';
+    d_fim_semana_anterior DATE := d_inicio_semana_atual - INTERVAL '1 second';
+BEGIN
+    -- 1. Primeiro, garantimos que os status estão atualizados
+    -- Isso garante que o dashboard mostre a realidade do momento
+    PERFORM sync_client_statuses();
+
+    -- 2. Contagem da Base (Filtrando Planos Relevantes)
+    SELECT 
+        COUNT(*) FILTER (WHERE status = 'ATIVO'),
+        COUNT(*) FILTER (WHERE status = 'ATRASO'),
+        COUNT(*) FILTER (WHERE status = 'INATIVO'),
+        COUNT(*) FILTER (WHERE status = 'CANCELADO')
+    INTO 
+        v_total_ativos,
+        v_total_atraso,
+        v_total_inativos,
+        v_total_cancelados
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual');
+
+    v_total_base := v_total_ativos + v_total_atraso + v_total_inativos + v_total_cancelados;
+
+    -- 3. Cálculo de Churn (Cancelados / Base Total)
+    IF v_total_base > 0 THEN
+        v_churn_rate := ROUND((v_total_cancelados::numeric / v_total_base) * 100, 2);
+    ELSE
+        v_churn_rate := 0;
+    END IF;
+
+    -- 4. Vendas (Mês)
+    SELECT COUNT(*) INTO v_vendas_mes_atual
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual')
+    AND created_at >= d_inicio_mes_atual;
+
+    SELECT COUNT(*) INTO v_vendas_mes_anterior
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual')
+    AND created_at >= d_inicio_mes_anterior AND created_at <= d_fim_mes_anterior;
+
+    -- 5. Vendas (Semana)
+    SELECT COUNT(*) INTO v_vendas_semana_atual
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual')
+    AND created_at >= d_inicio_semana_atual;
+
+    SELECT COUNT(*) INTO v_vendas_semana_anterior
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual')
+    AND created_at >= d_inicio_semana_anterior AND created_at <= d_fim_semana_anterior;
+
+    -- 6. Montar Retorno JSON
+    RETURN json_build_object(
+        'ativos', v_total_ativos,
+        'atraso', v_total_atraso,
+        'inativos', v_total_inativos, -- Novo campo pedido
+        'cancelados', v_total_cancelados,
+        'churn_rate', v_churn_rate,
+        'vendas_mes', json_build_object(
+            'atual', v_vendas_mes_atual,
+            'anterior', v_vendas_mes_anterior
+        ),
+        'vendas_semana', json_build_object(
+            'atual', v_vendas_semana_atual,
+            'anterior', v_vendas_semana_anterior
+        )
+    );
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_financial_metrics,"CREATE OR REPLACE FUNCTION public.get_card_financial_metrics(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS json
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
 AS $function$
 DECLARE
     result json;
-    current_week_start date := date_trunc('week', CURRENT_DATE);
-    last_week_start date := current_week_start - interval '1 week';
     current_month_start date := date_trunc('month', CURRENT_DATE);
-    last_month_start date := current_month_start - interval '1 month';
+    last_month_start date := date_trunc('month', CURRENT_DATE - INTERVAL '1 month');
+    last_month_end date := current_month_start - INTERVAL '1 day';
 BEGIN
-    WITH titulares_ativos AS (
-        SELECT COUNT(*) as count
-        FROM clients
-        WHERE status = 'ATIVO'
-        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+    WITH current_month AS (
+        SELECT
+            COALESCE(SUM(amount), 0) AS receita_bruta,
+            COALESCE(SUM(net_value), 0) AS receita_liquida,
+            COUNT(DISTINCT client_id) AS clientes_pagantes
+        FROM asaas_payments
+        WHERE status = 'RECEIVED'
+          AND payment_date >= current_month_start
+          AND client_id IS NOT NULL
     ),
-    novos_titulares_semana AS (
-        SELECT 
-            COUNT(*) FILTER (WHERE created_at >= current_week_start) as current,
-            COUNT(*) FILTER (WHERE created_at >= last_week_start AND created_at < current_week_start) as previous
-        FROM clients
-        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+    previous_month AS (
+        SELECT
+            COALESCE(SUM(amount), 0) AS receita_bruta,
+            COALESCE(SUM(net_value), 0) AS receita_liquida,
+            COUNT(DISTINCT client_id) AS clientes_pagantes
+        FROM asaas_payments
+        WHERE status = 'RECEIVED'
+          AND payment_date >= last_month_start AND payment_date <= last_month_end
+          AND client_id IS NOT NULL
     ),
-    novos_titulares_mes AS (
-        SELECT 
-            COUNT(*) FILTER (WHERE created_at >= current_month_start) as current,
-            COUNT(*) FILTER (WHERE created_at >= last_month_start AND created_at < current_month_start) as previous
-        FROM clients
-        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
-    ),
-    status_titulares AS (
-        SELECT 
-            COUNT(*) FILTER (WHERE status = 'ATIVO') as ativos,
-            COUNT(*) FILTER (WHERE status = 'ATRASO' OR status = 'INATIVO') as atraso,
-            COUNT(*) FILTER (WHERE status = 'CANCELADO') as cancelados
-        FROM clients
-        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
-    ),
-    churn_data AS (
-        SELECT 
-            COUNT(*) FILTER (WHERE status = 'CANCELADO' AND created_at >= current_month_start) as churn_total,
-            CASE 
-                WHEN COUNT(*) FILTER (WHERE status = 'ATIVO') > 0 
-                THEN (COUNT(*) FILTER (WHERE status = 'CANCELADO' AND created_at >= current_month_start) * 100.0 / COUNT(*) FILTER (WHERE status = 'ATIVO'))
-                ELSE 0
-            END as churn_percentual
-        FROM clients
-        WHERE (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+    a_receber AS (
+        SELECT COALESCE(SUM(amount), 0) AS total
+        FROM asaas_payments p
+        JOIN clients c ON p.client_id = c.id
+        WHERE p.status IN ('PENDING', 'OVERDUE')
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
     )
     SELECT json_build_object(
-        'titulares_ativos', (SELECT count FROM titulares_ativos),
-        'novos_titulares_semana', json_build_object(
-            'current', (SELECT current FROM novos_titulares_semana),
-            'previous', (SELECT previous FROM novos_titulares_semana)
+        'receita_bruta', json_build_object(
+            'current', (SELECT receita_bruta FROM current_month),
+            'previous', (SELECT receita_bruta FROM previous_month)
         ),
-        'novos_titulares_mes', json_build_object(
-            'current', (SELECT current FROM novos_titulares_mes),
-            'previous', (SELECT previous FROM novos_titulares_mes)
+        'receita_liquida', json_build_object(
+            'current', (SELECT receita_liquida FROM current_month),
+            'previous', (SELECT receita_liquida FROM previous_month)
         ),
-        'status_ativos', (SELECT ativos FROM status_titulares),
-        'status_atraso', (SELECT atraso FROM status_titulares),
-        'status_cancelados', (SELECT cancelados FROM status_titulares),
-        'churn_total', (SELECT churn_total FROM churn_data),
-        'churn_percentual', json_build_object(
-            'current', (SELECT churn_percentual FROM churn_data)
-        )
+        'clientes_pagantes', json_build_object(
+            'current', (SELECT clientes_pagantes FROM current_month),
+            'previous', (SELECT clientes_pagantes FROM previous_month)
+        ),
+        'a_receber_mes', (SELECT total FROM a_receber)
     ) INTO result;
-    
     RETURN result;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_financial_metrics,"CREATE OR REPLACE FUNCTION public.get_card_financial_metrics()
+ RETURNS json
+ LANGUAGE sql
+ STABLE
+AS $function$
+    WITH 
+    month_periods AS (
+        SELECT
+            date_trunc('month', CURRENT_DATE) AS current_month_start,
+            date_trunc('month', CURRENT_DATE) + interval '1 month' AS current_month_end,
+            date_trunc('month', CURRENT_DATE - interval '1 month') AS last_month_start,
+            date_trunc('month', CURRENT_DATE) AS last_month_end
+    ),
+    current_month AS (
+        SELECT
+            COALESCE(SUM(ap.amount), 0) AS total_recebido,
+            COALESCE(SUM(ap.net_value), 0) AS total_liquido,
+            COUNT(DISTINCT ap.client_id) AS pagantes
+        FROM asaas_payments ap
+        CROSS JOIN month_periods mp
+        WHERE ap.status = 'RECEIVED'
+          AND ap.payment_date >= mp.current_month_start
+          AND ap.payment_date < mp.current_month_end
+    ),
+    last_month AS (
+        SELECT
+            COALESCE(SUM(ap.amount), 0) AS total_recebido,
+            COALESCE(SUM(ap.net_value), 0) AS total_liquido,
+            COUNT(DISTINCT ap.client_id) AS pagantes
+        FROM asaas_payments ap
+        CROSS JOIN month_periods mp
+        WHERE ap.status = 'RECEIVED'
+          AND ap.payment_date >= mp.last_month_start
+          AND ap.payment_date < mp.last_month_end
+    ),
+    a_receber AS (
+        SELECT
+            COALESCE(SUM(ap.amount), 0) AS total_aberto
+        FROM asaas_payments ap
+        WHERE ap.status IN ('PENDING', 'OVERDUE')
+          AND ap.due_date >= date_trunc('month', CURRENT_DATE)
+    )
+    SELECT json_build_object(
+        'receita_bruta',
+            json_build_object('current', (SELECT total_recebido FROM current_month),
+                             'previous', (SELECT total_recebido FROM last_month)),
+        'receita_liquida',
+            json_build_object('current', (SELECT total_liquido FROM current_month),
+                             'previous', (SELECT total_liquido FROM last_month)),
+        'clientes_pagantes',
+            json_build_object('current', (SELECT pagantes FROM current_month),
+                             'previous', (SELECT pagantes FROM last_month)),
+        'a_receber_mes', (SELECT total_aberto FROM a_receber)
+    );
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_overview,"CREATE OR REPLACE FUNCTION public.get_card_overview()
+ RETURNS json
+ LANGUAGE sql
+ STABLE
+AS $function$
+    WITH 
+    target_plans AS (SELECT unnest(ARRAY['Bim Familiar', 'Bim Individual']) AS plano),
+    clients_base AS (
+        SELECT *
+        FROM clients
+        WHERE plano IN (SELECT plano FROM target_plans)
+    ),
+    atuais AS (
+        SELECT
+            COUNT(*) FILTER (WHERE status = 'ATIVO') AS ativos,
+            COUNT(*) FILTER (WHERE status = 'ATRASO') AS atraso,
+            COUNT(*) FILTER (WHERE status = 'CANCELADO') AS cancelados,
+            COUNT(*) FILTER (WHERE status = 'INATIVO') AS inativos
+        FROM clients_base
+    ),
+    novos_semana AS (
+        SELECT
+            COUNT(*) FILTER (WHERE created_at >= date_trunc('week', CURRENT_DATE)) AS current,
+            COUNT(*) FILTER (WHERE created_at >= date_trunc('week', CURRENT_DATE) - interval '7 days'
+                             AND created_at < date_trunc('week', CURRENT_DATE)) AS previous
+        FROM clients_base
+    ),
+    novos_mes AS (
+        SELECT
+            COUNT(*) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE)) AS current,
+            COUNT(*) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE) - interval '1 month'
+                             AND created_at < date_trunc('month', CURRENT_DATE)) AS previous
+        FROM clients_base
+    ),
+    churn_mes AS (
+        SELECT
+            COUNT(*) AS cancelados_mes,
+            (SELECT COUNT(*) FROM clients_base WHERE status = 'ATIVO') AS total_ativos
+        FROM clients_base
+        WHERE status = 'CANCELADO'
+          AND created_at >= date_trunc('month', CURRENT_DATE)   -- ⚠️ alterado de updated_at para created_at
+    )
+    SELECT json_build_object(
+        'ativos', (SELECT ativos FROM atuais),
+        'atraso', (SELECT atraso FROM atuais),
+        'cancelados', (SELECT cancelados FROM atuais),
+        'inativos', (SELECT inativos FROM atuais),
+        'novos_semana', json_build_object('current', (SELECT current FROM novos_semana),
+                                          'previous', (SELECT previous FROM novos_semana)),
+        'novos_mes', json_build_object('current', (SELECT current FROM novos_mes),
+                                      'previous', (SELECT previous FROM novos_mes)),
+        'churn_mes', json_build_object(
+            'cancelados', (SELECT cancelados_mes FROM churn_mes),
+            'taxa', CASE WHEN (SELECT total_ativos FROM churn_mes) > 0 
+                        THEN ROUND((SELECT cancelados_mes FROM churn_mes) * 100.0 / (SELECT total_ativos FROM churn_mes), 2)
+                        ELSE 0 END
+        )
+    );
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_card_usage_cohort,"CREATE OR REPLACE FUNCTION public.get_card_usage_cohort(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(cohort_month text, month_number integer, active_clients bigint, total_in_cohort bigint)
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    RETURN QUERY
+    WITH first_payment AS (
+        SELECT
+            c.id AS client_id,
+            date_trunc('month', MIN(p.payment_date))::date AS cohort_date
+        FROM clients c
+        JOIN asaas_payments p ON c.id = p.client_id
+        WHERE p.status = 'RECEIVED'
+          AND p.payment_date IS NOT NULL
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+        GROUP BY c.id
+    ),
+    monthly_activity AS (
+        SELECT DISTINCT
+            c.id AS client_id,
+            fp.cohort_date,
+            date_trunc('month', a.appointment_date)::date AS activity_month
+        FROM appointments a
+        JOIN clients c ON a.client_id = c.id
+        JOIN first_payment fp ON c.id = fp.client_id
+        WHERE a.appointment_date >= fp.cohort_date
+    ),
+    cohort_size AS (
+        SELECT cohort_date, COUNT(*)::bigint AS total
+        FROM first_payment
+        GROUP BY cohort_date
+    )
+    SELECT
+        to_char(ma.cohort_date, 'YYYY-MM') AS cohort_month,
+        (EXTRACT(YEAR FROM ma.activity_month) * 12 + EXTRACT(MONTH FROM ma.activity_month))
+        - (EXTRACT(YEAR FROM ma.cohort_date) * 12 + EXTRACT(MONTH FROM ma.cohort_date)) AS month_number,
+        COUNT(DISTINCT ma.client_id)::bigint AS active_clients,
+        cs.total::bigint AS total_in_cohort
+    FROM monthly_activity ma
+    JOIN cohort_size cs ON ma.cohort_date = cs.cohort_date
+    GROUP BY ma.cohort_date, cs.total, ma.activity_month
+    ORDER BY ma.cohort_date, month_number;
 END;
 $function$
 "
 4. FUNÇÕES (RPC),FUNÇÃO: get_churn_data,"CREATE OR REPLACE FUNCTION public.get_churn_data(plan_filter text DEFAULT 'all'::text)
  RETURNS TABLE(mes text, taxa_churn numeric)
  LANGUAGE plpgsql
+ STABLE
 AS $function$
 BEGIN
     RETURN QUERY
@@ -571,8 +920,8 @@ BEGIN
             COUNT(*) FILTER (WHERE status = 'ATIVO') as ativos
         FROM clients
         WHERE created_at IS NOT NULL 
-        AND created_at >= CURRENT_DATE - interval '6 months'
-        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))) -- Correção para filtro múltiplo
+          AND created_at >= CURRENT_DATE - interval '6 months'
+          AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY date_trunc('month', created_at)
     )
     SELECT 
@@ -684,6 +1033,61 @@ ORDER BY ca.client_name;
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: get_clinic_financial_metrics,"CREATE OR REPLACE FUNCTION public.get_clinic_financial_metrics(plan_filter text DEFAULT 'all'::text)
+ RETURNS json
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    result json;
+    current_month_start date := date_trunc('month', CURRENT_DATE);
+    last_month_start date := date_trunc('month', CURRENT_DATE - INTERVAL '1 month');
+    last_month_end date := current_month_start - INTERVAL '1 day';
+BEGIN
+    WITH current_month AS (
+        SELECT
+            COALESCE(SUM(p.amount), 0) AS faturamento,
+            COUNT(DISTINCT a.id) AS consultas_pagas,
+            CASE
+                WHEN COUNT(DISTINCT a.id) > 0
+                THEN COALESCE(SUM(p.amount) / COUNT(DISTINCT a.id), 0)
+                ELSE 0
+            END AS ticket_medio
+        FROM appointments a
+        JOIN payments p ON a.id = p.appointment_id
+        JOIN clients c ON a.client_id = c.id
+        WHERE a.appointment_date >= current_month_start
+          AND a.appointment_date < current_month_start + INTERVAL '1 month'
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    ),
+    previous_month AS (
+        SELECT
+            COALESCE(SUM(p.amount), 0) AS faturamento,
+            COUNT(DISTINCT a.id) AS consultas_pagas
+        FROM appointments a
+        JOIN payments p ON a.id = p.appointment_id
+        JOIN clients c ON a.client_id = c.id
+        WHERE a.appointment_date >= last_month_start
+          AND a.appointment_date < current_month_start
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    )
+    SELECT json_build_object(
+        'faturamento', json_build_object(
+            'current', (SELECT faturamento FROM current_month),
+            'previous', (SELECT faturamento FROM previous_month)
+        ),
+        'consultas_pagas', json_build_object(
+            'current', (SELECT consultas_pagas FROM current_month),
+            'previous', (SELECT consultas_pagas FROM previous_month)
+        ),
+        'ticket_medio', json_build_object(
+            'current', (SELECT ticket_medio FROM current_month)
+        )
+    ) INTO result;
+    RETURN result;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: get_clinic_overview,"CREATE OR REPLACE FUNCTION public.get_clinic_overview(plan_filter text DEFAULT 'all'::text)
  RETURNS json
  LANGUAGE plpgsql
@@ -754,47 +1158,160 @@ BEGIN
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: get_cohort_metrics,"CREATE OR REPLACE FUNCTION public.get_cohort_metrics(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(mes_entrada text, total_safra bigint, mes_1 numeric, mes_2 numeric, mes_3 numeric, mes_6 numeric)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  RETURN QUERY
+  WITH first_payment AS (
+    SELECT 
+      ap.client_id,
+      date_trunc('month', MIN(ap.payment_date)) as cohort_month
+    FROM public.asaas_payments ap
+    JOIN public.clients c ON ap.client_id = c.id
+    WHERE ap.status = 'RECEIVED'
+      AND ap.payment_date IS NOT NULL
+      AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    GROUP BY ap.client_id
+  ),
+  monthly_activity AS (
+    SELECT 
+      fp.client_id,
+      fp.cohort_month,
+      ap.payment_date,
+      EXTRACT(MONTH FROM age(date_trunc('month', ap.payment_date), fp.cohort_month))::int as month_number
+    FROM public.asaas_payments ap
+    JOIN first_payment fp ON ap.client_id = fp.client_id
+    JOIN public.clients c ON ap.client_id = c.id
+    WHERE ap.status = 'RECEIVED'
+      AND ap.payment_date IS NOT NULL
+      AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+  ),
+  cohort_size AS (
+    SELECT 
+      cohort_month,
+      COUNT(DISTINCT client_id) as total_clients
+    FROM first_payment
+    GROUP BY cohort_month
+  ),
+  retention_data AS (
+    SELECT 
+      ma.cohort_month,
+      cs.total_clients,
+      COUNT(DISTINCT CASE WHEN ma.month_number = 1 THEN ma.client_id END) as month_1,
+      COUNT(DISTINCT CASE WHEN ma.month_number = 2 THEN ma.client_id END) as month_2,
+      COUNT(DISTINCT CASE WHEN ma.month_number = 3 THEN ma.client_id END) as month_3,
+      COUNT(DISTINCT CASE WHEN ma.month_number = 6 THEN ma.client_id END) as month_6
+    FROM monthly_activity ma
+    JOIN cohort_size cs ON ma.cohort_month = cs.cohort_month
+    GROUP BY ma.cohort_month, cs.total_clients
+  )
+  SELECT
+    to_char(rd.cohort_month, 'YYYY-MM') as mes_entrada,
+    rd.total_clients::bigint as total_safra,
+    CASE WHEN rd.total_clients > 0 
+      THEN ROUND((rd.month_1::numeric / rd.total_clients::numeric) * 100, 2)
+      ELSE 0 
+    END as mes_1,
+    CASE WHEN rd.total_clients > 0 
+      THEN ROUND((rd.month_2::numeric / rd.total_clients::numeric) * 100, 2)
+      ELSE 0 
+    END as mes_2,
+    CASE WHEN rd.total_clients > 0 
+      THEN ROUND((rd.month_3::numeric / rd.total_clients::numeric) * 100, 2)
+      ELSE 0 
+    END as mes_3,
+    CASE WHEN rd.total_clients > 0 
+      THEN ROUND((rd.month_6::numeric / rd.total_clients::numeric) * 100, 2)
+      ELSE 0 
+    END as mes_6
+  FROM retention_data rd
+  WHERE rd.cohort_month >= date_trunc('month', CURRENT_DATE - INTERVAL '12 months')
+  ORDER BY rd.cohort_month DESC;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_cohort_overdue_percentage,"CREATE OR REPLACE FUNCTION public.get_cohort_overdue_percentage(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(cohort_month text, total_clients bigint, clients_with_overdue bigint, overdue_percentage numeric)
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    RETURN QUERY
+    WITH first_payment AS (
+        SELECT
+            c.id,
+            date_trunc('month', MIN(p.payment_date))::date AS cohort_date
+        FROM clients c
+        JOIN asaas_payments p ON c.id = p.client_id
+        WHERE p.status = 'RECEIVED'
+          AND p.payment_date IS NOT NULL
+          AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+        GROUP BY c.id
+    ),
+    current_overdue AS (
+        SELECT DISTINCT client_id
+        FROM asaas_payments
+        WHERE status IN ('OVERDUE', 'PENDING')
+          AND due_date < CURRENT_DATE
+    )
+    SELECT
+        to_char(fp.cohort_date, 'YYYY-MM') AS cohort_month,
+        COUNT(DISTINCT fp.id)::bigint AS total_clients,
+        COUNT(DISTINCT co.client_id)::bigint AS clients_with_overdue,
+        ROUND((COUNT(DISTINCT co.client_id) * 100.0 / NULLIF(COUNT(DISTINCT fp.id), 0))::numeric, 2) AS overdue_percentage
+    FROM first_payment fp
+    LEFT JOIN current_overdue co ON fp.id = co.client_id
+    GROUP BY fp.cohort_date
+    ORDER BY fp.cohort_date DESC;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: get_consultation_forecast,"CREATE OR REPLACE FUNCTION public.get_consultation_forecast(plan_filter text DEFAULT 'all'::text)
  RETURNS TABLE(week_start date, count bigint, is_forecast boolean)
  LANGUAGE plpgsql
+ STABLE
 AS $function$
 DECLARE
-    avg_last_4_weeks DECIMAL;
+    avg_last_4_weeks numeric;
 BEGIN
     SELECT COALESCE(AVG(weekly_count), 0) INTO avg_last_4_weeks
     FROM (
-        SELECT COUNT(a.id)::decimal as weekly_count
-        FROM public.appointments a
-        JOIN public.clients c ON a.client_id = c.id
-        WHERE a.appointment_date >= date_trunc('week', now() - interval '4 weeks')::date
-          AND a.appointment_date < date_trunc('week', now())::date
+        SELECT COUNT(a.id) AS weekly_count
+        FROM appointments a
+        LEFT JOIN clients c ON a.client_id = c.id
+        WHERE a.appointment_date >= date_trunc('week', CURRENT_DATE - interval '4 weeks')::date
+          AND a.appointment_date < date_trunc('week', CURRENT_DATE)::date
+          AND a.status != 'cancelado'
           AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY date_trunc('week', a.appointment_date)
-    ) AS last_weeks;
+    ) last_weeks;
 
     RETURN QUERY
-    WITH historical_data AS (
+    WITH historical AS (
         SELECT
             date_trunc('week', a.appointment_date)::date AS week_start,
             COUNT(a.id) AS count,
             FALSE AS is_forecast
-        FROM public.appointments a
-        JOIN public.clients c ON a.client_id = c.id
-        WHERE a.appointment_date >= date_trunc('week', now() - interval '8 weeks')::date
-          AND a.appointment_date < date_trunc('week', now())::date
+        FROM appointments a
+        LEFT JOIN clients c ON a.client_id = c.id
+        WHERE a.appointment_date >= date_trunc('week', CURRENT_DATE - interval '8 weeks')::date
+          AND a.appointment_date < date_trunc('week', CURRENT_DATE)::date
+          AND a.status != 'cancelado'
           AND (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY week_start
     ),
-    forecast_data AS (
+    forecast AS (
         SELECT
-            (date_trunc('week', now())::date + (n.week_num || ' weeks')::interval)::date AS week_start,
+            (date_trunc('week', CURRENT_DATE) + (n.week_num || ' weeks')::interval)::date AS week_start,
             ROUND(avg_last_4_weeks)::bigint AS count,
             TRUE AS is_forecast
         FROM generate_series(0, 3) AS n(week_num)
     )
-    SELECT * FROM historical_data
+    SELECT * FROM historical
     UNION ALL
-    SELECT * FROM forecast_data
+    SELECT * FROM forecast
     ORDER BY week_start;
 END;
 $function$
@@ -926,6 +1443,29 @@ RETURN result;
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: get_dashboard_summary_report,"CREATE OR REPLACE FUNCTION public.get_dashboard_summary_report(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS json
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    result json;
+BEGIN
+    -- Chama as funções já existentes e consolida
+    SELECT json_build_object(
+        'card_financials', get_card_financial_metrics(plan_filter),
+        'card_overview', get_card_overview(plan_filter),
+        'clinic_financials', get_clinic_financial_metrics(plan_filter),
+        'clinic_overview', get_clinic_overview(plan_filter),
+        'weekly_overdue', (SELECT json_agg(row_to_json(t)) FROM get_weekly_overdue_stats(plan_filter) t),
+        'acquisition_vs_overdue', (SELECT row_to_json(t) FROM get_acquisition_vs_overdue(plan_filter) t),
+        'cohort_overdue', (SELECT json_agg(row_to_json(t)) FROM get_cohort_overdue_percentage(plan_filter) t),
+        'updated_at', now()
+    ) INTO result;
+    RETURN result;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: get_financial_metrics,"CREATE OR REPLACE FUNCTION public.get_financial_metrics(plan_filter text DEFAULT 'all'::text)
  RETURNS json
  LANGUAGE plpgsql
@@ -1016,6 +1556,7 @@ $function$
 4. FUNÇÕES (RPC),FUNÇÃO: get_inadimplencia_data,"CREATE OR REPLACE FUNCTION public.get_inadimplencia_data(plan_filter text DEFAULT 'all'::text)
  RETURNS TABLE(mes text, taxa_inadimplencia numeric)
  LANGUAGE plpgsql
+ STABLE
 AS $function$
 BEGIN
     RETURN QUERY
@@ -1026,8 +1567,8 @@ BEGIN
             COUNT(*) as total
         FROM clients
         WHERE created_at IS NOT NULL
-        AND created_at >= CURRENT_DATE - interval '6 months'
-        AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ','))) -- Correção para filtro múltiplo
+          AND created_at >= CURRENT_DATE - interval '6 months'
+          AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
         GROUP BY date_trunc('month', created_at)
     )
     SELECT 
@@ -1081,6 +1622,21 @@ RETURN QUERY
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: get_monthly_consultations,"CREATE OR REPLACE FUNCTION public.get_monthly_consultations(plan_filter text DEFAULT 'all'::text)
+ RETURNS TABLE(mes text, total_consultas bigint)
+ LANGUAGE sql
+ SET search_path TO 'public'
+AS $function$
+    SELECT
+        to_char(date_trunc('month', a.appointment_date), 'YYYY-MM') AS mes,
+        COUNT(*)::bigint AS total_consultas
+    FROM appointments a
+    JOIN clients c ON a.client_id = c.id
+    WHERE (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    GROUP BY date_trunc('month', a.appointment_date)
+    ORDER BY date_trunc('month', a.appointment_date);
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: get_my_role,"CREATE OR REPLACE FUNCTION public.get_my_role()
  RETURNS text
  LANGUAGE plpgsql
@@ -1092,6 +1648,70 @@ BEGIN
     FROM public.profiles
     WHERE id = auth.uid()
   );
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_sales_by_seller,"CREATE OR REPLACE FUNCTION public.get_sales_by_seller()
+ RETURNS TABLE(vendedor text, vendas_mes bigint, vendas_mes_anterior bigint)
+ LANGUAGE sql
+ STABLE
+AS $function$
+    WITH 
+    target_plans AS (SELECT unnest(ARRAY['Bim Familiar', 'Bim Individual']) AS plano),
+    vendas AS (
+        SELECT
+            COALESCE(NULLIF(vendedor, ''), 'Não Identificado') AS vendedor_nome,
+            created_at
+        FROM clients
+        WHERE plano IN (SELECT plano FROM target_plans)
+          AND created_at >= date_trunc('month', CURRENT_DATE - interval '1 month')
+    )
+    SELECT
+        vendedor_nome,
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE)) AS vendas_mes,
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE - interval '1 month')
+                         AND created_at < date_trunc('month', CURRENT_DATE)) AS vendas_mes_anterior
+    FROM vendas
+    GROUP BY vendedor_nome
+    ORDER BY vendas_mes DESC;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_sales_by_seller,"CREATE OR REPLACE FUNCTION public.get_sales_by_seller(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(vendedor text, vendas_mes bigint, vendas_mes_anterior bigint)
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    current_month_start date := date_trunc('month', CURRENT_DATE);
+    last_month_start date := date_trunc('month', CURRENT_DATE - INTERVAL '1 month');
+    last_month_end date := current_month_start - INTERVAL '1 day';
+BEGIN
+    RETURN QUERY
+    WITH current_month AS (
+        SELECT
+            COALESCE(vendedor, 'Não informado') AS vendedor,
+            COUNT(*)::bigint AS vendas
+        FROM clients
+        WHERE created_at >= current_month_start
+          AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+        GROUP BY vendedor
+    ),
+    previous_month AS (
+        SELECT
+            COALESCE(vendedor, 'Não informado') AS vendedor,
+            COUNT(*)::bigint AS vendas
+        FROM clients
+        WHERE created_at >= last_month_start AND created_at <= last_month_end
+          AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+        GROUP BY vendedor
+    )
+    SELECT
+        COALESCE(cm.vendedor, pm.vendedor) AS vendedor,
+        COALESCE(cm.vendas, 0)::bigint AS vendas_mes,
+        COALESCE(pm.vendas, 0)::bigint AS vendas_mes_anterior
+    FROM current_month cm
+    FULL OUTER JOIN previous_month pm ON cm.vendedor = pm.vendedor
+    ORDER BY vendas_mes DESC;
 END;
 $function$
 "
@@ -1231,6 +1851,78 @@ RETURN QUERY
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_active_titulares,"CREATE OR REPLACE FUNCTION public.get_weekly_active_titulares(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(week_label text, cumulative_count bigint)
+ LANGUAGE sql
+ SET search_path TO 'public'
+AS $function$
+    WITH weekly_new AS (
+        SELECT
+            date_trunc('week', created_at)::date AS week_start,
+            COUNT(*) AS new_in_week
+        FROM clients
+        WHERE status = 'ATIVO'
+          AND created_at IS NOT NULL
+          AND (plan_filter = 'all' OR plano = ANY(string_to_array(plan_filter, ',')))
+        GROUP BY week_start
+    )
+    SELECT
+        to_char(week_start, 'DD/MM') AS week_label,
+        SUM(new_in_week) OVER (ORDER BY week_start)::bigint AS cumulative_count
+    FROM weekly_new
+    ORDER BY week_start DESC
+    LIMIT 12;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_active_titulares,"CREATE OR REPLACE FUNCTION public.get_weekly_active_titulares()
+ RETURNS TABLE(week_label text, cumulative_count bigint)
+ LANGUAGE plpgsql
+ STABLE
+AS $function$
+DECLARE
+    total_anterior bigint;
+BEGIN
+    -- Total de titulares ativos cadastrados antes das últimas 12 semanas
+    SELECT COUNT(*) INTO total_anterior
+    FROM clients
+    WHERE plano IN ('Bim Familiar', 'Bim Individual')
+      AND status = 'ATIVO'
+      AND created_at < date_trunc('week', CURRENT_DATE - interval '12 weeks');
+
+    RETURN QUERY
+    WITH weeks AS (
+        SELECT generate_series(0, 11) AS week_offset
+    ),
+    week_starts AS (
+        SELECT
+            (date_trunc('week', CURRENT_DATE - interval '12 weeks') + (week_offset || ' weeks')::interval)::date AS week_start
+        FROM weeks
+    ),
+    weekly_new AS (
+        SELECT
+            date_trunc('week', created_at)::date AS week_start,
+            COUNT(*)::bigint AS new_count
+        FROM clients
+        WHERE plano IN ('Bim Familiar', 'Bim Individual')
+          AND status = 'ATIVO'
+          AND created_at >= date_trunc('week', CURRENT_DATE - interval '12 weeks')
+        GROUP BY week_start
+    ),
+    cumulative AS (
+        SELECT
+            ws.week_start,
+            (COALESCE(SUM(wn.new_count) OVER (ORDER BY ws.week_start ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 0) + total_anterior)::bigint AS cum
+        FROM week_starts ws
+        LEFT JOIN weekly_new wn ON ws.week_start = wn.week_start
+    )
+    SELECT
+        to_char(week_start, 'DD/MM') AS week_label,
+        cum AS cumulative_count
+    FROM cumulative
+    ORDER BY week_start;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_consultations,"CREATE OR REPLACE FUNCTION public.get_weekly_consultations()
  RETURNS TABLE(week_start date, count bigint)
  LANGUAGE plpgsql
@@ -1248,6 +1940,80 @@ BEGIN
       week_start
     ORDER BY
       week_start;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: get_weekly_overdue_stats,"CREATE OR REPLACE FUNCTION public.get_weekly_overdue_stats(plan_filter text DEFAULT 'Bim Familiar,Bim Individual'::text)
+ RETURNS TABLE(week_start date, total_receivable numeric, overdue_10_29 numeric, overdue_30_59 numeric, overdue_60_89 numeric, overdue_90_plus numeric, overdue_percentage numeric)
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    RETURN QUERY
+    WITH weeks AS (
+        SELECT generate_series(
+            date_trunc('week', CURRENT_DATE - INTERVAL '12 weeks')::date,
+            date_trunc('week', CURRENT_DATE)::date,
+            '1 week'::interval
+        ) AS week_start
+    ),
+    payments AS (
+        SELECT
+            p.client_id,
+            p.amount,
+            p.due_date,
+            p.status,
+            c.plano
+        FROM asaas_payments p
+        JOIN clients c ON p.client_id = c.id
+        WHERE (plan_filter = 'all' OR c.plano = ANY(string_to_array(plan_filter, ',')))
+    ),
+    weekly AS (
+        SELECT
+            w.week_start,
+            COALESCE(SUM(p.amount) FILTER (WHERE p.status IN ('PENDING', 'OVERDUE')), 0) AS total_receivable,
+            COALESCE(SUM(p.amount) FILTER (
+                WHERE p.status IN ('PENDING', 'OVERDUE')
+                  AND p.due_date >= w.week_start
+                  AND p.due_date < w.week_start + INTERVAL '10 days'
+            ), 0) AS over_10,
+            COALESCE(SUM(p.amount) FILTER (
+                WHERE p.status IN ('PENDING', 'OVERDUE')
+                  AND p.due_date >= w.week_start + INTERVAL '10 days'
+                  AND p.due_date < w.week_start + INTERVAL '30 days'
+            ), 0) AS over_30,
+            COALESCE(SUM(p.amount) FILTER (
+                WHERE p.status IN ('PENDING', 'OVERDUE')
+                  AND p.due_date >= w.week_start + INTERVAL '30 days'
+                  AND p.due_date < w.week_start + INTERVAL '60 days'
+            ), 0) AS over_60,
+            COALESCE(SUM(p.amount) FILTER (
+                WHERE p.status IN ('PENDING', 'OVERDUE')
+                  AND p.due_date >= w.week_start + INTERVAL '60 days'
+                  AND p.due_date < w.week_start + INTERVAL '90 days'
+            ), 0) AS over_90,
+            COALESCE(SUM(p.amount) FILTER (
+                WHERE p.status IN ('PENDING', 'OVERDUE')
+                  AND p.due_date >= w.week_start + INTERVAL '90 days'
+            ), 0) AS over_90plus
+        FROM weeks w
+        CROSS JOIN payments p  -- cuidado: pode ser pesado, mas com filtro de plano reduzimos
+        GROUP BY w.week_start
+    )
+    SELECT
+        w.week_start,
+        w.total_receivable,
+        w.over_10,
+        w.over_30 - w.over_10 AS overdue_30_59,  -- ajuste fino
+        w.over_60 - w.over_30 AS overdue_60_89,
+        w.over_90plus + (w.over_90 - w.over_60) AS overdue_90_plus,
+        CASE
+            WHEN w.total_receivable > 0
+            THEN ROUND(((w.over_10 + w.over_30 + w.over_60 + w.over_90 + w.over_90plus) / w.total_receivable * 100)::numeric, 2)
+            ELSE 0
+        END AS overdue_percentage
+    FROM weekly w
+    ORDER BY w.week_start;
 END;
 $function$
 "
@@ -1434,6 +2200,161 @@ BEGIN
 END;
 $function$
 "
+4. FUNÇÕES (RPC),FUNÇÃO: sync_client_statuses,"CREATE OR REPLACE FUNCTION public.sync_client_statuses()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'extensions'
+AS $function$
+BEGIN
+    -- 1. CANCELADO: mais de 60 dias em atraso (OVERDUE ou PENDING vencido)
+    UPDATE clients c
+    SET status = 'CANCELADO',
+        observacao = COALESCE(observacao || '; ', '') || 'cancelado por atraso (' || CURRENT_DATE || ')'
+    WHERE c.plano IN ('Bim Familiar', 'Bim Individual')
+      AND c.status != 'CANCELADO'
+      AND EXISTS (
+        SELECT 1
+        FROM asaas_payments p
+        WHERE p.client_id = c.id
+          AND (p.status = 'OVERDUE' OR (p.status = 'PENDING' AND p.due_date < CURRENT_DATE))
+          AND p.due_date < (CURRENT_DATE - INTERVAL '60 days')
+      );
+
+    -- 2. INATIVO: entre 30 e 60 dias em atraso
+    UPDATE clients c
+    SET status = 'INATIVO'
+    WHERE c.plano IN ('Bim Familiar', 'Bim Individual')
+      AND c.status NOT IN ('CANCELADO', 'INATIVO')
+      AND EXISTS (
+        SELECT 1
+        FROM asaas_payments p
+        WHERE p.client_id = c.id
+          AND (p.status = 'OVERDUE' OR (p.status = 'PENDING' AND p.due_date < CURRENT_DATE))
+          AND p.due_date >= (CURRENT_DATE - INTERVAL '60 days')
+          AND p.due_date < (CURRENT_DATE - INTERVAL '30 days')
+      );
+
+    -- 3. ATRASO: até 30 dias em atraso
+    UPDATE clients c
+    SET status = 'ATRASO'
+    WHERE c.plano IN ('Bim Familiar', 'Bim Individual')
+      AND c.status NOT IN ('CANCELADO', 'INATIVO', 'ATRASO')
+      AND EXISTS (
+        SELECT 1
+        FROM asaas_payments p
+        WHERE p.client_id = c.id
+          AND (p.status = 'OVERDUE' OR (p.status = 'PENDING' AND p.due_date < CURRENT_DATE))
+          AND p.due_date >= (CURRENT_DATE - INTERVAL '30 days')
+      );
+
+    -- 4. ATIVO: nenhum pagamento em atraso
+    UPDATE clients c
+    SET status = 'ATIVO'
+    WHERE c.plano IN ('Bim Familiar', 'Bim Individual')
+      AND c.status NOT IN ('CANCELADO')
+      AND NOT EXISTS (
+        SELECT 1
+        FROM asaas_payments p
+        WHERE p.client_id = c.id
+          AND (p.status = 'OVERDUE' OR (p.status = 'PENDING' AND p.due_date < CURRENT_DATE))
+      );
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: sync_single_client_status,"CREATE OR REPLACE FUNCTION public.sync_single_client_status(p_client_id bigint)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_status TEXT;
+    v_client RECORD;
+    v_latest_payment RECORD;
+BEGIN
+    -- Buscar dados do cliente
+    SELECT id, status, plano INTO v_client
+    FROM clients
+    WHERE id = p_client_id;
+    
+    IF NOT FOUND THEN
+        RETURN;
+    END IF;
+    
+    -- Se for plano não mensal, não altera
+    IF v_client.plano NOT IN ('Bim Familiar', 'Bim Individual') THEN
+        RETURN;
+    END IF;
+    
+    -- Buscar o pagamento mais recente do cliente
+    SELECT 
+        status,
+        due_date,
+        payment_date
+    INTO v_latest_payment
+    FROM asaas_payments
+    WHERE client_id = p_client_id
+    ORDER BY due_date DESC, created_at DESC
+    LIMIT 1;
+    
+    -- Determinar o status com base no pagamento mais recente
+    IF v_latest_payment IS NULL THEN
+        v_status := 'PENDENTE';
+    ELSE
+        CASE v_latest_payment.status
+            WHEN 'RECEIVED' THEN
+                v_status := 'ATIVO';
+                
+            WHEN 'PENDING' THEN
+                IF v_latest_payment.due_date < CURRENT_DATE THEN
+                    IF v_latest_payment.due_date < (CURRENT_DATE - INTERVAL '30 days') THEN
+                        v_status := 'INATIVO';
+                    ELSE
+                        v_status := 'ATRASO';
+                    END IF;
+                ELSE
+                    v_status := 'ATIVO';
+                END IF;
+                
+            WHEN 'OVERDUE' THEN
+                IF v_latest_payment.due_date < (CURRENT_DATE - INTERVAL '30 days') THEN
+                    v_status := 'INATIVO';
+                ELSE
+                    v_status := 'ATRASO';
+                END IF;
+                
+            WHEN 'CANCELED' THEN
+                v_status := 'CANCELADO';
+                
+            ELSE
+                v_status := 'ATIVO';
+        END CASE;
+    END IF;
+    
+    -- Atualizar o status do cliente se necessário
+    IF v_client.status != v_status THEN
+        UPDATE clients 
+        SET status = v_status,
+            updated_at = NOW()
+        WHERE id = p_client_id;
+        
+        -- Log da alteração
+        INSERT INTO action_logs (action, details, user_email, created_at)
+        VALUES (
+            'CLIENT_STATUS_UPDATED',
+            jsonb_build_object(
+                'client_id', p_client_id,
+                'old_status', v_client.status,
+                'new_status', v_status,
+                'reason', 'payment_change'
+            ),
+            'system',
+            NOW()
+        );
+    END IF;
+END;
+$function$
+"
 4. FUNÇÕES (RPC),FUNÇÃO: trigger_sanitize_client_data,"CREATE OR REPLACE FUNCTION public.trigger_sanitize_client_data()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1468,13 +2389,31 @@ BEGIN
 END;
 $function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(text)
+4. FUNÇÕES (RPC),FUNÇÃO: trigger_update_client_status_on_payment_change,"CREATE OR REPLACE FUNCTION public.trigger_update_client_status_on_payment_change()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_client_status TEXT;
+BEGIN
+    -- Se o pagamento tem um client_id, atualiza apenas aquele cliente
+    IF NEW.client_id IS NOT NULL OR OLD.client_id IS NOT NULL THEN
+        -- Chama a função de sincronização apenas para este cliente
+        PERFORM public.sync_single_client_status(COALESCE(NEW.client_id, OLD.client_id));
+    END IF;
+    
+    RETURN NEW;
+END;
+$function$
+"
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(regdictionary, text)
  RETURNS text
  LANGUAGE c
  STABLE PARALLEL SAFE STRICT
 AS '$libdir/unaccent', $function$unaccent_dict$function$
 "
-4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(regdictionary, text)
+4. FUNÇÕES (RPC),FUNÇÃO: unaccent,"CREATE OR REPLACE FUNCTION public.unaccent(text)
  RETURNS text
  LANGUAGE c
  STABLE PARALLEL SAFE STRICT
@@ -1523,12 +2462,15 @@ RETURN 'Atualização concluída. ' || updated_count || ' agendamentos foram vin
 END;
 $function$
 "
-5. GATILHOS (TRIGGERS),TABELA: clients,GATILHO: sanitize_clients_trigger | EVENTO: INSERT | QUANDO: BEFORE | EXECUTA: EXECUTE FUNCTION trigger_sanitize_client_data()
+5. GATILHOS (TRIGGERS),TABELA: asaas_payments,GATILHO: trigger_sync_client_status_on_payment_delete | EVENTO: DELETE | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION trigger_update_client_status_on_payment_change()
+5. GATILHOS (TRIGGERS),TABELA: asaas_payments,GATILHO: trigger_sync_client_status_on_payment_insert | EVENTO: INSERT | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION trigger_update_client_status_on_payment_change()
+5. GATILHOS (TRIGGERS),TABELA: asaas_payments,GATILHO: trigger_sync_client_status_on_payment_update | EVENTO: UPDATE | QUANDO: AFTER | EXECUTA: EXECUTE FUNCTION trigger_update_client_status_on_payment_change()
 5. GATILHOS (TRIGGERS),TABELA: clients,GATILHO: sanitize_clients_trigger | EVENTO: UPDATE | QUANDO: BEFORE | EXECUTA: EXECUTE FUNCTION trigger_sanitize_client_data()
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: action_logs,POLÍTICA: Allow authenticated users to insert their own logs | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
+5. GATILHOS (TRIGGERS),TABELA: clients,GATILHO: sanitize_clients_trigger | EVENTO: INSERT | QUANDO: BEFORE | EXECUTA: EXECUTE FUNCTION trigger_sanitize_client_data()
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: action_logs,"POLÍTICA: Allow read access to admins | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (( SELECT profiles.role
    FROM profiles
   WHERE (profiles.id = auth.uid())) = ANY (ARRAY['superadmin'::text, 'admin'::text])) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: action_logs,POLÍTICA: Allow authenticated users to insert their own logs | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: appointments,POLÍTICA: Permitir leitura para usuários logados | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: asaas_subscriptions,POLÍTICA: Enable insert for authenticated users | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): true
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: asaas_subscriptions,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
@@ -1539,16 +2481,26 @@ $function$
    FROM professionals
   WHERE (professionals.user_id = auth.uid())) = professional_id)) | VERIFICANDO (WITH CHECK): N/A"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: consultations,POLÍTICA: Enable read access for all authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,"POLÍTICA: Enable insert for owning professionals | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
    FROM professionals
   WHERE (professionals.id = exam_protocols.professional_id)))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: exam_protocols,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,"POLÍTICA: Permitir inserção para profissionais donos do protocolo de im | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.uid() = ( SELECT professionals.user_id
    FROM professionals
   WHERE (professionals.id = image_exam_protocols.professional_id)))"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: image_exam_protocols,POLÍTICA: Permitir leitura de protocolos de imagem para usuários autenti | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: mensagem_para_disparo,POLÍTICA: Permitir inserção para autenticados | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: mensagem_para_disparo,POLÍTICA: Permitir leitura para autenticados | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: mensagem_para_disparo,POLÍTICA: Permitir inserção para autenticados | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: plans,"POLÍTICA: Enable delete for admins | COMANDO: DELETE | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'superadmin'::text]))))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: plans,"POLÍTICA: Enable update for admins | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'superadmin'::text]))))) | VERIFICANDO (WITH CHECK): N/A"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: plans,"POLÍTICA: Enable insert for admins | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'superadmin'::text])))))"
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: plans,POLÍTICA: Enable read access for authenticated users | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: professional_events,"POLÍTICA: Manage events based on role or ownership | COMANDO: ALL | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): ((auth.uid() = ( SELECT professionals.user_id
    FROM professionals
   WHERE (professionals.id = professional_events.professional_id))) OR (EXISTS ( SELECT 1
@@ -1559,5 +2511,5 @@ $function$
    FROM profiles
   WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'superadmin'::text, 'recepcao'::text]))))))"
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: professional_events,POLÍTICA: Authenticated users can read all events | COMANDO: SELECT | PERMISSÃO: PERMISSIVE | PARA: authenticated | USANDO (USING): true | VERIFICANDO (WITH CHECK): N/A
-6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem criar novos perfis | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
 6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem editar perfis | COMANDO: UPDATE | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): (auth.role() = 'authenticated'::text) | VERIFICANDO (WITH CHECK): N/A
+6. POLÍTICAS DE SEGURANÇA (RLS),TABELA: profiles,POLÍTICA: Admins podem criar novos perfis | COMANDO: INSERT | PERMISSÃO: PERMISSIVE | PARA: public | USANDO (USING): N/A | VERIFICANDO (WITH CHECK): (auth.role() = 'authenticated'::text)
