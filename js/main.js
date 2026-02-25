@@ -3,20 +3,20 @@ import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, get
 import { showDashboard, showLoginScreen } from './ui.js';
 import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, handleGenerateContract } from './clientes.js';
 import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
-import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js'; 
+import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js';
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
 import { loadPatientsData, selectPatient, finalizeConsultation, removeExam, unsubscribePatients, triggerPrintFromElement } from './pacientes.js';
 import { loadLaboratoryData, openExamModal, saveExam } from './laboratorio.js';
 import { loadUsersData, openUserModal, saveUser } from './usuarios.js';
 import { loadProfessionalsData, openProfessionalModal, saveProfessional, openAvailabilityModal, saveProfessionalEvent, loadMyEvents, deleteProfessionalEvent } from './profissionais.js';
 import { handleGenerateCSV, loadMunicipios } from './disparos.js';
-import { setupProntuarioPage } from './prontuario.js'; 
+import { setupProntuarioPage } from './prontuario.js';
 import { setupCarteirinhaPage } from './carteirinha.js';
 import { setupVendasPage } from './vendas.js';
 import { loadConfirmationsData, updateConfirmationStatus } from './confirmacoes.js';
 import { loadLogsData, setupLogsPage } from './logs.js';
 import { loadDashboardView } from './dashboard.js';
-import { setupFinanceiroPage, openFinancialModal, loadFinancialHistory, emitirCarne } from './financeiro.js';
+import { setupFinanceiroPage, openFinancialModal, loadFinancialHistory } from './financeiro.js';
 import { setupWhatsAppAdminPage } from './whatsapp_admin.js';
 import { setupCronogramaPage } from './cronograma.js';
 // IMPORTAÇÃO DA LÓGICA DE PLANOS
@@ -58,14 +58,14 @@ async function loadPageData(pageName) {
     else if (pageName === 'cronograma') setupCronogramaPage();
     // NOVA ROTA PARA PLANOS
     else if (pageName === 'plans') setupPlansPage();
-}                                     
+}
 
 // --- FUNÇÕES DE NAVEGAÇÃO E EVENTOS ---
 function navigateToPage(pageName) {
     cleanupRealtimeSubscriptions();
 
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
-    
+
     const targetPage = document.getElementById(`${pageName}Page`);
     if (targetPage) {
         targetPage.classList.add('active');
@@ -116,15 +116,15 @@ async function loadHomePageData() {
     const quoteElement = document.getElementById('motivationalQuote');
     if (quoteElement) {
         const quotes = [
-            "A motivação é o que te faz começar. O hábito é o que te faz continuar.", 
-            "Não tenha medo de desistir do bom para perseguir o ótimo.", 
-            "A disciplina é a ponte entre metas e realizações.", 
-            "Grandes coisas não são feitas por impulso, mas pela união de pequenas coisas.", 
-            "A única maneira de fazer um excelente trabalho é amar o que você faz.", 
+            "A motivação é o que te faz começar. O hábito é o que te faz continuar.",
+            "Não tenha medo de desistir do bom para perseguir o ótimo.",
+            "A disciplina é a ponte entre metas e realizações.",
+            "Grandes coisas não são feitas por impulso, mas pela união de pequenas coisas.",
+            "A única maneira de fazer um excelente trabalho é amar o que você faz.",
             "Obstáculos são aquelas coisas assustadoras que você vê quando tira os olhos do seu objetivo.",
-            "A melhor maneira de prever o futuro é criá-lo.", 
+            "A melhor maneira de prever o futuro é criá-lo.",
             "Se você não pode fazer grandes coisas, faça pequenas coisas de uma maneira grandiosa.",
-            "Acredite que você pode, e você já está no meio do caminho.", "O segredo para avançar é começar.", 
+            "Acredite que você pode, e você já está no meio do caminho.", "O segredo para avançar é começar.",
             "A excelência não é um ato, mas um hábito.", "Cada novo dia é uma nova oportunidade para ser melhor que ontem.", "Planejamento, organização e foco são fatores essenciais para o sucesso.", "Não diminua a meta. Aumente o esforço.", "A criatividade é a inteligência se divertindo.", "O único lugar onde o sucesso vem antes do trabalho é no dicionário.", "Desafios são oportunidades de crescimento disfarçadas.", "Faça hoje o que seu 'eu' do futuro agradecerá.", "Produtividade nunca é um acidente. É sempre o resultado de comprometimento com a excelência.", "Sua atitude determina sua altitude.", "Tudo o que um sonho precisa para ser realizado é de alguém que acredite que ele possa ser realizado.", "A qualidade do seu trabalho é o seu melhor cartão de visitas.", "O insucesso é apenas uma oportunidade para recomeçar com mais inteligência.", "Foco no resultado, não na dificuldade.", "Talento é dom, é graça. Sucesso é trabalho, é persistência.", "Você nunca sabe que resultados virão da sua ação. Mas se você não fizer nada, não existirão resultados.", "Juntos somos mais fortes e vamos mais longe.", "A mudança é a lei da vida. E aqueles que olham apenas para o passado ou para o presente certamente perderão o futuro.", "Valorize o progresso, não apenas a perfeição.", "Tudo o que você sempre quis está do outro lado do medo.",
         ];
         const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -148,10 +148,10 @@ function setupEventListeners() {
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
     }
-    
+
     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-    
+
     document.getElementById('sidebar')?.addEventListener('click', (e) => {
         const menuItem = e.target.closest('.menu-item, .submenu-item');
         if (menuItem?.dataset.page) {
@@ -166,18 +166,18 @@ function setupEventListeners() {
     document.getElementById('newAppointmentBtn')?.addEventListener('click', openNewAppointmentModal);
     document.getElementById('addExamBtn')?.addEventListener('click', () => openExamModal());
     document.getElementById('addUserBtn')?.addEventListener('click', () => openUserModal());
-    
+
     // LISTENER DO BOTÃO NOVO PLANO
     document.getElementById('addPlanBtn')?.addEventListener('click', () => openPlanModal());
 
     document.getElementById('manageMyAvailabilityBtn')?.addEventListener('click', () => {
         const user = getCurrentUserProfile();
-        
+
         if (!user) return;
 
         if (user.role === 'medicos') {
             openAvailabilityModal();
-        } 
+        }
         else if (['admin', 'superadmin', 'recepcao'].includes(user.role)) {
             showToast('Para gerenciar a agenda, selecione um profissional na lista.', 'info');
             navigateToPage('profissionais');
@@ -196,20 +196,20 @@ function setupEventListeners() {
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
     document.getElementById('professionalForm')?.addEventListener('submit', saveProfessional);
     document.getElementById('professionalEventForm')?.addEventListener('submit', saveProfessionalEvent);
-    
+
     // LISTENER DO SUBMIT DE PLANO
     document.getElementById('planForm')?.addEventListener('submit', savePlan);
-    
+
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
-            const container = document.getElementById('dependentesContainer');
-            addDependenteField(container, 'dependenteCount');
-        });
+        const container = document.getElementById('dependentesContainer');
+        addDependenteField(container, 'dependenteCount');
+    });
     document.getElementById('addDependenteDetailsBtn')?.addEventListener('click', () => {
-            const container = document.getElementById('detailsDependentesContainer');
-            addDependenteField(container, 'dependenteDetailsCount');
-        });
-    
-    document.body.addEventListener('submit', function(event) {
+        const container = document.getElementById('detailsDependentesContainer');
+        addDependenteField(container, 'dependenteDetailsCount');
+    });
+
+    document.body.addEventListener('submit', function (event) {
         if (event.target.id === 'exportForm') {
             event.preventDefault();
             handleGenerateCSV(event);
@@ -222,18 +222,18 @@ function setupEventListeners() {
             clearTimeout(clientsSearchInput.searchTimeout);
             clientsSearchInput.searchTimeout = setTimeout(() => {
                 loadClientsData(e.target.value);
-            }, 500); 
+            }, 500);
         });
     }
 
-    document.body.addEventListener('change', async function(event) {
+    document.body.addEventListener('change', async function (event) {
         if (event.target.classList.contains('confirmation-checkbox')) {
             const checkbox = event.target;
             const appointmentId = checkbox.dataset.appointmentId;
             const isConfirmed = checkbox.checked;
-            checkbox.disabled = true; 
+            checkbox.disabled = true;
             await updateConfirmationStatus(appointmentId, isConfirmed);
-            checkbox.disabled = false; 
+            checkbox.disabled = false;
         }
     });
 
@@ -264,13 +264,13 @@ function setupEventListeners() {
         });
     }
 
-    document.body.addEventListener('click', async function(event) {
+    document.body.addEventListener('click', async function (event) {
         const target = event.target;
         if (target.closest('.close-btn') || target.closest('[data-close-modal]')) {
             const modal = target.closest('.modal');
-            if(modal) modal.style.display = 'none';
+            if (modal) modal.style.display = 'none';
         }
-        
+
         const editUserButton = target.closest('.edit-user-btn');
         if (editUserButton) openUserModal(editUserButton.dataset.id);
 
@@ -280,7 +280,7 @@ function setupEventListeners() {
         // LISTENERS DE AÇÃO NOS PLANOS
         const editPlanButton = target.closest('.edit-plan-btn');
         if (editPlanButton) openPlanModal(editPlanButton.dataset.id);
-        
+
         const deletePlanButton = target.closest('.delete-plan-btn');
         if (deletePlanButton) deletePlan(deletePlanButton.dataset.id);
 
@@ -289,16 +289,16 @@ function setupEventListeners() {
             // Reutiliza o modal de edição, mas pode ser ajustado para apenas leitura
             openPlanModal(viewContractButton.dataset.id);
         }
-        
+
         const checkinButton = target.closest('.checkin-btn');
         if (checkinButton) markArrival(checkinButton.dataset.id);
-        
+
         const paymentButton = target.closest('.payment-btn');
         if (paymentButton) openPaymentModal(paymentButton.dataset.id, paymentButton.dataset.name);
-        
+
         const appointmentCard = target.closest('.appointment-card[data-appointment-id]');
         if (appointmentCard) openAppointmentDetails(appointmentCard.dataset.appointmentId);
-        
+
         const detailsClientButton = target.closest('.view-details-btn');
         if (detailsClientButton) openDetailsModal(detailsClientButton.dataset.titularId);
 
@@ -307,26 +307,29 @@ function setupEventListeners() {
 
         const carneBtn = target.closest('.emit-carne-btn');
         if (carneBtn) {
+            const titularId = carneBtn.dataset.titularId;
             const cpf = carneBtn.dataset.cpf;
+            const plano = carneBtn.dataset.plano;
             const nome = carneBtn.dataset.name;
             const clientMock = {
+                id: titularId,
                 nome: nome.split(' ')[0],
                 sobrenome: nome.split(' ').slice(1).join(' '),
                 cpf: cpf,
-                plano: 'Bim Familiar'
+                plano: plano
             };
             openFinancialModal(clientMock);
         }
-        
+
         const patientQueueItem = target.closest('.paciente-espera-item');
         if (patientQueueItem) selectPatient(patientQueueItem.dataset.appointmentId);
 
         const finalizeButton = target.closest('#finalizeConsultationBtn');
         if (finalizeButton) finalizeConsultation();
-        
+
         const printGenericButton = target.closest('.print-btn');
         if (printGenericButton) {
-           triggerPrintFromElement(printGenericButton);
+            triggerPrintFromElement(printGenericButton);
         }
 
         const editProfessionalButton = target.closest('.edit-professional-btn');
@@ -336,12 +339,12 @@ function setupEventListeners() {
         if (manageEventsButton) {
             openAvailabilityModal(manageEventsButton.dataset.id);
         }
-        
+
         const removeDependenteButton = target.closest('.remove-dependente-btn');
         if (removeDependenteButton) {
             const dependentGroup = removeDependenteButton.closest('.dependente-form-group');
             const dependentId = dependentGroup.dataset.dependenteId;
-    
+
             if (dependentId) {
                 const confirmed = await showConfirm('Tem certeza que deseja remover este dependente? A remoção será permanente ao salvar.');
                 if (confirmed) {
@@ -360,7 +363,7 @@ function setupEventListeners() {
 
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
     document.getElementById('nextDayBtn')?.addEventListener('click', () => changeDay(1));
-    
+
     document.getElementById('exportClientsBtn')?.addEventListener('click', exportToExcel);
 }
 
@@ -381,11 +384,11 @@ async function initializeDashboard(user) {
         showToast('Erro crítico: Perfil do usuário não encontrado.', 'error');
         return handleLogout();
     }
-    
+
     setCurrentUserProfile(profile);
     setupPermissions(profile.role);
     showDashboard();
-    
+
     await loadPageData('home');
 }
 

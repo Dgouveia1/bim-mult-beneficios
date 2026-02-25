@@ -7,216 +7,87 @@ async function safeRpc(rpcName, params = {}) {
         const { data, error } = await _supabase.rpc(rpcName, params);
         if (error) {
             console.warn(`⚠️ RPC ${rpcName}:`, error.message);
-            // Retorna estrutura compatível com o esperado
-            return Array.isArray(params) ? [] : null;
+            return null;
         }
         return data;
     } catch (err) {
         console.error(`❌ Exceção em ${rpcName}:`, err);
-        return Array.isArray(params) ? [] : null;
+        return null;
     }
 }
 
-// ---------- ATUALIZAÇÃO DE CARDS ----------
-function updateKpiCard(id, value, compareText = null, positive = null) {
+// ---------- HELPERS DE UI ----------
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? '--';
+}
+
+function setComp(id, text, positive = null) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = value ?? '--';
-    if (compareText !== null) {
-        const compEl = document.getElementById(id.replace('-valor', '-comp'));
-        if (compEl) {
-            compEl.textContent = compareText;
-            compEl.classList.remove('positive', 'negative');
-            if (positive === true) compEl.classList.add('positive');
-            else if (positive === false) compEl.classList.add('negative');
-        }
-    }
+    el.textContent = text ?? '';
+    el.classList.remove('positive', 'negative');
+    if (positive === true) el.classList.add('positive');
+    else if (positive === false) el.classList.add('negative');
 }
 
-function updateFinancialCard(prefix, data, period = 'mês') {
-    const current = data?.current ?? 0;
-    const previous = data?.previous ?? 0;
-    const formatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
-    updateKpiCard(`${prefix}-valor`, formatter.format(current));
-
-    const compEl = document.getElementById(`${prefix}-comp`);
-    if (compEl) {
-        if (previous === 0) {
-            compEl.textContent = current > 0 ? `+${formatter.format(current)} vs ${period} anterior` : `vs ${period} anterior`;
-            compEl.className = current > 0 ? 'positive' : '';
-        } else {
-            const change = ((current - previous) / previous) * 100;
-            compEl.textContent = `${change > 0 ? '+' : ''}${change.toFixed(1)}% vs ${period} anterior`;
-            compEl.className = change >= 0 ? 'positive' : 'negative';
-        }
-    }
+function fmtBRL(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val ?? 0);
 }
 
-function updatePercentageCard(prefix, data, period = 'mês') {
-    const current = data?.current ?? 0;
-    const previous = data?.previous ?? 0;
-    updateKpiCard(`${prefix}-valor`, `${current.toFixed(1)}%`);
-
-    const compEl = document.getElementById(`${prefix}-comp`);
-    if (compEl) {
-        const diff = current - previous;
-        compEl.textContent = `${diff > 0 ? '+' : ''}${diff.toFixed(1)} pp vs ${period} anterior`;
-        compEl.className = diff <= 0 ? 'positive' : 'negative';
-    }
+function fmtPct(val, decimals = 1) {
+    return `${(val ?? 0).toFixed(decimals)}%`;
 }
 
-// ---------- CRIAÇÃO DE CARDS DINÂMICOS ----------
-function ensureCardSection(title, prefix, parentSelector = '#dashboardPage .dashboard-wrapper') {
-    const parent = document.querySelector(parentSelector);
-    if (!parent) return null;
-    let section = document.querySelector(`#card-section-${prefix}`);
-    if (!section) {
-        section = document.createElement('section');
-        section.id = `card-section-${prefix}`;
-        section.className = 'dashboard-section';
-        section.innerHTML = `
-            <h2 class="section-title">${title}</h2>
-            <div class="financial-grid" id="${prefix}-grid">
-                <div class="kpi-card" id="${prefix}-receita">
-                    <span class="card-title">Receita Bruta</span>
-                    <h2 id="${prefix}-receita-valor">--</h2>
-                    <p id="${prefix}-receita-comp">vs mês anterior</p>
-                </div>
-                <div class="kpi-card" id="${prefix}-liquido">
-                    <span class="card-title">Receita Líquida</span>
-                    <h2 id="${prefix}-liquido-valor">--</h2>
-                    <p id="${prefix}-liquido-comp">vs mês anterior</p>
-                </div>
-                <div class="kpi-card" id="${prefix}-clientes">
-                    <span class="card-title">Clientes Pagantes</span>
-                    <h2 id="${prefix}-clientes-valor">--</h2>
-                    <p id="${prefix}-clientes-comp">vs mês anterior</p>
-                </div>
-                <div class="kpi-card" id="${prefix}-a-receber">
-                    <span class="card-title">A Receber (mês)</span>
-                    <h2 id="${prefix}-a-receber-valor">--</h2>
-                    <p>Pendentes + Vencidos</p>
-                </div>
-            </div>
-        `;
-        const header = parent.querySelector('header');
-        if (header) header.insertAdjacentElement('afterend', section);
-        else parent.prepend(section);
-    }
-    return section;
+function fmtDelta(current, previous, label = 'anterior') {
+    if (!previous || previous === 0) return `vs ${label}`;
+    const d = ((current - previous) / previous) * 100;
+    return `${d > 0 ? '+' : ''}${d.toFixed(1)}% vs ${label}`;
 }
 
-function ensureClinicFinancialSection() {
-    const parent = document.querySelector('#dashboardPage .dashboard-wrapper');
-    if (!parent) return;
-    let section = document.querySelector('#card-section-clinica-financeiro');
-    if (!section) {
-        section = document.createElement('section');
-        section.id = 'card-section-clinica-financeiro';
-        section.className = 'dashboard-section';
-        section.innerHTML = `
-            <h2 class="section-title">Financeiro da Clínica</h2>
-            <div class="financial-grid" id="clinica-fin-grid">
-                <div class="kpi-card" id="clinica-faturamento">
-                    <span class="card-title">Faturamento</span>
-                    <h2 id="clinica-faturamento-valor">--</h2>
-                    <p id="clinica-faturamento-comp">vs mês anterior</p>
-                </div>
-                <div class="kpi-card" id="clinica-consultas-pagas">
-                    <span class="card-title">Consultas Pagas</span>
-                    <h2 id="clinica-consultas-pagas-valor">--</h2>
-                    <p id="clinica-consultas-pagas-comp">vs mês anterior</p>
-                </div>
-                <div class="kpi-card" id="clinica-ticket">
-                    <span class="card-title">Ticket Médio</span>
-                    <h2 id="clinica-ticket-valor">--</h2>
-                    <p id="clinica-ticket-comp">vs mês anterior</p>
-                </div>
-            </div>
-        `;
-        const cardSection = document.querySelector('#card-section-cartao');
-        if (cardSection) cardSection.insertAdjacentElement('afterend', section);
-        else parent.append(section);
-    }
+// ---------- CHAMADAS RPC ----------
+async function fetchDashboardOverviewCartao() {
+    return safeRpc('get_dashboard_overview_cartao');
 }
-
-// ---------- NOVOS CARDS: AQUISIÇÃO VS INADIMPLÊNCIA ----------
-function ensureAcquisitionOverdueCard() {
-    const parent = document.querySelector('#dashboardPage .dashboard-wrapper');
-    if (!parent) return;
-    if (document.getElementById('acquisition-overdue-card')) return;
-    const card = document.createElement('div');
-    card.id = 'acquisition-overdue-card';
-    card.className = 'kpi-card';
-    card.innerHTML = `
-        <span class="card-title">Aquisição vs Em Dívida (mês)</span>
-        <h2 id="acquisition-new-clients">--</h2>
-        <p id="acquisition-overdue-clients" style="font-size: 0.9rem;">-- em dívida</p>
-        <p id="acquisition-ratio" style="font-size: 0.8rem; color: #555;">--% dos novos em dívida</p>
-    `;
-    // Insere após o card de churn ou no fim da seção Overview Cartão
-    const overviewGrid = document.querySelector('.overview-grid');
-    if (overviewGrid) overviewGrid.appendChild(card);
+async function fetchClinicOverviewNew() {
+    return safeRpc('get_clinic_overview_new');
 }
-
-// ---------- CHAMADAS ÀS NOVAS FUNÇÕES RPC ----------
-async function fetchCardFinancials(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_card_financial_metrics', { plan_filter: planFilter });
+async function fetchCardMetrics() {
+    return safeRpc('get_card_metrics');
 }
-async function fetchClinicFinancials(planFilter = 'all') {
-    return safeRpc('get_clinic_financial_metrics', { plan_filter: planFilter });
+async function fetchActiveClientsHistory() {
+    return safeRpc('get_active_clients_history');
 }
-async function fetchCardOverview(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_card_overview', { plan_filter: planFilter });
+async function fetchOverduePctCumulative() {
+    return safeRpc('get_overdue_pct_cumulative');
 }
-async function fetchClinicOverview(planFilter = 'all') {
-    return safeRpc('get_clinic_overview', { plan_filter: planFilter });
+async function fetchCohortOverdueBySafra() {
+    return safeRpc('get_cohort_overdue_by_safra');
 }
-async function fetchSalesBySeller(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_sales_by_seller', { plan_filter: planFilter });
+async function fetchPlanSegmentation() {
+    return safeRpc('get_plan_segmentation');
 }
-async function fetchWeeklyTitulares(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_weekly_active_titulares', { plan_filter: planFilter });
+async function fetchSalesDashboard() {
+    return safeRpc('get_sales_dashboard');
 }
-async function fetchMonthlyConsultations(planFilter = 'all') {
-    return safeRpc('get_monthly_consultations', { plan_filter: planFilter });
+// Mantidas para Métricas da Clínica
+async function fetchMonthlyConsultations() {
+    return safeRpc('get_monthly_consultations', { plan_filter: 'all' });
 }
-async function fetchConsultationForecast(planFilter = 'all') {
-    return safeRpc('get_consultation_forecast', { plan_filter: planFilter });
+async function fetchTempoMedioConsultas() {
+    return safeRpc('get_tempo_medio_consultas', { plan_filter: 'all' });
 }
-async function fetchCardAcquisitionForecast(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_card_acquisition_forecast', { plan_filter: planFilter });
+async function fetchTaxaOcupacao() {
+    return safeRpc('get_taxa_ocupacao', { plan_filter: 'all' });
 }
-async function fetchChurnData(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_churn_data', { plan_filter: planFilter });
+async function fetchConsultationsByProfessional() {
+    return safeRpc('get_consultations_by_professional', { plan_filter: 'all' });
 }
-// INADIMPLÊNCIA SEMANAL (substitui a mensal)
-async function fetchWeeklyOverdueStats(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_weekly_overdue_stats', { plan_filter: planFilter });
+async function fetchConsultationsByPlan() {
+    return safeRpc('get_consultations_by_plan', { plan_filter: 'all' });
 }
-// INADIMPLÊNCIA POR SAFRA (novo)
-async function fetchCohortOverduePercentage(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_cohort_overdue_percentage', { plan_filter: planFilter });
-}
-async function fetchConsultationsByProfessional(planFilter = 'all') {
-    return safeRpc('get_consultations_by_professional', { plan_filter: planFilter });
-}
-async function fetchConsultationsByPlan(planFilter = 'all') {
-    return safeRpc('get_consultations_by_plan', { plan_filter: planFilter });
-}
-async function fetchTempoMedioConsultas(planFilter = 'all') {
-    return safeRpc('get_tempo_medio_consultas', { plan_filter: planFilter });
-}
-async function fetchTaxaOcupacao(planFilter = 'all') {
-    return safeRpc('get_taxa_ocupacao', { plan_filter: planFilter });
-}
-// COORTE DE USO DA CLÍNICA (substitui a antiga get_monthly_cohorts)
-async function fetchCardUsageCohort(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_card_usage_cohort', { plan_filter: planFilter });
-}
-// AQUISIÇÃO VS INADIMPLÊNCIA (novo)
-async function fetchAcquisitionVsOverdue(planFilter = 'Bim Familiar,Bim Individual') {
-    return safeRpc('get_acquisition_vs_overdue', { plan_filter: planFilter });
+async function fetchCardUsageCohort() {
+    return safeRpc('get_card_usage_cohort', { plan_filter: 'Bim Familiar,Bim Individual' });
 }
 
 // ---------- GRÁFICOS ----------
@@ -225,213 +96,99 @@ function destroyChart(id) {
     if (charts[id]) { charts[id].destroy(); delete charts[id]; }
 }
 function hexToRgba(hex, alpha = 1) {
-    const h = hex.replace('#','');
-    const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
+    const h = hex.replace('#', '');
+    const bigint = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
     const b = bigint & 255;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
-function createNoDataMessage(canvasId, message = 'Sem dados para exibir') {
+function noData(canvasId, msg = 'Sem dados') {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '14px Arial';
     ctx.fillStyle = '#888';
     ctx.textAlign = 'center';
-    ctx.fillText(message, w/2, h/2);
+    ctx.fillText(msg, canvas.width / 2, canvas.height / 2);
 }
-function createBarChart(ctx, labels, data, label, color = '#4682B4') {
-    if (!labels || labels.length === 0) {
-        createNoDataMessage(ctx.canvas.id);
-        return null;
-    }
-    return new Chart(ctx, {
+function createBarChart(canvasId, labels, data, label, color = '#4682B4') {
+    destroyChart(canvasId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (!labels || labels.length === 0) { noData(canvasId); return; }
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
         type: 'bar',
         data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: data,
-                backgroundColor: hexToRgba(color, 0.8),
-                borderColor: color,
-                borderWidth: 1
-            }]
+            labels,
+            datasets: [{ label, data, backgroundColor: hexToRgba(color, 0.8), borderColor: color, borderWidth: 1 }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } }
         }
     });
 }
-function createLineChart(ctx, labels, data, label, color = '#4682B4') {
-    if (!labels || labels.length === 0) {
-        createNoDataMessage(ctx.canvas.id);
-        return null;
-    }
-    return new Chart(ctx, {
+function createLineChart(canvasId, labels, data, label, color = '#4682B4') {
+    destroyChart(canvasId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    if (!labels || labels.length === 0) { noData(canvasId); return; }
+    charts[canvasId] = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: data,
-                borderColor: color,
-                backgroundColor: hexToRgba(color, 0.1),
-                fill: true,
-                tension: 0.3
-            }]
+            labels,
+            datasets: [{ label, data, borderColor: color, backgroundColor: hexToRgba(color, 0.1), fill: true, tension: 0.3 }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-function createForecastChart(ctx, forecastData) {
-    if (!forecastData || forecastData.length === 0) {
-        createNoDataMessage(ctx.canvas.id, 'Sem projeções');
-        return;
-    }
-    const labels = forecastData.map(d => {
-        const date = new Date(d.week_start);
-        return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}`;
-    });
-    const historical = forecastData.map(d => d.is_forecast ? null : d.count);
-    const projected = forecastData.map(d => d.is_forecast ? d.count : null);
-    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4682B4';
-    charts.forecast = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Realizado',
-                    data: historical,
-                    backgroundColor: hexToRgba('#95a5a6', 0.8),
-                    order: 2
-                },
-                {
-                    label: 'Projeção',
-                    data: projected,
-                    type: 'line',
-                    borderColor: accentColor,
-                    borderWidth: 2,
-                    borderDash: [5,5],
-                    fill: false,
-                    pointRadius: 5,
-                    pointBackgroundColor: accentColor,
-                    order: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { tooltip: { mode: 'index', intersect: false } },
-            scales: { y: { beginAtZero: true } }
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: true } }
         }
     });
 }
 
-// ---------- GRÁFICO DE INADIMPLÊNCIA SEMANAL (STACKED) ----------
-function createWeeklyOverdueChart(ctx, data) {
-    if (!data || data.length === 0) {
-        createNoDataMessage(ctx.canvas.id, 'Sem dados de inadimplência');
-        return;
-    }
-    const labels = data.map(d => {
-        const date = new Date(d.week_start);
-        return `${date.getDate()}/${date.getMonth()+1}`;
-    });
-    charts.weeklyOverdue = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: '10-29 dias',
-                    data: data.map(d => d.overdue_10_29),
-                    backgroundColor: '#f39c12',
-                    stack: 'overdue'
-                },
-                {
-                    label: '30-59 dias',
-                    data: data.map(d => d.overdue_30_59),
-                    backgroundColor: '#e67e22',
-                    stack: 'overdue'
-                },
-                {
-                    label: '60-89 dias',
-                    data: data.map(d => d.overdue_60_89),
-                    backgroundColor: '#d35400',
-                    stack: 'overdue'
-                },
-                {
-                    label: '90+ dias',
-                    data: data.map(d => d.overdue_90_plus),
-                    backgroundColor: '#c0392b',
-                    stack: 'overdue'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: { mode: 'index', intersect: false },
-                legend: { position: 'top', labels: { boxWidth: 12 } }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: { display: true, text: 'Valor em R$' }
-                }
-            }
-        }
-    });
-}
-
-// ---------- GRÁFICO DE INADIMPLÊNCIA POR SAFRA ----------
-function createCohortOverdueChart(ctx, data) {
-    if (!data || data.length === 0) {
-        createNoDataMessage(ctx.canvas.id, 'Sem dados de inadimplência por safra');
-        return;
-    }
-    const labels = data.map(d => d.cohort_month);
-    const percentages = data.map(d => d.overdue_percentage);
-    charts.cohortOverdue = createBarChart(ctx, labels, percentages, '% em dívida', '#e74c3c');
-}
-
-// ---------- TABELA DE COORTE (USO DA CLÍNICA) ----------
-function createCohortTable(data) {
-    const container = document.getElementById('cohort-chart-container');
+// ---------- TABELA COORTE INADIMPLÊNCIA (HEATMAP) ----------
+// Recebe: [{acquisition_month, month_number, total_in_cohort, overdue_count, overdue_pct}]
+// Linhas = safra (YYYY/MM), Colunas = Mês 0, Mês 1, Mês 2...
+function renderCohortOverdueMatrix(data) {
+    const container = document.getElementById('cohort-overdue-matrix');
     if (!container) return;
     if (!data || data.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:20px;">Dados insuficientes para análise de coorte.</p>';
+        container.innerHTML = '<p style="text-align:center;padding:20px;color:#888;">Sem dados suficientes para coorte de inadimplência.</p>';
         return;
     }
-    const cohorts = data.reduce((acc, row) => {
-        if (!acc[row.cohort_month]) acc[row.cohort_month] = { total: row.total_in_cohort, months: {} };
-        acc[row.cohort_month].months[row.month_number] = row.active_clients;
-        return acc;
-    }, {});
-    const maxMonth = Math.max(...data.map(d => d.month_number));
-    let html = '<div class="cohort-table-wrapper"><table class="cohort-table"><thead><tr><th>Coorte</th><th>Total</th>';
-    for (let i = 0; i <= maxMonth; i++) html += `<th>Mês ${i}</th>`;
+    // Pivot
+    const cohorts = [...new Set(data.map(r => r.acquisition_month))].sort();
+    const maxMonth = Math.max(...data.map(r => r.month_number));
+    // Map lookup: cohort → month_number → overdue_pct
+    const map = {};
+    data.forEach(r => {
+        if (!map[r.acquisition_month]) map[r.acquisition_month] = {};
+        map[r.acquisition_month][r.month_number] = { pct: r.overdue_pct, cnt: r.overdue_count, total: r.total_in_cohort };
+    });
+
+    let html = '<div class="cohort-table-wrapper"><table class="cohort-table"><thead><tr><th>Safra</th><th>Total</th>';
+    for (let m = 0; m <= maxMonth; m++) html += `<th>Mês ${m}</th>`;
     html += '</tr></thead><tbody>';
-    Object.entries(cohorts).forEach(([month, c]) => {
-        html += `<tr><td>${month}</td><td>${c.total}</td>`;
-        for (let i = 0; i <= maxMonth; i++) {
-            const active = c.months[i] ?? 0;
-            const pct = c.total > 0 ? ((active / c.total) * 100).toFixed(0) : 0;
-            const alpha = pct / 100;
-            html += `<td style="background-color: rgba(70,130,180,${alpha}); color: ${alpha > 0.5 ? '#fff' : '#000'}">${pct}%</td>`;
+
+    cohorts.forEach(cohort => {
+        // total from first row of this cohort
+        const totalEntry = data.find(r => r.acquisition_month === cohort);
+        const total = totalEntry ? totalEntry.total_in_cohort : 0;
+        html += `<tr><td><strong>${cohort}</strong></td><td>${total}</td>`;
+        for (let m = 0; m <= maxMonth; m++) {
+            const cell = map[cohort]?.[m];
+            if (!cell) {
+                html += '<td style="background:#f8f8f8;color:#ccc;">-</td>';
+            } else {
+                const pct = cell.pct ?? 0;
+                const alpha = Math.min(pct / 25, 1);
+                const bg = `rgba(231,76,60,${alpha.toFixed(2)})`;
+                const fg = alpha > 0.5 ? '#fff' : '#000';
+                html += `<td style="background:${bg};color:${fg}" title="${cell.cnt} de ${total}">${pct.toFixed(1)}%</td>`;
+            }
         }
         html += '</tr>';
     });
@@ -439,23 +196,83 @@ function createCohortTable(data) {
     container.innerHTML = html;
 }
 
+// ---------- COORTE DE USO DA CLÍNICA (substitui Retenção) ----------
+// Recebe: [{cohort_month (YYYY/MM), month_number, total_in_cohort, used_clinic}]
+function renderClinicUsageCohortTable(data) {
+    const container = document.getElementById('cohort-chart-container');
+    if (!container) return;
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:20px;">Dados insuficientes para coorte de uso da clínica.</p>';
+        return;
+    }
+    // Pivot
+    const cohorts = [...new Set(data.map(r => r.cohort_month))].sort();
+    const maxMonth = Math.max(...data.map(r => r.month_number));
+    const map = {};
+    data.forEach(r => {
+        if (!map[r.cohort_month]) map[r.cohort_month] = { total: r.total_in_cohort, months: {} };
+        map[r.cohort_month].months[r.month_number] = r.used_clinic;
+    });
+
+    let html = '<div class="cohort-table-wrapper"><table class="cohort-table"><thead><tr><th>Safra</th><th>Total</th>';
+    for (let m = 0; m <= maxMonth; m++) html += `<th>Mês ${m}</th>`;
+    html += '</tr></thead><tbody>';
+
+    cohorts.forEach(cohort => {
+        const c = map[cohort];
+        if (!c) return;
+        html += `<tr><td><strong>${cohort}</strong></td><td>${c.total}</td>`;
+        for (let m = 0; m <= maxMonth; m++) {
+            const used = c.months[m] ?? null;
+            if (used === null) {
+                html += '<td style="background:#f8f8f8;color:#ccc;">-</td>';
+            } else {
+                const pct = c.total > 0 ? (used / c.total) * 100 : 0;
+                const alpha = pct / 100;
+                html += `<td style="background-color:rgba(70,130,180,${alpha.toFixed(2)});color:${alpha > 0.5 ? '#fff' : '#000'}" title="${used} de ${c.total}">${pct.toFixed(0)}%</td>`;
+            }
+        }
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// ---------- TABELA SEGMENTAÇÃO POR PLANO ----------
+// Recebe: [{plan_name, total_ativos, novos_semana, novos_semana_anterior, novos_mes, novos_mes_anterior, taxa_inadimplencia, tempo_medio_atraso, uso_clinica_pct}]
+function renderPlanSegmentationTable(data) {
+    const tbody = document.getElementById('planSegmentationBody');
+    if (!tbody) return;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;">Nenhum dado de segmentação.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = data.map(row => {
+        const novaSem = row.novos_semana ?? 0;
+        const novaSemAnt = row.novos_semana_anterior ?? 0;
+        const novaMes = row.novos_mes ?? 0;
+        const novaMesAnt = row.novos_mes_anterior ?? 0;
+        const semSign = novaSem > novaSemAnt ? '▲' : novaSem < novaSemAnt ? '▼' : '—';
+        const mesSign = novaMes > novaMesAnt ? '▲' : novaMes < novaMesAnt ? '▼' : '—';
+        const usoPct = row.uso_clinica_pct != null ? `${Number(row.uso_clinica_pct).toFixed(1)}%` : '--';
+        return `<tr>
+            <td><strong>${row.plan_name ?? '-'}</strong></td>
+            <td>${row.total_ativos ?? 0}</td>
+            <td>${novaSem} ${semSign} <small style="color:#888">vs ${novaSemAnt}</small></td>
+            <td>${novaMes} ${mesSign} <small style="color:#888">vs ${novaMesAnt}</small></td>
+            <td>${fmtPct(row.taxa_inadimplencia)}</td>
+            <td>${row.tempo_medio_atraso != null ? `${Number(row.tempo_medio_atraso).toFixed(0)} dias` : '--'}</td>
+            <td>${usoPct}</td>
+        </tr>`;
+    }).join('');
+}
+
 // ---------- FUNÇÃO PRINCIPAL ----------
 export async function loadDashboardView() {
-    console.log('📊 Carregando Dashboard (refatorado)');
+    console.log('📊 Carregando Dashboard (refatorado v2)');
 
-    // Lê o filtro de plano do select
+    // Popula o select de planos se vazio
     const planFilterSelect = document.getElementById('dashboardPlanFilter');
-    let planFilter = 'all'; // padrão
-    if (planFilterSelect) {
-        planFilter = planFilterSelect.value;
-    }
-
-    // Garante que as seções existam
-    ensureCardSection('Financeiro do Cartão', 'cartao');
-    ensureClinicFinancialSection();
-    ensureAcquisitionOverdueCard();
-
-    // Se o select estiver vazio, popula com opções
     if (planFilterSelect && planFilterSelect.options.length <= 1) {
         const planos = ['Bim Familiar', 'Bim Individual', 'Mult', 'Convenio', 'Particular'];
         planos.forEach(p => {
@@ -467,264 +284,193 @@ export async function loadDashboardView() {
     }
 
     try {
-        // Para funções de cartão, se o filtro for 'all', passamos os planos padrão
-        const cardPlanFilter = (planFilter === 'all') ? 'Bim Familiar,Bim Individual' : planFilter;
-        // Para clínica, usamos o filtro como está (all ou um plano específico)
-        const clinicPlanFilter = planFilter;
-
         const [
-            cardFin,
-            clinicFin,
-            cardOverview,
+            overviewCartao,
             clinicOverview,
-            sales,
-            weeklyTitulares,
+            cardMetrics,
+            activeClientsHistory,
+            overduePctCumulative,
+            cohortOverdueBySafra,
+            planSegmentation,
+            salesDashboard,
             monthlyConsultations,
-            consultationForecast,
-            acquisitionForecast,
-            churnData,
-            weeklyOverdue,
-            cohortOverdue,
-            consProf,
-            consPlan,
             tempoMedio,
             ocupacao,
-            usageCohort,
-            acquisitionVsOverdue
+            consProf,
+            consPlan,
+            usageCohort
         ] = await Promise.all([
-            fetchCardFinancials(cardPlanFilter),
-            fetchClinicFinancials(clinicPlanFilter),
-            fetchCardOverview(cardPlanFilter),
-            fetchClinicOverview(clinicPlanFilter),
-            fetchSalesBySeller(cardPlanFilter),
-            fetchWeeklyTitulares(cardPlanFilter),
-            fetchMonthlyConsultations(clinicPlanFilter),
-            fetchConsultationForecast(clinicPlanFilter),
-            fetchCardAcquisitionForecast(cardPlanFilter),
-            fetchChurnData(cardPlanFilter),
-            fetchWeeklyOverdueStats(cardPlanFilter),
-            fetchCohortOverduePercentage(cardPlanFilter),
-            fetchConsultationsByProfessional(clinicPlanFilter),
-            fetchConsultationsByPlan(clinicPlanFilter),
-            fetchTempoMedioConsultas(clinicPlanFilter),
-            fetchTaxaOcupacao(clinicPlanFilter),
-            fetchCardUsageCohort(cardPlanFilter),
-            fetchAcquisitionVsOverdue(cardPlanFilter)
+            fetchDashboardOverviewCartao(),
+            fetchClinicOverviewNew(),
+            fetchCardMetrics(),
+            fetchActiveClientsHistory(),
+            fetchOverduePctCumulative(),
+            fetchCohortOverdueBySafra(),
+            fetchPlanSegmentation(),
+            fetchSalesDashboard(),
+            fetchMonthlyConsultations(),
+            fetchTempoMedioConsultas(),
+            fetchTaxaOcupacao(),
+            fetchConsultationsByProfessional(),
+            fetchConsultationsByPlan(),
+            fetchCardUsageCohort()
         ]);
 
-        // ----- CARTÃO: FINANCEIRO -----
-        if (cardFin) {
-            updateFinancialCard('cartao-receita', cardFin.receita_bruta);
-            updateFinancialCard('cartao-liquido', cardFin.receita_liquida);
-            updateKpiCard('cartao-clientes-valor', cardFin.clientes_pagantes?.current ?? 0,
-                `vs mês anterior: ${cardFin.clientes_pagantes?.previous ?? 0}`);
-            updateKpiCard('cartao-a-receber-valor',
-                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cardFin.a_receber_mes ?? 0));
+        // ===== 1. OVERVIEW CARTÃO =====
+        if (overviewCartao) {
+            setText('cartao-receita-valor', fmtBRL(overviewCartao.receita_mes));
+            setComp('cartao-receita-comp',
+                fmtDelta(overviewCartao.receita_mes, overviewCartao.receita_mes_anterior, 'mês anterior'),
+                (overviewCartao.receita_mes ?? 0) >= (overviewCartao.receita_mes_anterior ?? 0));
+            setText('cartao-clientes-ativos', overviewCartao.clientes_ativos ?? 0);
+            setText('cartao-taxa-inad-valor', fmtPct(overviewCartao.taxa_inadimplencia));
+            setText('cartao-tempo-medio-atraso',
+                `Tempo médio: ${overviewCartao.tempo_medio_atraso != null ? Number(overviewCartao.tempo_medio_atraso).toFixed(0) : '--'} dias`);
         }
 
-        // ----- CARTÃO: OVERVIEW -----
-        if (cardOverview) {
-            updateKpiCard('titulares-ativos', cardOverview.ativos ?? 0);
-            updateKpiCard('status-ativos', cardOverview.ativos ?? 0);
-            updateKpiCard('status-atraso', cardOverview.atraso ?? 0);
-            updateKpiCard('status-cancelados', cardOverview.cancelados ?? 0);
+        // ===== 2. OVERVIEW CLÍNICA =====
+        if (clinicOverview) {
+            setText('consultas-hoje', clinicOverview.consultas_hoje ?? 0);
+            setComp('consultas-hoje-comp', `vs ontem: ${clinicOverview.consultas_ontem ?? 0}`);
 
-            const sem = cardOverview.novos_semana || {};
-            updateKpiCard('novos-titulares-semana-valor', sem.current ?? 0,
-                `vs semana passada: ${sem.previous ?? 0}`, sem.current > sem.previous);
+            const sem = clinicOverview.consultas_semana ?? {};
+            setText('consultas-semana-valor', sem.current ?? 0);
+            setComp('consultas-semana-comp',
+                `vs semana passada: ${sem.previous ?? 0}`,
+                (sem.current ?? 0) >= (sem.previous ?? 0));
 
-            const mes = cardOverview.novos_mes || {};
-            updateKpiCard('novos-titulares-mes-valor', mes.current ?? 0,
-                `vs mês passado: ${mes.previous ?? 0}`, mes.current > mes.previous);
+            const mes = clinicOverview.consultas_mes ?? {};
+            setText('consultas-mes-valor', mes.current ?? 0);
+            setComp('consultas-mes-comp',
+                `vs mês passado: ${mes.previous ?? 0}`,
+                (mes.current ?? 0) >= (mes.previous ?? 0));
 
-            const churnMes = cardOverview.churn_mes || {};
-            updateKpiCard('churn-total', churnMes.cancelados ?? 0);
-            updateKpiCard('churn-percentual-valor', `${churnMes.taxa ?? 0}%`,
-                `vs mês anterior (estimado)`, false);
+            setText('ocupacao-salas-valor', fmtPct(clinicOverview.taxa_ocupacao));
+            setComp('ocupacao-salas-comp', 'Seg-Sex 7h-18h / Sáb 7h-12h');
         }
 
-        // ----- CARTÃO: VENDAS -----
-        if (sales && sales.length > 0) {
-            const totalVendasMes = sales.reduce((acc, s) => acc + (s.vendas_mes || 0), 0);
-            const totalVendasMesAnterior = sales.reduce((acc, s) => acc + (s.vendas_mes_anterior || 0), 0);
-            updateKpiCard('vendas-mes-valor', totalVendasMes,
-                `vs mês anterior: ${totalVendasMesAnterior}`, totalVendasMes > totalVendasMesAnterior);
-            const top = sales[0];
-            updateKpiCard('top-vendedor-nome', top.vendedor ?? '-');
-            updateKpiCard('top-vendedor-valor', `${top.vendas_mes ?? 0} vendas`);
+        // ===== 3. MÉTRICAS CARTÃO =====
+        if (cardMetrics) {
+            setText('metricas-total-ativos', cardMetrics.total_ativos ?? 0);
 
-            destroyChart('vendasVendedorChart');
-            const ctx = document.getElementById('vendasVendedorChart')?.getContext('2d');
-            if (ctx) {
-                charts.vendasVendedor = createBarChart(ctx,
-                    sales.map(s => s.vendedor),
-                    sales.map(s => s.vendas_mes),
-                    'Vendas',
-                    '#2ecc71'
-                );
+            const nsem = cardMetrics.novos_semana ?? {};
+            setText('metricas-novos-semana-valor', nsem.current ?? 0);
+            setComp('metricas-novos-semana-comp',
+                `vs semana passada: ${nsem.previous ?? 0}`,
+                (nsem.current ?? 0) >= (nsem.previous ?? 0));
+
+            const nmes = cardMetrics.novos_mes ?? {};
+            setText('metricas-novos-mes-valor', nmes.current ?? 0);
+            setComp('metricas-novos-mes-comp',
+                `vs mês passado: ${nmes.previous ?? 0}`,
+                (nmes.current ?? 0) >= (nmes.previous ?? 0));
+
+            setText('metricas-taxa-inad-valor', fmtPct(cardMetrics.taxa_inadimplencia));
+            setText('metricas-tempo-atraso',
+                `Tempo médio: ${cardMetrics.tempo_medio_atraso != null ? Number(cardMetrics.tempo_medio_atraso).toFixed(0) : '--'} dias`);
+        }
+
+        // ===== 4. GRÁFICOS =====
+        // Linha: Clientes Ativos Semanal
+        if (activeClientsHistory && activeClientsHistory.length) {
+            createLineChart('activeClientsChart',
+                activeClientsHistory.map(d => d.week_label ?? d.week_start),
+                activeClientsHistory.map(d => d.active_clients ?? d.cumulative_count),
+                'Clientes Ativos', '#3498db');
+        } else {
+            noData('activeClientsChart', 'Sem dados de clientes ativos');
+        }
+
+        // Linha: % Inadimplência Acumulativa (eixo Y fixo 0–100)
+        if (overduePctCumulative && overduePctCumulative.length) {
+            destroyChart('overduePctChart');
+            const overdueCanvas = document.getElementById('overduePctChart');
+            if (overdueCanvas) {
+                const color = '#e74c3c';
+                charts['overduePctChart'] = new Chart(overdueCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: overduePctCumulative.map(d => d.week_label ?? d.week_start),
+                        datasets: [{
+                            label: '% Inadimplência',
+                            data: overduePctCumulative.map(d => d.overdue_pct_cumulative ?? d.overdue_pct),
+                            borderColor: color,
+                            backgroundColor: hexToRgba(color, 0.1),
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true } },
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100,
+                                ticks: { callback: val => val + '%' }
+                            }
+                        }
+                    }
+                });
             }
         } else {
-            updateKpiCard('vendas-mes-valor', 0, 'vs mês anterior: 0');
-            updateKpiCard('top-vendedor-nome', '-');
-            updateKpiCard('top-vendedor-valor', '0 vendas');
-            const ctx = document.getElementById('vendasVendedorChart')?.getContext('2d');
-            if (ctx) createNoDataMessage('vendasVendedorChart', 'Sem vendas no período');
+            noData('overduePctChart', 'Sem dados de inadimplência');
         }
 
-        // ----- CARTÃO: AQUISIÇÃO VS INADIMPLÊNCIA -----
-        if (acquisitionVsOverdue) {
-            const novos = acquisitionVsOverdue.new_clients_current_month ?? 0;
-            const inadimplentes = acquisitionVsOverdue.overdue_clients_current_month ?? 0;
-            const ratio = novos > 0 ? ((inadimplentes / novos) * 100).toFixed(1) : 0;
-            updateKpiCard('acquisition-new-clients', novos);
-            updateKpiCard('acquisition-overdue-clients', `${inadimplentes} em dívida`);
-            const ratioEl = document.getElementById('acquisition-ratio');
-            if (ratioEl) ratioEl.textContent = `${ratio}% dos novos estão em dívida`;
+        // Coorte de Inadimplência (heatmap)
+        renderCohortOverdueMatrix(cohortOverdueBySafra);
+
+        // ===== 5. SEGMENTAÇÃO POR PLANO =====
+        renderPlanSegmentationTable(planSegmentation);
+
+        // ===== 6. VENDAS =====
+        if (salesDashboard && salesDashboard.length) {
+            const totalMes = salesDashboard.reduce((s, r) => s + (r.vendas_mes ?? 0), 0);
+            const totalAnt = salesDashboard.reduce((s, r) => s + (r.vendas_mes_anterior ?? 0), 0);
+            setText('vendas-mes-valor', totalMes);
+            setComp('vendas-mes-comp', `vs mês anterior: ${totalAnt}`, totalMes >= totalAnt);
+            const top = salesDashboard.reduce((best, cur) =>
+                (cur.vendas_mes ?? 0) > (best.vendas_mes ?? 0) ? cur : best
+                , salesDashboard[0]);
+            setText('top-vendedor-nome', top.vendedor ?? '-');
+            setText('top-vendedor-valor', `${top.vendas_mes ?? 0} vendas`);
+            createBarChart('vendasVendedorChart',
+                salesDashboard.map(s => s.vendedor),
+                salesDashboard.map(s => s.vendas_mes),
+                'Vendas', '#2ecc71');
+        } else {
+            setText('vendas-mes-valor', 0);
+            setComp('vendas-mes-comp', 'vs mês anterior: 0');
+            setText('top-vendedor-nome', '-');
+            setText('top-vendedor-valor', '0 vendas');
+            noData('vendasVendedorChart', 'Sem vendas no período');
         }
 
-        // ----- CARTÃO: GRÁFICOS -----
-        destroyChart('titularesChart');
-        const titCtx = document.getElementById('titularesChart')?.getContext('2d');
-        if (titCtx) {
-            if (weeklyTitulares && weeklyTitulares.length) {
-                charts.titulares = createLineChart(titCtx,
-                    weeklyTitulares.map(d => d.week_label),
-                    weeklyTitulares.map(d => d.cumulative_count),
-                    'Titulares Ativos'
-                );
-            } else {
-                createNoDataMessage('titularesChart', 'Nenhum titular ativo encontrado');
-            }
+        // ===== 7. MÉTRICAS DA CLÍNICA =====
+        if (monthlyConsultations && monthlyConsultations.length) {
+            const labels = monthlyConsultations.map(d => {
+                const [ano, mes] = d.mes.split('-');
+                return `${mes}/${ano}`;
+            });
+            createBarChart('consultasChart', labels, monthlyConsultations.map(d => d.total_consultas), 'Consultas', '#27ae60');
+        } else {
+            noData('consultasChart', 'Sem consultas no período');
         }
 
-        destroyChart('churnChart');
-        const churnCtx = document.getElementById('churnChart')?.getContext('2d');
-        if (churnCtx) {
-            if (churnData && churnData.length) {
-                charts.churn = createBarChart(churnCtx,
-                    churnData.map(d => d.mes),
-                    churnData.map(d => d.taxa_churn),
-                    'Churn %',
-                    '#e74c3c'
-                );
-            } else {
-                createNoDataMessage('churnChart', 'Sem dados de churn');
-            }
+        if (tempoMedio && tempoMedio.length) {
+            createLineChart('tempoMedioChart',
+                tempoMedio.map(d => d.mes),
+                tempoMedio.map(d => d.tempo_medio),
+                'Minutos', '#9b59b6');
+        } else {
+            noData('tempoMedioChart', 'Sem dados de tempo médio');
         }
 
-        // ----- INADIMPLÊNCIA SEMANAL (substitui o antigo gráfico mensal) -----
-        destroyChart('inadimplenciaChart');
-        const inadCtx = document.getElementById('inadimplenciaChart')?.getContext('2d');
-        if (inadCtx) {
-            if (weeklyOverdue && weeklyOverdue.length) {
-                createWeeklyOverdueChart(inadCtx, weeklyOverdue);
-            } else {
-                createNoDataMessage('inadimplenciaChart', 'Sem dados de inadimplência');
-            }
-        }
-
-        // ----- INADIMPLÊNCIA POR SAFRA (novo gráfico) -----
-        // Criar canvas se não existir
-        let cohortOverdueCanvas = document.getElementById('cohortOverdueChart');
-        if (!cohortOverdueCanvas) {
-            const chartGrid = document.querySelector('.chart-grid');
-            if (chartGrid) {
-                const newSection = document.createElement('div');
-                newSection.className = 'chart-section';
-                newSection.innerHTML = `
-                    <h3>Inadimplência por Safra</h3>
-                    <div class="chart-container">
-                        <canvas id="cohortOverdueChart"></canvas>
-                    </div>
-                `;
-                chartGrid.appendChild(newSection);
-                cohortOverdueCanvas = document.getElementById('cohortOverdueChart');
-            }
-        }
-        if (cohortOverdueCanvas) {
-            destroyChart('cohortOverdueChart');
-            const ctx = cohortOverdueCanvas.getContext('2d');
-            if (cohortOverdue && cohortOverdue.length) {
-                createCohortOverdueChart(ctx, cohortOverdue);
-            } else {
-                createNoDataMessage('cohortOverdueChart', 'Sem dados');
-            }
-        }
-
-        destroyChart('acquisitionForecastChart');
-        const acqCtx = document.getElementById('acquisitionForecastChart')?.getContext('2d');
-        if (acqCtx) {
-            if (acquisitionForecast && acquisitionForecast.length) {
-                createForecastChart(acqCtx, acquisitionForecast);
-            } else {
-                createNoDataMessage('acquisitionForecastChart', 'Sem projeções');
-            }
-        }
-
-        // ----- CLÍNICA: FINANCEIRO -----
-        if (clinicFin) {
-            updateFinancialCard('clinica-faturamento', clinicFin.faturamento);
-            updateKpiCard('clinica-consultas-pagas-valor', clinicFin.consultas_pagas?.current ?? 0,
-                `vs mês anterior: ${clinicFin.consultas_pagas?.previous ?? 0}`,
-                clinicFin.consultas_pagas?.current > clinicFin.consultas_pagas?.previous);
-            const ticket = clinicFin.ticket_medio?.current ?? 0;
-            updateKpiCard('clinica-ticket-valor',
-                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ticket));
-        }
-
-        // ----- CLÍNICA: OVERVIEW -----
-        if (clinicOverview) {
-            updateKpiCard('consultas-hoje', clinicOverview.consultas_hoje ?? 0);
-            const sem = clinicOverview.consultas_semana || {};
-            updateKpiCard('consultas-semana-valor', sem.current ?? 0,
-                `vs semana passada: ${sem.previous ?? 0}`, sem.current > sem.previous);
-            const mes = clinicOverview.consultas_mes || {};
-            updateKpiCard('consultas-mes-valor', mes.current ?? 0,
-                `vs mês passado: ${mes.previous ?? 0}`, mes.current > mes.previous);
-            const ocup = clinicOverview.ocupacao_salas || {};
-            updateKpiCard('ocupacao-salas-valor', `${(ocup.current ?? 0).toFixed(1)}%`,
-                `vs mês passado: ${(ocup.previous ?? 0).toFixed(1)}%`, ocup.current < ocup.previous);
-        }
-
-        // ----- CLÍNICA: GRÁFICOS -----
-        destroyChart('consultasChart');
-        const consCtx = document.getElementById('consultasChart')?.getContext('2d');
-        if (consCtx) {
-            if (monthlyConsultations && monthlyConsultations.length) {
-                const labels = monthlyConsultations.map(d => {
-                    const [ano, mes] = d.mes.split('-');
-                    return `${mes}/${ano}`;
-                });
-                charts.consultas = createBarChart(consCtx,
-                    labels,
-                    monthlyConsultations.map(d => d.total_consultas),
-                    'Consultas',
-                    '#27ae60'
-                );
-            } else {
-                createNoDataMessage('consultasChart', 'Sem consultas no período');
-            }
-        }
-
-        destroyChart('tempoMedioChart');
-        const tempoCtx = document.getElementById('tempoMedioChart')?.getContext('2d');
-        if (tempoCtx) {
-            if (tempoMedio && tempoMedio.length) {
-                charts.tempoMedio = createLineChart(tempoCtx,
-                    tempoMedio.map(d => d.mes),
-                    tempoMedio.map(d => d.tempo_medio),
-                    'Minutos',
-                    '#9b59b6'
-                );
-            } else {
-                createNoDataMessage('tempoMedioChart', 'Sem dados de tempo médio');
-            }
-        }
-
-        destroyChart('ocupacaoChart');
-        const ocupCtx = document.getElementById('ocupacaoChart')?.getContext('2d');
-        if (ocupCtx) {
-            if (ocupacao && ocupacao.length) {
+        if (ocupacao && ocupacao.length) {
+            destroyChart('ocupacaoChart');
+            const ocupCanvas = document.getElementById('ocupacaoChart');
+            if (ocupCanvas) {
                 const months = [...new Set(ocupacao.map(d => d.mes))].sort();
                 const rooms = [...new Set(ocupacao.map(d => d.sala))].sort();
                 const datasets = rooms.map((room, i) => ({
@@ -733,73 +479,44 @@ export async function loadDashboardView() {
                         const rec = ocupacao.find(d => d.mes === m && d.sala === room);
                         return rec ? rec.taxa_ocupacao : 0;
                     }),
-                    backgroundColor: hexToRgba(['#3498db','#e74c3c','#2ecc71','#f39c12','#9b59b6'][i % 5], 0.7),
+                    backgroundColor: hexToRgba(['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'][i % 5], 0.7),
                     borderWidth: 1
                 }));
-                charts.ocupacao = new Chart(ocupCtx, {
+                charts['ocupacaoChart'] = new Chart(ocupCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: months.map(m => {
-                            const [ano, mes] = m.split('-');
-                            return `${mes}/${ano}`;
-                        }),
-                        datasets: datasets
+                        labels: months.map(m => { const [ano, mes] = m.split('-'); return `${mes}/${ano}`; }),
+                        datasets
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true, max: 100 } }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
                 });
-            } else {
-                createNoDataMessage('ocupacaoChart', 'Sem dados de ocupação');
             }
+        } else {
+            noData('ocupacaoChart', 'Sem dados de ocupação');
         }
 
-        destroyChart('consultasProfissionalChart');
-        const profCtx = document.getElementById('consultasProfissionalChart')?.getContext('2d');
-        if (profCtx) {
-            if (consProf && consProf.length) {
-                charts.consProf = createBarChart(profCtx,
-                    consProf.map(d => d.professional_name),
-                    consProf.map(d => d.count),
-                    'Consultas',
-                    '#4682B4'
-                );
-            } else {
-                createNoDataMessage('consultasProfissionalChart', 'Sem dados de profissionais');
-            }
+        if (consProf && consProf.length) {
+            createBarChart('consultasProfissionalChart',
+                consProf.map(d => d.professional_name),
+                consProf.map(d => d.count),
+                'Consultas', '#4682B4');
+        } else {
+            noData('consultasProfissionalChart', 'Sem dados de profissionais');
         }
 
-        destroyChart('consultasPlanoChart');
-        const planoCtx = document.getElementById('consultasPlanoChart')?.getContext('2d');
-        if (planoCtx) {
-            if (consPlan && consPlan.length) {
-                charts.consPlan = createBarChart(planoCtx,
-                    consPlan.map(d => d.plano),
-                    consPlan.map(d => d.count),
-                    'Consultas',
-                    '#e67e22'
-                );
-            } else {
-                createNoDataMessage('consultasPlanoChart', 'Sem consultas por plano');
-            }
+        if (consPlan && consPlan.length) {
+            createBarChart('consultasPlanoChart',
+                consPlan.map(d => d.plano),
+                consPlan.map(d => d.count),
+                'Consultas', '#e67e22');
+        } else {
+            noData('consultasPlanoChart', 'Sem consultas por plano');
         }
 
-        destroyChart('forecastChart');
-        const forecastCtx = document.getElementById('forecastChart')?.getContext('2d');
-        if (forecastCtx) {
-            if (consultationForecast && consultationForecast.length) {
-                createForecastChart(forecastCtx, consultationForecast);
-            } else {
-                createNoDataMessage('forecastChart', 'Sem projeções');
-            }
-        }
+        // ===== 8. COORTE DE USO DA CLÍNICA =====
+        renderClinicUsageCohortTable(usageCohort);
 
-        // ----- COORTE DE USO DA CLÍNICA -----
-        createCohortTable(usageCohort);
-
-        showToast('Dashboard atualizado com sucesso!', 'success');
+        showToast('Dashboard atualizado!', 'success');
     } catch (err) {
         console.error('Erro ao carregar dashboard:', err);
         showToast('Erro ao carregar dados do dashboard.', 'error');

@@ -86,7 +86,7 @@ async function loadClientsData(searchTerm = null) {
             const dependentNameFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
             const dependentOrFilters = `and(${dependentNameFilter}),cpf.ilike.%${lowerSearchTerm}%`;
             dependentQuery = dependentQuery.or(dependentOrFilters);
-            
+
             const [clientResults, dependentResults] = await Promise.all([
                 clientQuery,
                 dependentQuery
@@ -105,7 +105,7 @@ async function loadClientsData(searchTerm = null) {
                     .select('*, dependents(*)')
                     .in('id', allMatchingClientIds)
                     .order('created_at', { ascending: false });
-                
+
                 if (clientsError) throw clientsError;
                 finalClients = clients;
             }
@@ -137,7 +137,7 @@ async function loadClientsData(searchTerm = null) {
                         titular_id: client.id,
                         nome: `${dep.nome || ''} ${dep.sobrenome || ''}`.trim(),
                         cpf: dep.cpf,
-                        telefone: dep.telefone || client.telefone, 
+                        telefone: dep.telefone || client.telefone,
                         plano: client.plano,
                         status: client.status,
                         tipo: 'Dependente'
@@ -146,7 +146,7 @@ async function loadClientsData(searchTerm = null) {
             }
         });
 
-        allPeople = peopleList; 
+        allPeople = peopleList;
         renderClientsTable(allPeople);
 
     } catch (error) {
@@ -161,7 +161,7 @@ async function loadClientsData(searchTerm = null) {
 function renderClientsTable(people) {
     if (!clientsTableBody) return;
     clientsTableBody.innerHTML = '';
-    
+
     document.getElementById('resultsCount').textContent = people.length;
     document.getElementById('totalResults').textContent = people.length;
 
@@ -172,7 +172,7 @@ function renderClientsTable(people) {
 
     people.forEach(person => {
         const row = document.createElement('tr');
-        
+
         const phone = person.telefone;
         const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
         let whatsappButton = '';
@@ -198,10 +198,10 @@ function renderClientsTable(people) {
             `;
 
             // Lógica do Botão de Reenviar Link
-            // Aparece para qualquer titular do Bim Familiar, independente do status
-            if (person.plano === 'Bim Familiar') {
+            // Aparece para Bim Familiar e Bim Individual
+            if (person.plano === 'Bim Familiar' || person.plano === 'Bim Individual') {
                 financeButton = `
-                    <button class="btn btn-primary btn-small emit-carne-btn" data-cpf="${person.cpf}" data-name="${person.nome}" title="Ver Financeiro / Emitir Carnê" style="padding: 8px 10px; font-size: 14px; line-height: 1; background-color: var(--secondary-dark);">
+                    <button class="btn btn-primary btn-small emit-carne-btn" data-titular-id="${person.titular_id}" data-cpf="${person.cpf}" data-plano="${person.plano}" data-name="${person.nome}" title="Ver Financeiro / Emitir Carnê" style="padding: 8px 10px; font-size: 14px; line-height: 1; background-color: var(--secondary-dark);">
                         <i class="fas fa-dollar-sign"></i>
                     </button>
                 `;
@@ -221,7 +221,7 @@ function renderClientsTable(people) {
         else if (person.status === 'CANCELADO') statusClass = 'cancelled';
 
         // Se estiver ATRASO, coloca um ícone de alerta
-        const statusDisplay = person.status === 'ATRASO' 
+        const statusDisplay = person.status === 'ATRASO'
             ? `<span class="status status-${statusClass}" style="background-color: #ffebee; color: #c62828;"><i class="fas fa-exclamation-triangle"></i> ATRASO</span>`
             : `<span class="status status-${statusClass}">${person.status}</span>`;
 
@@ -255,7 +255,7 @@ async function handleResendPaymentLink(event) {
     const btn = event.currentTarget;
     const titularId = btn.dataset.titularId;
     const phone = btn.dataset.phone;
-    
+
     const originalContent = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -276,7 +276,7 @@ async function handleResendPaymentLink(event) {
         // Abre WhatsApp com a mensagem
         const message = `Olá! Segue o link para regularização/pagamento da sua mensalidade Bim Benefícios: ${sub.payment_link}`;
         const whatsappUrl = `https://wa.me/55${phone}?text=${encodeURIComponent(message)}`;
-        
+
         window.open(whatsappUrl, '_blank');
         showToast('Redirecionando para o WhatsApp...');
 
@@ -318,7 +318,7 @@ async function handleGenerateContract(titularId) {
 
         // Se não achar o plano ou não tiver texto, usa um fallback ou avisa
         let contractText = plan?.contract_text;
-        
+
         if (!contractText) {
             showToast('Modelo de contrato não encontrado para este plano. Configure em Gestão de Planos.', 'warning');
             return;
@@ -332,7 +332,7 @@ async function handleGenerateContract(titularId) {
         // Formata dependentes
         let listaDependentes = "Nenhum dependente cadastrado.";
         if (client.dependents && client.dependents.length > 0) {
-            listaDependentes = client.dependents.map(d => 
+            listaDependentes = client.dependents.map(d =>
                 `- ${d.nome} ${d.sobrenome || ''} (CPF: ${d.cpf || 'N/A'}, Nasc: ${d.data_nascimento || 'N/A'})`
             ).join('\n');
         }
@@ -359,10 +359,10 @@ async function handleGenerateContract(titularId) {
 
         // Quebra o texto em linhas para caber na página (largura max ~180mm)
         const splitText = doc.splitTextToSize(contractText, 180);
-        
+
         // Adiciona texto (início em x=15, y=20)
         let y = 20;
-        
+
         // Lógica simples de paginação
         for (let i = 0; i < splitText.length; i++) {
             if (y > 280) { // Se chegar no fim da página
@@ -390,7 +390,7 @@ async function handleNewClientSubmit(event) {
 
     const titularFormData = new FormData(form);
     const titularFormProps = Object.fromEntries(titularFormData);
-    
+
     if (titularFormProps.cpf && !validateCPF(titularFormProps.cpf)) {
         showToast('O CPF do titular é inválido!');
         return;
@@ -399,7 +399,7 @@ async function handleNewClientSubmit(event) {
         showToast('O Email do titular é inválido!');
         return;
     }
-     if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
+    if (titularFormProps.telefone && !validatePhone(titularFormProps.telefone)) {
         showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
@@ -450,14 +450,14 @@ async function handleNewClientSubmit(event) {
         endereco: titularFormProps.endereco,
         municipio: titularFormProps.municipio,
         observacao: titularFormProps.observacao,
-        vendedor: vendedorName 
+        vendedor: vendedorName
     };
-    
+
     const dependentesData = [];
     const dependenteGroups = form.querySelectorAll('.dependente-form-group');
 
     const cpfsInForm = new Set();
-    if(titularFormProps.cpf) cpfsInForm.add(titularFormProps.cpf);
+    if (titularFormProps.cpf) cpfsInForm.add(titularFormProps.cpf);
 
     for (const group of dependenteGroups) {
         const id = group.dataset.dependenteNewId;
@@ -487,10 +487,10 @@ async function handleNewClientSubmit(event) {
         }
         dependentesData.push(dependente);
     }
-    
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-    
+
     titularData.data_nascimento = formatDateForSupabase(titularData.data_nascimento);
 
     try {
@@ -501,15 +501,15 @@ async function handleNewClientSubmit(event) {
             .single();
 
         if (titularError) throw titularError;
-        
+
         await logAction('CREATE_CLIENT', { clientId: newTitular.id, clientName: `${newTitular.nome} ${newTitular.sobrenome}`, vendedor: vendedorName });
 
         const titularId = newTitular.id;
 
         if (dependentesData.length > 0) {
             const dependentesParaSalvar = dependentesData.map(dep => {
-                return { 
-                    ...dep, 
+                return {
+                    ...dep,
                     titular_id: titularId,
                     data_nascimento: formatDateForSupabase(dep.data_nascimento)
                 };
@@ -527,7 +527,7 @@ async function handleNewClientSubmit(event) {
         form.reset();
         document.getElementById('dependentesContainer').innerHTML = '';
         dependenteCount = 0;
-        loadClientsData(); 
+        loadClientsData();
 
     } catch (error) {
         showToast('Erro ao salvar cliente: ' + error.message);
@@ -565,14 +565,14 @@ function populateDetailsForm(client, dependents) {
     document.getElementById('details_cpf').value = client.cpf || '';
     document.getElementById('details_email').value = client.email || '';
     document.getElementById('details_data_nascimento').value = formatDateForInput(client.data_nascimento);
-    
+
     document.getElementById('details_plano').value = client.plano || '';
     document.getElementById('details_status').value = client.status || 'ATIVO';
     document.getElementById('details_cep').value = client.cep || '';
     document.getElementById('details_endereco').value = client.endereco || '';
     document.getElementById('details_municipio').value = client.municipio || '';
     document.getElementById('details_observacao').value = client.observacao || '';
-    
+
     if (dependents && dependents.length > 0) {
         dependents.forEach(dep => {
             const dataNascimentoFormatada = formatDateForInput(dep.data_nascimento);
@@ -610,7 +610,7 @@ async function handleUpdateClient(event) {
 
     const formData = new FormData(form);
     const formProps = Object.fromEntries(formData);
-    
+
     if (formProps.details_cpf && !validateCPF(formProps.details_cpf)) {
         showToast('O CPF do titular é inválido!');
         return;
@@ -619,11 +619,11 @@ async function handleUpdateClient(event) {
         showToast('O Email do titular é inválido!');
         return;
     }
-     if (formProps.details_telefone && !validatePhone(formProps.details_telefone)) {
+    if (formProps.details_telefone && !validatePhone(formProps.details_telefone)) {
         showToast('O Telefone do titular parece inválido! Deve ter 10 ou 11 dígitos.');
         return;
     }
-    
+
     const titularId = formProps.id;
     const titularData = {
         nome: formProps.details_nome,
@@ -639,7 +639,7 @@ async function handleUpdateClient(event) {
         municipio: formProps.details_municipio,
         observacao: formProps.details_observacao
     };
-    
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
@@ -662,7 +662,7 @@ async function handleUpdateClient(event) {
                 dependentesParaDeletar.push(id);
                 continue;
             }
-            
+
             let dependente = {};
             if (id) {
                 dependente = {
@@ -674,7 +674,7 @@ async function handleUpdateClient(event) {
                     telefone: group.querySelector(`[name="dependente_telefone_${id}"]`).value,
                     data_nascimento: formatDateForSupabase(group.querySelector(`[name="dependente_data_nascimento_${id}"]`).value),
                 };
-                 if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
+                if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
                 dependentesUpsert.push(dependente);
             } else if (newId) {
                 dependente = {
@@ -685,7 +685,7 @@ async function handleUpdateClient(event) {
                     telefone: group.querySelector(`[name="dependente_telefone_${newId}"]`).value,
                     data_nascimento: formatDateForSupabase(group.querySelector(`[name="dependente_data_nascimento_${newId}"]`).value),
                 };
-                 if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
+                if (dependente.cpf && !validateCPF(dependente.cpf)) { throw new Error(`CPF do dependente ${dependente.nome} é inválido.`); }
                 novosDependentes.push(dependente);
             }
         }
