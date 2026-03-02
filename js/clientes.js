@@ -573,6 +573,18 @@ function populateDetailsForm(client, dependents) {
     document.getElementById('details_municipio').value = client.municipio || '';
     document.getElementById('details_observacao').value = client.observacao || '';
 
+    // Lógica para exibição condicional dos botões Cancelar / Reativar
+    const btnCancelar = document.getElementById('btnCancelarPlano');
+    const btnReativar = document.getElementById('btnReativarPlano');
+
+    if (client.status === 'CANCELADO' || client.status === 'INATIVO') {
+        if (btnCancelar) btnCancelar.style.display = 'none';
+        if (btnReativar) btnReativar.style.display = 'flex';
+    } else {
+        if (btnCancelar) btnCancelar.style.display = 'flex';
+        if (btnReativar) btnReativar.style.display = 'none';
+    }
+
     if (dependents && dependents.length > 0) {
         dependents.forEach(dep => {
             const dataNascimentoFormatada = formatDateForInput(dep.data_nascimento);
@@ -729,6 +741,60 @@ function closeModal(modalElement) {
     if (modalElement) modalElement.style.display = 'none';
 }
 
+// =================================================================
+// NOVA FUNÇÃO: MIGRAR PLANO PARA BIM FAMILIAR
+// =================================================================
+async function handleMigratePlanToFamiliar() {
+    const titularId = document.getElementById('detailsClientId').value;
+    const planoAtual = document.getElementById('details_plano').value;
+
+    if (planoAtual === 'Bim Familiar') {
+        showToast('O cliente já está no plano Bim Familiar.', 'warning');
+        return;
+    }
+
+    if (planoAtual !== 'Mult' && planoAtual !== 'Bim Individual') {
+        showToast('A migração só está disponível para clientes Mult ou Bim Individual.', 'warning');
+        return;
+    }
+
+    const confirmacao = await showConfirm(`Deseja realmente migrar este cliente do plano ${planoAtual} para o Bim Familiar?`);
+    if (!confirmacao) return;
+
+    const btn = document.getElementById('btnMigrarPlanoFamiliar');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Migrando...';
+
+    try {
+        const { data, error } = await _supabase.functions.invoke('migrate-plan-to-familiar', {
+            body: { clientId: titularId }
+        });
+
+        if (error) {
+            console.error("Supabase edge function error:", error);
+            throw error;
+        }
+
+        if (data && data.success) {
+            showToast(data.message, 'success');
+            closeModal(document.getElementById('detailsClientModal'));
+            loadClientsData();
+        } else {
+            const errorMsg = data?.error || 'Erro desconhecido retornado pela API.';
+            showToast(`Erro na migração: ${errorMsg}`, 'error');
+        }
+    } catch (error) {
+        console.error("Migration catch error:", error);
+        showToast(`Erro ao conectar com servidor para migração: ${error.message || 'Erro desconhecido'}`, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+}
+
 function exportToExcel() {
     if (allPeople.length === 0) {
         showToast("Não há dados para exportar (baseado na busca/filtro atual).");
@@ -748,4 +814,89 @@ function exportToExcel() {
     XLSX.writeFile(workbook, "Todos_Beneficiarios.xlsx");
 }
 
-export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople, handleGenerateContract };
+async function handleCancelPlan() {
+    const titularId = document.getElementById('detailsClientId').value;
+
+    const confirmacao = await showConfirm('Tem certeza que deseja cancelar este plano e todas as cobranças pendentes no Asaas?');
+    if (!confirmacao) return;
+
+    const btn = document.getElementById('btnCancelarPlano');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelando...';
+
+    try {
+        const { data, error } = await _supabase.functions.invoke('cancel-asaas-subscription', {
+            body: { client_id: titularId }
+        });
+
+        if (error) {
+            console.error("Supabase edge function error:", error);
+            throw error;
+        }
+
+        if (data && data.success) {
+            showToast(data.message, 'success');
+            closeModal(document.getElementById('detailsClientModal'));
+            loadClientsData();
+        } else {
+            const errorMsg = data?.error || 'Erro desconhecido retornado pela API.';
+            showToast(`Erro no cancelamento: ${errorMsg}`, 'error');
+        }
+    } catch (error) {
+        console.error("Cancellation catch error:", error);
+        showToast(`Erro ao conectar com servidor para cancelamento: ${error.message || 'Erro desconhecido'}`, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+}
+
+// =================================================================
+// NOVA FUNÇÃO: REATIVAR PLANO (GERAR NOVA ASSINATURA ASAAS)
+// =================================================================
+async function handleReactivatePlan() {
+    const titularId = document.getElementById('detailsClientId').value;
+
+    const confirmacao = await showConfirm('Tem certeza que deseja reativar o plano deste cliente? Uma nova assinatura será gerada.');
+    if (!confirmacao) return;
+
+    const btn = document.getElementById('btnReativarPlano');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+    try {
+        const { data, error } = await _supabase.functions.invoke('reactivate-asaas-subscription', {
+            body: { client_id: titularId }
+        });
+
+        if (error) {
+            console.error("Supabase edge function error:", error);
+            throw error;
+        }
+
+        if (data && data.success) {
+            showToast(data.message, 'success');
+            closeModal(document.getElementById('detailsClientModal'));
+            loadClientsData();
+        } else {
+            const errorMsg = data?.error || 'Erro desconhecido retornado pela API.';
+            showToast(`Erro ao reativar: ${errorMsg}`, 'error');
+        }
+    } catch (error) {
+        console.error("Reactivate catch error:", error);
+        showToast(`Erro ao conectar com servidor: ${error.message || 'Erro de conexão.'}`, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+    }
+}
+
+export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople, handleGenerateContract, handleMigratePlanToFamiliar, handleCancelPlan, handleReactivatePlan };

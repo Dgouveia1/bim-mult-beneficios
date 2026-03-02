@@ -1,7 +1,7 @@
 import { _supabase } from './supabase.js';
 import { showToast, fetchAddressByCEP, showConfirm } from './utils.js';
 // Importamos o getCurrentUserProfile para obter o vendedor logado
-import { getCurrentUserProfile } from './auth.js'; 
+import { getCurrentUserProfile } from './auth.js';
 
 let availablePlans = [];
 
@@ -10,11 +10,11 @@ let availablePlans = [];
  */
 export function setupVendasPage() {
     const form = document.getElementById('newSaleForm');
-    
+
     if (form) {
         form.removeEventListener('submit', handleSaleSubmit);
         form.addEventListener('submit', handleSaleSubmit);
-        
+
         const cepInput = form.querySelector('input[name="cep"]');
         if (cepInput) {
             cepInput.addEventListener('blur', async (e) => {
@@ -31,7 +31,7 @@ export function setupVendasPage() {
             addDepBtn.onclick = () => addDependenteField();
         }
     }
-    
+
     loadPlansIntoSelect();
 }
 
@@ -64,10 +64,10 @@ async function loadPlansIntoSelect() {
 
         plans.forEach(plan => {
             const option = document.createElement('option');
-            option.value = plan.name; 
+            option.value = plan.name;
             option.dataset.planId = plan.id;
             option.dataset.price = plan.price;
-            
+
             const priceFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price);
             option.textContent = `${plan.name} - ${priceFormatted}`;
             planSelect.appendChild(option);
@@ -84,8 +84,8 @@ async function loadPlansIntoSelect() {
  */
 function addDependenteField() {
     const container = document.getElementById('vendasDependentesContainer');
-    const index = container.children.length; 
-    
+    const index = container.children.length;
+
     const div = document.createElement('div');
     div.className = 'dependente-row form-row';
     div.style.backgroundColor = '#f9f9f9';
@@ -102,6 +102,10 @@ function addDependenteField() {
         <div class="form-group" style="flex: 1;">
             <label>CPF</label>
             <input type="text" name="dep_cpf_${index}" placeholder="000.000.000-00" oninput="this.value = this.value.replace(/\\D/g, '').replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, '$1.$2.$3-$4')">
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>Telefone</label>
+            <input type="text" name="dep_telefone_${index}" placeholder="(00) 00000-0000" oninput="this.value = this.value.replace(/\\D/g, '').replace(/^(\\d{2})(\\d)/g, '($1) $2').replace(/(\\d)(\\d{4})$/, '$1-$2')">
         </div>
         <div class="form-group" style="flex: 1;">
             <label>Nascimento</label>
@@ -131,11 +135,11 @@ async function handleSaleSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
     const submitBtn = form.querySelector('button[type="submit"]');
-    
+
     // Recupera dados do plano selecionado
     const selectedPlanName = formData.get('plano');
     const selectedPlan = availablePlans.find(p => p.name === selectedPlanName);
-    
+
     if (!selectedPlan) {
         showToast('Por favor, selecione um plano válido.', 'warning');
         return;
@@ -143,7 +147,7 @@ async function handleSaleSubmit(event) {
 
     const cpfRaw = formData.get('cpf');
     const cpfClean = cpfRaw ? cpfRaw.replace(/\D/g, '') : '';
-    
+
     if (!cpfClean || cpfClean.length !== 11) {
         showToast('CPF inválido. Verifique os dados.', 'warning');
         return;
@@ -179,7 +183,7 @@ async function handleSaleSubmit(event) {
             cep: formData.get('cep'),
             endereco: formData.get('endereco'),
             municipio: formData.get('municipio'),
-            plano: selectedPlanName, 
+            plano: selectedPlanName,
             status: formData.get('status') || 'ATIVO',
             vendedor: sellerName, // REGISTRA O VENDEDOR AQUI
             created_at: new Date()
@@ -203,6 +207,7 @@ async function handleSaleSubmit(event) {
                         titular_id: client.id,
                         nome: value,
                         cpf: formData.get(`dep_cpf_${index}`)?.replace(/\D/g, ''),
+                        telefone: formData.get(`dep_telefone_${index}`)?.replace(/\D/g, ''),
                         data_nascimento: formData.get(`dep_nasc_${index}`) || null,
                         parentesco: formData.get(`dep_parentesco_${index}`)
                     });
@@ -247,7 +252,7 @@ async function handleSaleSubmit(event) {
                 type: 'Receita',
                 category: 'Venda de Plano', // Categoria específica
                 amount: selectedPlan.price,
-                status: 'Pendente', 
+                status: 'Pendente',
                 description: `Venda Plano ${selectedPlan.name} - Vendedor: ${sellerName}`,
                 due_date: new Date().toISOString().split('T')[0]
             }]);
@@ -256,24 +261,24 @@ async function handleSaleSubmit(event) {
         }
 
         showToast('Venda realizada com sucesso!', 'success');
-        
+
         // 5. Geração do Contrato
         await generateContractPDF(client.id);
 
         // 6. WhatsApp
         if (paymentLink) {
             const confirmed = await showConfirm(`Venda Concluída! Enviar link de pagamento via WhatsApp?`);
-            
+
             if (confirmed) {
                 const phoneRaw = clientData.telefone || '';
                 const phoneClean = phoneRaw.replace(/\D/g, '');
-                
+
                 if (phoneClean) {
                     const phoneFull = phoneClean.length <= 11 ? `55${phoneClean}` : phoneClean;
                     const firstName = clientData.nome.split(' ')[0];
                     const msg = `Olá ${firstName}, seja bem-vindo(a) à Bim Benefícios! Segue o link para pagamento da sua adesão: ${paymentLink}`;
                     const wppUrl = `https://wa.me/${phoneFull}?text=${encodeURIComponent(msg)}`;
-                    
+
                     window.open(wppUrl, '_blank');
                 } else {
                     showToast('Cliente sem telefone cadastrado.', 'warning');
@@ -304,7 +309,7 @@ export async function generateContractPDF(titularId) {
         if (!client) return;
 
         const { data: plan } = await _supabase.from('plans').select('contract_text, price').ilike('name', client.plano).maybeSingle();
-        
+
         let contractText = plan?.contract_text;
         if (!contractText) {
             showToast('Contrato não configurado para este plano.', 'warning');
@@ -313,7 +318,7 @@ export async function generateContractPDF(titularId) {
 
         const today = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        
+
         let listaDependentes = "";
         if (client.dependents && client.dependents.length > 0) {
             listaDependentes = client.dependents.map(d => `${d.nome} | CPF: ${d.cpf || 'N/A'}`).join('\n');
@@ -337,7 +342,7 @@ export async function generateContractPDF(titularId) {
             const doc = new jsPDF();
             doc.setFont("helvetica");
             doc.setFontSize(10);
-            
+
             const splitText = doc.splitTextToSize(contractText, 180);
             let y = 20;
             for (let i = 0; i < splitText.length; i++) {

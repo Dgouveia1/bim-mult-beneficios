@@ -1344,9 +1344,25 @@
                                 <div id="detailsDependentesContainer"></div>
                                 <button type="button" class="btn btn-secondary" id="addDependenteDetailsBtn">Adicionar
                                     Dependente</button>
-                                <div class="modal-footer"><button type="button" class="btn btn-secondary"
-                                        data-close-modal="detailsClientModal">Cancelar</button><button type="submit"
-                                        class="btn">Salvar Alterações</button></div>
+                                <div class="modal-footer" style="flex-wrap: wrap; gap: 10px;">
+                                    <button type="button" class="btn btn-warning" id="btnMigrarPlanoFamiliar"
+                                        style="margin-right: auto;">
+                                        <i class="fas fa-exchange-alt"></i> Migrar para Bim Familiar
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="btnCancelarPlano"
+                                        style="margin-right: auto; margin-left: 10px;">
+                                        <i class="fas fa-trash-alt"></i> Cancelar Plano
+                                    </button>
+                                    <button type="button" class="btn" id="btnReativarPlano"
+                                        style="background-color: #10b981; color: white; display: none; margin-right: auto; margin-left: 10px;">
+                                        <i class="fas fa-undo"></i> Reativar Plano
+                                    </button>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-close-modal="detailsClientModal">Cancelar</button>
+                                        <button type="submit" class="btn">Salvar Alterações</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
