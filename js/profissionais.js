@@ -61,7 +61,7 @@ async function loadProfessionalsData() {
 // Abre o modal para editar um profissional (Admin)
 async function openProfessionalModal(id) {
     professionalForm.reset();
-    
+
     try {
         const { data: prof, error } = await _supabase.from('professionals').select('*').eq('id', id).single();
         if (error) throw error;
@@ -70,7 +70,7 @@ async function openProfessionalModal(id) {
         document.getElementById('professionalName').value = prof.name;
         document.getElementById('professionalSpecialty').value = prof.specialty;
         document.getElementById('professionalCRM').value = prof.CRM;
-        
+
         professionalModal.style.display = 'flex';
 
     } catch (error) {
@@ -126,7 +126,7 @@ async function openAvailabilityModal(targetProfessionalId = null) {
     try {
         // Se nenhum ID foi passado, tenta descobrir o ID do profissional logado
         if (!profIdToLoad) {
-            if (user.role === 'medicos') {
+            if (user.role === 'medicos' || user.role === 'dentista') {
                 const { data: professional, error } = await _supabase
                     .from('professionals')
                     .select('id, name')
@@ -226,7 +226,7 @@ async function loadMyEvents(professionalId, date) {
 async function saveProfessionalEvent(event) {
     event.preventDefault();
     const submitButton = eventForm.querySelector('button[type="submit"]');
-    
+
     const formData = {
         professional_id: eventProfessionalIdInput.value,
         title: document.getElementById('eventTitle').value,
@@ -273,7 +273,7 @@ async function saveProfessionalEvent(event) {
         document.getElementById('eventTitle').value = '';
         document.getElementById('eventStartTime').value = '';
         document.getElementById('eventEndTime').value = '';
-        
+
         await loadMyEvents(formData.professional_id, formData.event_date);
         showToast('Bloqueio salvo com sucesso.');
 
@@ -299,7 +299,7 @@ async function deleteProfessionalEvent(eventId) {
             .eq('id', eventId);
 
         if (error) throw error;
-        
+
         await logAction('DELETE_PROFESSIONAL_EVENT', { eventId: eventId });
         showToast('Bloqueio removido com sucesso.');
 
@@ -313,9 +313,9 @@ async function deleteProfessionalEvent(eventId) {
     }
 }
 
-export { 
-    loadProfessionalsData, 
-    openProfessionalModal, 
+export {
+    loadProfessionalsData,
+    openProfessionalModal,
     saveProfessional,
     openAvailabilityModal, // Exportada com o novo nome
     openMyAvailabilityModal, // Mantida para compatibilidade

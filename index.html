@@ -62,11 +62,13 @@
                 <div class="menu-item" id="menu-clinica"><i class="fas fa-clinic-medical"></i> Clínica Bim</div>
                 <div class="submenu" id="submenu-clinica">
                     <a href="#" class="submenu-item" data-page="recepcao">Recepção</a>
+                    <a href="#" class="submenu-item" data-page="caixa">Caixa</a>
                     <a href="#" class="submenu-item" data-page="agenda">Agenda</a>
                     <a href="#" class="submenu-item" data-page="confirmacoes">Confirmações</a>
-                    <a href="#" class="submenu-item" data-page="pacientes">Atendimentos</a>
+                    <a href="#" class="submenu-item" data-page="pacientes_medico">Atendimento Médico</a>
+                    <a href="#" class="submenu-item" data-page="pacientes_odonto">Atendimento Odonto</a>
                     <a href="#" class="submenu-item" data-page="prontuario">Prontuário</a>
-
+                    <a href="#" class="submenu-item" data-page="exames">Exames</a>
                 </div>
 
                 <div class="admin-only">
@@ -90,6 +92,13 @@
             </div>
 
             <div class="main-content" id="mainContent">
+                <div id="impersonationBanner"
+                    style="display: none; background-color: #ff9800; color: white; padding: 10px 20px; text-align: center; font-weight: bold; border-radius: 5px; margin: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span id="impersonationText">Você está acessando como: Usuário</span>
+                    <button id="exitImpersonationBtn" class="btn btn-danger btn-small" style="margin-left: 15px;">Sair
+                        da Impersonalização</button>
+                </div>
+
                 <div class="page-content active" id="homePage">
                     <div class="home-header">
                         <h2 id="homeGreeting" class="home-greeting"></h2>
@@ -364,7 +373,9 @@
                                 </div>
 
                                 <div class="atendimento-tab-nav">
-                                    <button class="btn-tab active" data-tab="Atendimento">Atendimento Atual</button>
+                                    <button class="btn-tab active" data-tab="AtendimentoMedico">Atendimento
+                                        Médico</button>
+                                    <button class="btn-tab" data-tab="AtendimentoOdonto">Atendimento Odonto</button>
                                     <button class="btn-tab" data-tab="Receita">Receita</button>
                                     <button class="btn-tab" data-tab="Atestado">Atestado</button>
                                     <button class="btn-tab" data-tab="ExamesLab">Exames Laboratoriais</button>
@@ -372,11 +383,12 @@
                                     <button class="btn-tab" data-tab="PosCirurgia">Cuidados Pós-Cirúrgicos</button>
                                     <button class="btn-tab" data-tab="Orcamentos">Orçamentos</button>
                                     <button class="btn-tab" data-tab="Historico">Histórico Completo</button>
+                                    <button class="btn-tab" data-tab="ExamesResultados">Exames</button>
                                     <button class="btn-tab" data-tab="Dados">Dados do Paciente</button>
                                 </div>
 
                                 <div class="atendimento-tab-content">
-                                    <div class="tab-pane active" id="tabAtendimento">
+                                    <div class="tab-pane active" id="tabAtendimentoMedico">
                                         <div class="form-group"><label>Queixa Principal / Anamnese</label><textarea
                                                 id="queixaPrincipal" rows="4"></textarea></div>
                                         <div class="form-group"><label>Exame Físico</label><textarea id="exameFisico"
@@ -394,6 +406,55 @@
                                                 <div id="uploadStatus" style="font-size: 12px; margin-top: 5px;"></div>
                                                 <ul id="attachmentsList"
                                                     style="list-style: none; padding: 0; margin-top: 10px;"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane" id="tabAtendimentoOdonto">
+                                        <div class="odontograma-layout">
+                                            <div class="odontograma-svg-container" id="odontogramaContainer">
+                                                <!-- O Odontograma SVG será renderizado aqui -->
+                                            </div>
+                                            <div class="odontograma-side-panel">
+                                                <h4>Registro do Dente</h4>
+                                                <div id="odontogramaFormContainer">
+                                                    <p class="text-muted" id="odontogramaPrompt">Selecione um dente e
+                                                        uma face no odontograma para registrar.</p>
+                                                    <form id="odontogramaForm" style="display: none;">
+                                                        <div class="form-group">
+                                                            <label>Dente / Face Selecionada</label>
+                                                            <input type="text" id="odontoFaceSelecionada" readonly
+                                                                style="background-color: #f5f5f5; cursor: not-allowed; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                                                            <input type="hidden" id="odontoDenteNum">
+                                                            <input type="hidden" id="odontoFaceNome">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Estado Clínico</label>
+                                                            <select id="odontoEstadoClinico" required>
+                                                                <option value="">Selecione...</option>
+                                                                <option value="higido">Hígido</option>
+                                                                <option value="carie">Cárie</option>
+                                                                <option value="restaurado">Restaurado</option>
+                                                                <option value="ausente">Ausente</option>
+                                                                <option value="extraido">Extraído / Indicação</option>
+                                                                <option value="canal">Tratamento de Canal</option>
+                                                                <option value="coroa">Coroa</option>
+                                                                <option value="implante">Implante</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Observações</label>
+                                                            <textarea id="odontoObservacoes" rows="3"></textarea>
+                                                        </div>
+                                                        <button type="button" class="btn btn-primary"
+                                                            id="btnSalvarOdonto"><i class="fas fa-save"></i> Salvar
+                                                            Registro</button>
+                                                        <button type="button" class="btn btn-danger btn-small"
+                                                            id="btnExcluirOdonto"
+                                                            style="display:none; margin-top:10px;"><i
+                                                                class="fas fa-trash"></i> Remover Registro</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -546,6 +607,11 @@
                                         <div class="historico-consultas" id="patientHistoryContainer"></div>
                                     </div>
 
+                                    <div class="tab-pane" id="tabExamesResultados">
+                                        <h4>Exames e Anexos Anteriores</h4>
+                                        <div class="historico-exames" id="pacienteHistoricoExamesContainer"></div>
+                                    </div>
+
                                     <div class="tab-pane" id="tabDados">
                                         <div class="dados-paciente-grid">
                                             <p><strong>Nome Completo:</strong> <span id="dadosNome"></span></p>
@@ -570,6 +636,37 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="page-content" id="examesPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Pedidos de Exames</h2>
+                        <button class="btn btn-secondary btn-small" id="refreshExamesBtn"><i
+                                class="fas fa-sync-alt"></i> Atualizar</button>
+                    </div>
+                    <div class="card">
+                        <div class="search-container">
+                            <input type="search" id="examesSearchInput"
+                                placeholder="Buscar pedido por nome, CPF ou médico...">
+                        </div>
+                        <div class="table-container">
+                            <table class="exam-table" id="examesListTable">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Paciente</th>
+                                        <th>CPF</th>
+                                        <th>Médico Solicitante</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="examesTableBody">
+                                    <!-- Carregado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <div class="page-content" id="prontuarioPage">
                     <div class="content-header">
                         <h2 class="page-title">Prontuário Eletrônico</h2>
@@ -584,8 +681,25 @@
                             <p><strong>CPF:</strong> <span id="prontuarioPatientCPF"></span></p>
                             <p><strong>Plano:</strong> <span id="prontuarioPatientPlan"></span></p>
                         </div>
-                        <div class="historico-consultas" id="prontuarioHistoryContainer">
-                            <p>Busque por um paciente para ver seu histórico de consultas.</p>
+                        <div class="prontuario-sections" id="prontuarioSections"
+                            style="display: none; margin-top: 20px;">
+                            <div class="tab-nav" style="margin-bottom: 20px;">
+                                <button class="btn-tab active" data-tab="ProntuarioConsultas">Histórico de
+                                    Consultas</button>
+                                <button class="btn-tab" data-tab="ProntuarioExames">Exames e Resultados</button>
+                            </div>
+
+                            <div class="tab-pane active" id="tabProntuarioConsultas">
+                                <div class="historico-consultas" id="prontuarioHistoryContainer"></div>
+                            </div>
+
+                            <div class="tab-pane" id="tabProntuarioExames">
+                                <div class="historico-exames" id="prontuarioExamesContainer"></div>
+                            </div>
+                        </div>
+
+                        <div id="prontuarioStartMessage">
+                            <p>Busque por um paciente para ver seu histórico.</p>
                         </div>
                     </div>
                 </div>
@@ -693,6 +807,43 @@
                     </div>
                 </div>
 
+                <!-- === PÁGINA DE CAIXA === -->
+                <div class="page-content" id="caixaPage">
+                    <div class="content-header">
+                        <h2 class="page-title">Caixa</h2>
+                        <div>
+                            <button class="btn btn-primary btn-small" id="fecharCaixaBtn"><i class="fas fa-lock"></i>
+                                Fechamento</button>
+                            <button class="btn btn-secondary btn-small" id="refreshCaixaBtn"><i
+                                    class="fas fa-sync-alt"></i>
+                                Atualizar</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="search-container">
+                            <input type="search" id="caixaSearchInput" placeholder="Buscar por paciente...">
+                        </div>
+                        <div class="table-container">
+                            <table class="caixa-table" id="caixaListTable">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Paciente</th>
+                                        <th>Tipo Cobrança</th>
+                                        <th>Desconto</th>
+                                        <th>Valor Final</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="caixaTableBody">
+                                    <!-- Carregado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- === PÁGINA DO DASHBOARD (NOVA) === -->
                 <div class="page-content" id="dashboardPage">
                     <div class="dashboard-wrapper">
@@ -792,7 +943,8 @@
                         <section class="chart-grid">
                             <div class="chart-section chart-section-full">
                                 <h3>Coorte de Inadimplência por Safra</h3>
-                                <p class="chart-subtitle">Linhas = safra (mês de aquisição). Colunas = Mês 0, Mês 1, Mês
+                                <p class="chart-subtitle">Linhas = safra (mês de aquisição). Colunas = Mês 0, Mês 1,
+                                    Mês
                                     2... Célula = % daquela safra que foi para OVERDUE naquele mês.</p>
                                 <div id="cohort-overdue-matrix"></div>
                             </div>
@@ -816,7 +968,8 @@
                                     </thead>
                                     <tbody id="planSegmentationBody">
                                         <tr>
-                                            <td colspan="7" style="text-align:center; padding: 20px;">Carregando...</td>
+                                            <td colspan="7" style="text-align:center; padding: 20px;">Carregando...
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -888,7 +1041,8 @@
                         <!-- 8. Coorte de Uso da Clínica -->
                         <section class="chart-section chart-section-full">
                             <h3>Coorte de Uso da Clínica por Safra</h3>
-                            <p class="chart-subtitle">% de titulares (e seus dependentes) de cada safra que realizaram
+                            <p class="chart-subtitle">% de titulares (e seus dependentes) de cada safra que
+                                realizaram
                                 ao menos 1 consulta por mês desde o cadastro.</p>
                             <div id="cohort-chart-container"></div>
                         </section>
@@ -958,7 +1112,8 @@
 
                 <div class="page-content" id="whatsapp_adminPage">
                     <div class="content-header">
-                        <h2 class="page-title"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Monitoramento de
+                        <h2 class="page-title"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Monitoramento
+                            de
                             Atendimento</h2>
                         <button class="btn btn-secondary btn-small" onclick="loadWhatsAppControlData()"><i
                                 class="fas fa-sync-alt"></i> Atualizar</button>
@@ -995,7 +1150,8 @@
                             <div class="form-group">
                                 <div
                                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <label for="cronogramaTexto" style="font-weight: bold; font-size: 1.1rem;">Texto do
+                                    <label for="cronogramaTexto" style="font-weight: bold; font-size: 1.1rem;">Texto
+                                        do
                                         Cronograma</label>
                                     <small id="cronogramaLastUpdate"
                                         style="color: var(--gray-medium); font-style: italic;">Carregando...</small>
@@ -1073,7 +1229,8 @@
                                             <option value="">Selecione</option>
                                             <option value="Consultório 1">Consultório 1</option>
                                             <option value="Consultório 2">Consultório 2</option>
-                                            <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
+                                            <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)
+                                            </option>
                                             <!-- ALTERAÇÃO: Removido "(segundo andar)" -->
                                             <option value="Consultório 4">Consultório 4</option>
                                             <option value="Consultório 5">Consultório 5</option>
@@ -1141,7 +1298,8 @@
                                             <option value="">Selecione</option>
                                             <option value="Consultório 1">Consultório 1</option>
                                             <option value="Consultório 2">Consultório 2</option>
-                                            <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)</option>
+                                            <option value="Consultório 3 (Dentista)">Consultório 3 (Dentista)
+                                            </option>
                                             <!-- ALTERAÇÃO: Removido "(segundo andar)" e corrigido o value -->
                                             <option value="Consultório 4">Consultório 4</option>
                                             <option value="Consultório 5">Consultório 5</option>
@@ -1229,7 +1387,8 @@
                                             maxlength="14"></div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+                                    <div class="form-group"><label>Email</label><input type="email" name="email">
+                                    </div>
                                     <div class="form-group"><label>Data de Nascimento</label><input type="text"
                                             name="data_nascimento" placeholder="dd/mm/aaaa"></div>
                                 </div>
@@ -1368,6 +1527,63 @@
                     </div>
                 </div>
 
+                <div class="modal" id="pedidoExamesModal">
+                    <div class="modal-content" style="max-width: 700px;">
+                        <div class="modal-header">
+                            <h2>Detalhes do Pedido de Exames</h2>
+                            <button class="close-btn" data-close-modal="pedidoExamesModal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="detalhePedidoExameId">
+                            <div class="details-grid" style="margin-bottom: 20px;">
+                                <div><strong>Paciente:</strong> <span id="detalhePedidoPaciente"></span></div>
+                                <div><strong>CPF:</strong> <span id="detalhePedidoCPF"></span></div>
+                                <div><strong>Médico:</strong> <span id="detalhePedidoMedico"></span></div>
+                                <div><strong>Data:</strong> <span id="detalhePedidoData"></span></div>
+                                <div><strong>Status:</strong> <span id="detalhePedidoStatus"
+                                        style="font-weight: bold;"></span></div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Exames Laboratoriais Solicitados</h4>
+                                <button type="button" class="btn btn-secondary btn-small print-segunda-via-btn"
+                                    data-type="lab" style="display: none;"><i class="fas fa-print"></i> 2ª Via
+                                    Lab</button>
+                            </div>
+                            <ul id="detalheExamesLabLista" style="margin-bottom: 20px; padding-left: 20px;"></ul>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Exames de Imagem Solicitados</h4>
+                                <button type="button" class="btn btn-secondary btn-small print-segunda-via-btn"
+                                    data-type="img" style="display: none;"><i class="fas fa-print"></i> 2ª Via
+                                    Imagem</button>
+                            </div>
+                            <ul id="detalheExamesImgLista" style="margin-bottom: 20px; padding-left: 20px;"></ul>
+
+                            <hr>
+                            <h4>Resultados Anexados</h4>
+                            <ul id="detalheAnexosLista" style="margin-bottom: 20px; padding-left: 20px;"></ul>
+
+                            <div class="form-group" id="containerAnexarResultadoExame">
+                                <label for="resultadoExameUpload" class="btn btn-secondary"
+                                    style="margin-top: 10px; width: fit-content;">
+                                    <i class="fas fa-paperclip"></i> Anexar PDF/Imagem do Resultado
+                                </label>
+                                <input type="file" id="resultadoExameUpload" accept=".pdf,.jpg,.jpeg,.png"
+                                    style="display: none;">
+                                <div id="resultadoUploadStatus" style="font-size: 12px; margin-top: 5px;"></div>
+                            </div>
+
+                            <div class="modal-footer" style="justify-content: space-between;">
+                                <button type="button" class="btn btn-success" id="btnConcluirPedidoExame"><i
+                                        class="fas fa-check"></i> Marcar como Concluído</button>
+                                <button type="button" class="btn btn-secondary"
+                                    data-close-modal="pedidoExamesModal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal" id="examModal">
                     <div class="modal-content" style="max-width: 600px;">
                         <div class="modal-header">
@@ -1436,6 +1652,116 @@
                     </div>
                 </div>
 
+                <!-- Modais Financeiros -->
+                <!-- Modal de Cobrança na Recepção REMOVIDO -->
+
+                <div class="modal" id="receberCaixaModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h2>Receber Pagamento</h2>
+                            <button class="close-btn" data-close-modal="receberCaixaModal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="receberCaixaTransacaoId">
+                            <p><strong>Paciente:</strong> <span id="receberCaixaPacienteNome"></span></p>
+                            <p><strong>Plano Ativo:</strong> <span id="receberCaixaPlanoNome"
+                                    style="font-weight: bold; color: var(--primary-color);"></span></p>
+
+                            <hr style="margin: 15px 0;">
+
+                            <div class="details-grid"
+                                style="grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                                <div><small>Valor Original:</small><br><span id="receberCaixaValorOriginal"
+                                        style="font-size: 1.2rem;">R$ 0,00</span></div>
+                                <div><small>Desconto Calculado:</small><br><span id="receberCaixaDesconto"
+                                        style="font-size: 1.2rem; color: #e74c3c;">- R$ 0,00</span></div>
+                            </div>
+
+                            <div class="form-group"
+                                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end;">
+                                <div>
+                                    <label for="receberCaixaTipoDesconto">Tipo de Desconto</label>
+                                    <select id="receberCaixaTipoDesconto">
+                                        <option value="nenhum">Nenhum</option>
+                                        <option value="percentual">Percentual (%)</option>
+                                        <option value="valor">Valor (R$)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="receberCaixaValorDesconto">Valor do Desconto</label>
+                                    <input type="number" id="receberCaixaValorDesconto" step="0.01" value="0.00"
+                                        disabled>
+                                </div>
+                            </div>
+
+                            <div
+                                style="background-color: #f0f7f4; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+                                <small style="display: block; color: var(--gray-dark); margin-bottom: 5px;">Total a
+                                    Pagar:</small>
+                                <strong id="receberCaixaValorFinal" style="font-size: 1.8rem; color: #2ecc71;">R$
+                                    0,00</strong>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="receberCaixaFormaPgto">Forma de Pagamento</label>
+                                <select id="receberCaixaFormaPgto">
+                                    <option value="PIX">PIX</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                    <option value="Cartão de Débito">Cartão de Débito</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-close-modal="receberCaixaModal">Cancelar</button>
+                                <button type="button" class="btn btn-success" id="btnConfirmarRecebimentoCaixa"><i
+                                        class="fas fa-check-circle"></i> Pagamento Recebido</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="fechamentoCaixaModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h2>Fechamento de Caixa</h2>
+                            <button class="close-btn" data-close-modal="fechamentoCaixaModal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="text-align: center; color: var(--gray-medium); margin-bottom: 20px;">Valores
+                                recebidos na data de hoje.</p>
+
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem; padding: 10px; border-bottom: 1px solid #eee;">
+                                <span>Dinheiro:</span>
+                                <strong id="fechamentoTotalDinheiro" style="color: #2ecc71;">R$ 0,00</strong>
+                            </div>
+
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem; padding: 10px; border-bottom: 1px solid #eee;">
+                                <span>PIX:</span>
+                                <strong id="fechamentoTotalPix" style="color: #2ecc71;">R$ 0,00</strong>
+                            </div>
+
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; padding: 10px; border-bottom: 1px solid #eee;">
+                                <span>Cartões (Crédito/Débito):</span>
+                                <strong id="fechamentoTotalCartoes" style="color: #2ecc71;">R$ 0,00</strong>
+                            </div>
+
+                            <div
+                                style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <strong>TOTAL RECEBIDO:</strong>
+                                <strong id="fechamentoTotalGeral" style="color: #27ae60;">R$ 0,00</strong>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-close-modal="fechamentoCaixaModal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal" id="professionalModal">
                     <div class="modal-content" style="max-width: 600px;">
                         <div class="modal-header">
@@ -1485,7 +1811,8 @@
                             <button type="button" class="btn btn-secondary"
                                 data-close-modal="printPreviewModal">Fechar</button>
                             <button type="button" class="btn btn-success" id="confirmPrintBtn"><i
-                                    class="fas fa-print"></i> Imprimir</button>
+                                    class="fas fa-print"></i>
+                                Imprimir</button>
                         </div>
                     </div>
                 </div>

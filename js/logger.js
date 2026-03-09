@@ -18,6 +18,10 @@ export async function logAction(action, details = {}) {
             return;
         }
 
+        if (userProfile.isImpersonated) {
+            details.impersonatedBy = userProfile.originalUserId;
+        }
+
         const logEntry = {
             user_id: userProfile.id,
             user_email: userProfile.email,

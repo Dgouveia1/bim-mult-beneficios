@@ -42,7 +42,7 @@ async function loadPageData(pageName) {
     else if (pageName === 'clientes') await loadClientsData();
     else if (pageName === 'agenda') await loadScheduleView();
     else if (pageName === 'recepcao') await loadReceptionQueue();
-    else if (pageName === 'pacientes') await loadPatientsData();
+    else if (pageName === 'pacientes_medico' || pageName === 'pacientes_odonto') await loadPatientsData(pageName.split('_')[1]);
     else if (pageName === 'laboratorio') await loadLaboratoryData();
     else if (pageName === 'usuarios') await loadUsersData();
     else if (pageName === 'profissionais') await loadProfessionalsData();
@@ -51,6 +51,14 @@ async function loadPageData(pageName) {
     else if (pageName === 'logs') setupLogsPage();
     else if (pageName === 'vendas') setupVendasPage();
     else if (pageName === 'prontuario') setupProntuarioPage();
+    else if (pageName === 'exames') {
+        const module = await import('./exames.js');
+        module.setupExamesPage();
+    }
+    else if (pageName === 'caixa') {
+        const module = await import('./caixa.js');
+        module.setupCaixaPage();
+    }
     else if (pageName === 'carteirinha') setupCarteirinhaPage();
     else if (pageName === 'financeiro') setupFinanceiroPage();
     else if (pageName === 'dashboard') loadDashboardView();
@@ -66,7 +74,8 @@ function navigateToPage(pageName) {
 
     document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
 
-    const targetPage = document.getElementById(`${pageName}Page`);
+    const pageId = pageName.startsWith('pacientes_') ? 'pacientes' : pageName;
+    const targetPage = document.getElementById(`${pageId}Page`);
     if (targetPage) {
         targetPage.classList.add('active');
     }
@@ -175,7 +184,7 @@ function setupEventListeners() {
 
         if (!user) return;
 
-        if (user.role === 'medicos') {
+        if (user.role === 'medicos' || user.role === 'dentista') {
             openAvailabilityModal();
         }
         else if (['admin', 'superadmin', 'recepcao'].includes(user.role)) {
@@ -199,6 +208,17 @@ function setupEventListeners() {
 
     // LISTENER DO SUBMIT DE PLANO
     document.getElementById('planForm')?.addEventListener('submit', savePlan);
+
+    document.getElementById('exitImpersonationBtn')?.addEventListener('click', async () => {
+        localStorage.removeItem('impersonatedUserId');
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (session) {
+            document.getElementById('impersonationBanner').style.display = 'none';
+            await initializeDashboard(session.user);
+        } else {
+            handleLogout();
+        }
+    });
 
     document.getElementById('addDependenteBtn')?.addEventListener('click', () => {
         const container = document.getElementById('dependentesContainer');
@@ -368,6 +388,18 @@ function setupEventListeners() {
                 dependentGroup.remove();
             }
         }
+
+        const impersonateBtn = target.closest('.impersonate-btn');
+        if (impersonateBtn) {
+            const confirmed = await showConfirm('Deseja acessar o sistema como este usuário? Todas as ações ficaram registradas.');
+            if (confirmed) {
+                localStorage.setItem('impersonatedUserId', impersonateBtn.dataset.id);
+                const { data: { session } } = await _supabase.auth.getSession();
+                if (session) {
+                    await initializeDashboard(session.user);
+                }
+            }
+        }
     });
 
     document.getElementById('prevDayBtn')?.addEventListener('click', () => changeDay(-1));
@@ -394,8 +426,29 @@ async function initializeDashboard(user) {
         return handleLogout();
     }
 
-    setCurrentUserProfile(profile);
-    setupPermissions(profile.role);
+    let finalProfile = profile;
+    const impersonatedUserId = localStorage.getItem('impersonatedUserId');
+    if ((profile.role === 'superadmin' || profile.role === 'admin') && impersonatedUserId) {
+        const { data: impersonatedProfile, error: impError } = await _supabase.from('profiles').select('*').eq('id', impersonatedUserId).single();
+        if (impersonatedProfile && !impError) {
+            finalProfile = {
+                ...impersonatedProfile,
+                isImpersonated: true,
+                originalUserId: profile.id
+            };
+            const banner = document.getElementById('impersonationBanner');
+            const bText = document.getElementById('impersonationText');
+            if (banner && bText) {
+                bText.textContent = `Você está acessando como: ${impersonatedProfile.full_name} (${impersonatedProfile.role})`;
+                banner.style.display = 'flex';
+            }
+        } else {
+            localStorage.removeItem('impersonatedUserId');
+        }
+    }
+
+    setCurrentUserProfile(finalProfile);
+    setupPermissions(finalProfile.role);
     showDashboard();
 
     await loadPageData('home');

@@ -1,17 +1,18 @@
 import { _supabase } from './supabase.js';
-import { allPeople } from './clientes.js'; 
-import { logAction } from './logger.js'; 
+import { allPeople } from './clientes.js';
+import { logAction } from './logger.js';
 import { showToast } from './utils.js';
 
 // Variável para guardar a inscrição e poder removê-la depois
 let receptionSubscription = null;
+let currentAppointments = [];
 
 // Lista de salas (deve ser consistente com o index.html e agenda.js)
 const ROOMS_LIST = [
-    'Consultório 1', 
-    'Consultório 2', 
-    'Consultório 3 (Dentista)', 
-    'Consultório 4', 
+    'Consultório 1',
+    'Consultório 2',
+    'Consultório 3 (Dentista)',
+    'Consultório 4',
     'Consultório 5'
 ];
 
@@ -32,19 +33,19 @@ async function loadReceptionQueue() {
 
     // Primeiro, remove qualquer inscrição anterior para evitar múltiplas execuções
     unsubscribeReception();
-    
+
     // Carrega os dados iniciais
-    await renderReceptionQueue(); 
+    await renderReceptionQueue();
 
     // Agora, cria a inscrição para futuras mudanças na tabela 'appointments'
     receptionSubscription = _supabase.channel('public:appointments_recepcao')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, (payload) => {
             console.log('🏥 [RECEPTION] Mudança detectada nos agendamentos!', payload);
-            
+
             // Verifica se a mudança é no dia de hoje
             const changedDate = (payload.new?.appointment_date || payload.old?.appointment_date || '').split('T')[0];
             const today = new Date().toISOString().split('T')[0];
-            
+
             // Se a data alterada for hoje OU se a data não estiver presente (ex: payload de delete pode não ter data completa dependendo da réplica), atualiza.
             // Para garantir: sempre atualiza se for hoje.
             if (changedDate === today) {
@@ -81,7 +82,7 @@ function createPatientCard(appt) {
     // --- LÓGICA MANTIDA: Alerta de Inadimplência apenas visual na recepção ---
     // Verifica se o objeto 'clients' veio populado e se o status é ATRASO
     const isOverdue = appt.clients && appt.clients.status === 'ATRASO';
-    
+
     // HTML do alerta visual
     const overdueAlertHtml = isOverdue ? `
         <div style="margin-top: 10px; background-color: #ffebee; border: 1px solid #ffcdd2; color: #c62828; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
@@ -92,6 +93,17 @@ function createPatientCard(appt) {
 
     // Adiciona uma borda vermelha extra ao card se estiver em atraso
     const extraStyle = isOverdue ? 'border-left: 5px solid #c62828 !important;' : '';
+
+    // Lógica do botão de Check-in (Fica verde se já foi)
+    let checkinBtnClass = 'btn-secondary';
+    let checkinIcon = 'fa-check';
+    let checkinText = 'Check-in';
+
+    if (appt.status === 'chegou' || appt.status === 'em_atendimento' || appt.status === 'finalizado') {
+        checkinBtnClass = 'btn-success';
+        checkinIcon = 'fa-check-double';
+        checkinText = 'Realizado';
+    }
 
     return `
         <div class="patient-card" data-appointment-id="${appt.id}" style="${extraStyle}">
@@ -106,11 +118,8 @@ function createPatientCard(appt) {
                 ${overdueAlertHtml}
             </div>
             <div class="patient-card-actions">
-                <button class="btn btn-secondary checkin-btn" data-id="${appt.id}" ${isCheckinDisabled ? 'disabled' : ''}>
-                    <i class="fas fa-check"></i> Check-in
-                </button>
-                <button class="btn btn-success payment-btn" data-id="${appt.id}" data-name="${appt.patient_name}" ${isPaymentDisabled ? 'disabled' : ''}>
-                    ${paymentButtonText}
+                <button class="btn ${checkinBtnClass} checkin-btn" data-id="${appt.id}" ${isCheckinDisabled ? 'disabled' : ''} style="width: 100%;">
+                    <i class="fas ${checkinIcon}"></i> ${checkinText}
                 </button>
             </div>
         </div>
@@ -151,23 +160,25 @@ async function renderReceptionQueue() {
     });
 
     const today = new Date().toISOString().split('T')[0];
-    
+
     try {
         // --- ATUALIZAÇÃO IMPORTANTE: Join com 'clients' para pegar o status financeiro ---
         const { data: appointments, error } = await _supabase
             .from('appointments')
-            .select(`*, professionals ( name ), clients ( status )`) 
+            .select(`*, professionals ( name ), clients ( status )`)
             .eq('appointment_date', today)
             .not('status', 'eq', 'finalizado')
             .not('status', 'eq', 'cancelado')
             .order('start_time');
 
-        if (error) throw error; 
+        if (error) throw error;
+
+        currentAppointments = appointments;
 
         // Distribui os pacientes nas colunas
         appointments.forEach(appt => {
             const cardHtml = createPatientCard(appt);
-            
+
             if (appt.room) {
                 const roomId = appt.room.replace(/[\s()]+/g, '-');
                 const roomColumn = document.getElementById(`column-${roomId}`);
@@ -184,31 +195,31 @@ async function renderReceptionQueue() {
             const roomId = roomName.replace(/[\s()]+/g, '-');
             const columnBody = document.getElementById(`column-${roomId}`);
             const statusIndicator = document.getElementById(`status-${roomId}`);
-            
+
             if (!columnBody) return;
 
             const isOccupied = columnBody.querySelector('.status-info') !== null; // Em atendimento
             const isWaiting = columnBody.querySelector('.status-active') !== null; // Chegou
-            
+
             if (statusIndicator) {
-                 if (isOccupied) {
+                if (isOccupied) {
                     statusIndicator.textContent = 'Em Atendimento';
                     statusIndicator.className = 'room-status ocupada';
                 } else if (isWaiting) {
-                     statusIndicator.textContent = 'Aguardando';
-                     statusIndicator.className = 'room-status ocupada'; 
+                    statusIndicator.textContent = 'Aguardando';
+                    statusIndicator.className = 'room-status ocupada';
                 } else {
                     statusIndicator.textContent = 'Livre';
                     statusIndicator.className = 'room-status livre';
                 }
             }
-            
+
             // Controle da mensagem "Sala vazia"
             const emptyMsg = document.getElementById(`empty-msg-${roomId}`);
             if (emptyMsg) {
-                 // Conta apenas os cards reais (ignorando a mensagem vazia)
-                 const cardCount = columnBody.querySelectorAll('.patient-card').length;
-                 emptyMsg.style.display = cardCount === 0 ? 'block' : 'none';
+                // Conta apenas os cards reais (ignorando a mensagem vazia)
+                const cardCount = columnBody.querySelectorAll('.patient-card').length;
+                emptyMsg.style.display = cardCount === 0 ? 'block' : 'none';
             }
         });
 
@@ -218,18 +229,19 @@ async function renderReceptionQueue() {
     }
 }
 
-// Marca a chegada do paciente (check-in)
+// Marca a chegada do paciente (check-in) e gera transação pendente no caixa
 async function markArrival(appointmentId) {
-    const checkinButton = document.querySelector(`.checkin-btn[data-id="${appointmentId}"]`);
-    if(checkinButton) {
-        checkinButton.disabled = true;
-        checkinButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    const appt = currentAppointments.find(a => a.id == appointmentId);
+    if (!appt) {
+        console.error('Atendimento não encontrado na fila para o ID:', appointmentId);
+        return;
     }
 
     try {
-        const updateData = { 
-            status: 'chegou', 
-            checkin_time: new Date().toISOString() 
+        // 1. Fazer o check-in na agenda
+        const updateData = {
+            status: 'chegou',
+            checkin_time: new Date().toISOString()
         };
 
         const { data: appointment, error } = await _supabase
@@ -237,25 +249,36 @@ async function markArrival(appointmentId) {
             .update(updateData)
             .eq('id', appointmentId)
             .select()
-            .single(); 
-            
+            .single();
+
         if (error) throw error;
-        
-        await logAction('CHECK_IN', { 
-            appointmentId: appointmentId, 
-            checkinTime: updateData.checkin_time 
+
+        // 2. Criar a transação financeira PENDENTE para o Caixa
+        const transacaoData = {
+            paciente_id: appt.client_id,
+            paciente_nome: appt.patient_name,
+            atendimento_id: appointmentId,
+            tipo_cobranca: 'CONSULTA',
+            valor_original: 0, // Será editado/preenchido no Caixa
+            desconto_aplicado: 0,
+            valor_final: 0, // Será editado/preenchido no Caixa
+            status_pagamento: 'PENDENTE',
+            created_by: (await _supabase.auth.getUser()).data.user.id
+        };
+
+        const { error: txError } = await _supabase.from('transacoes_financeiras').insert(transacaoData);
+        if (txError) throw txError;
+
+        await logAction('CHECK_IN', {
+            appointmentId: appointmentId,
+            checkinTime: updateData.checkin_time
         });
 
-        showToast(`Check-in de ${appointment.patient_name} realizado!`);
-        // O Realtime atualizará a tela automaticamente
-
-    } catch (error) {
-        showToast('Não foi possível realizar o check-in.');
-        console.error("Erro no check-in:", error);
-        if(checkinButton) {
-            checkinButton.disabled = false;
-            checkinButton.innerHTML = '<i class="fas fa-check"></i> Check-in';
-        }
+        showToast(`Check-in de ${appointment.patient_name} realizado! Fatura gerada no Caixa.`);
+        renderReceptionQueue(); // Atualiza a fila
+    } catch (err) {
+        console.error('Erro no check-in:', err);
+        showToast('Erro ao realizar o check-in.', 'error');
     }
 }
 
@@ -263,14 +286,14 @@ async function markArrival(appointmentId) {
 function openPaymentModal(appointmentId, patientName) {
     const modal = document.getElementById('paymentModal');
     if (!modal) return;
-    
+
     const patientData = allPeople.find(p => p.nome === patientName);
 
     document.getElementById('paymentAppointmentId').value = appointmentId;
     document.getElementById('paymentPatientName').textContent = patientName;
     document.getElementById('paymentPatientCPF').textContent = patientData?.cpf || 'N/A';
     document.getElementById('paymentPatientPlan').textContent = patientData?.plano || 'N/A';
-    
+
     modal.style.display = 'flex';
 }
 
@@ -279,16 +302,16 @@ async function savePayment(event) {
     event.preventDefault();
     const form = event.target;
     const submitButton = form.querySelector('button[type="submit"]');
-    
+
     const paymentData = {
         appointment_id: document.getElementById('paymentAppointmentId').value,
         amount: document.getElementById('paymentAmount').value,
         method: document.getElementById('paymentMethod').value,
     };
-    
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-    
+
     try {
         const { error: paymentError } = await _supabase.from('payments').insert(paymentData);
         if (paymentError) throw paymentError;
@@ -298,9 +321,9 @@ async function savePayment(event) {
             .update({ payment_status: 'pago' })
             .eq('id', paymentData.appointment_id);
         if (appointmentError) throw appointmentError;
-        
-        await logAction('REGISTER_PAYMENT', { 
-            appointmentId: paymentData.appointment_id, 
+
+        await logAction('REGISTER_PAYMENT', {
+            appointmentId: paymentData.appointment_id,
             amount: paymentData.amount,
             method: paymentData.method
         });

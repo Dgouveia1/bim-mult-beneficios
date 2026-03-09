@@ -22,7 +22,7 @@
 @import url('pages/_status.css');
 @import url('pages/_recepcao.css');
 @import url('pages/_agenda.css');
-@import url('pages/_disparos.css'); 
+@import url('pages/_disparos.css');
 @import url('pages/_clientes.css');
 @import url('pages/_prontuario.css');
 @import url('pages/_home.css');
@@ -33,3 +33,4 @@
 @import url('pages/_dashboard.css');
 @import url('pages/_financeiro.css');
 @import url('pages/_whatsapp_admin.css');
+@import url('pages/_odontograma.css');

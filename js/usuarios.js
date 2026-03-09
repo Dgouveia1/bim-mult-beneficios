@@ -19,8 +19,14 @@ async function loadUsersData() {
         const { data: profiles, error } = await _supabase.from('profiles').select('*').order('full_name');
         if (error) throw error;
 
+        const currentUser = getCurrentUserProfile();
+        const canImpersonate = currentUser && (!currentUser.isImpersonated && (currentUser.role === 'superadmin' || currentUser.role === 'admin'));
+
         tableBody.innerHTML = '';
         profiles.forEach(profile => {
+            const isSelf = currentUser && profile.id === currentUser.id;
+            const impersonateBtnHtml = canImpersonate && !isSelf ? `<button class="btn btn-warning btn-small impersonate-btn" data-id="${profile.id}" title="Acessar como" style="margin-left: 5px;"><i class="fas fa-user-secret"></i></button>` : '';
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${profile.full_name || 'N/A'}</td>
@@ -28,6 +34,7 @@ async function loadUsersData() {
                 <td>${profile.role || 'N/A'}</td>
                 <td class="actions">
                     <button class="btn btn-secondary btn-small edit-user-btn" data-id="${profile.id}">Editar</button>
+                    ${impersonateBtnHtml}
                 </td>
             `;
             tableBody.appendChild(row);
@@ -41,7 +48,7 @@ async function loadUsersData() {
 async function openUserModal(id = null) {
     userForm.reset();
     userIdInput.value = '';
-    
+
     populateRoleOptions();
 
     if (id) {
@@ -78,6 +85,7 @@ function populateRoleOptions() {
         admin: 'Administrador',
         recepcao: 'Usuário Recepção',
         medicos: 'Usuário Clínica',
+        dentista: 'Dentista',
         financeiro: 'Usuário Financeiro'
     };
 
@@ -99,7 +107,7 @@ async function saveUser(event) {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
 
     const id = userIdInput.value;
-    
+
     const formData = new FormData(userForm);
     const userData = {
         full_name: formData.get('full_name'),
@@ -116,7 +124,7 @@ async function saveUser(event) {
                 .update({ full_name: userData.full_name, role: userData.role })
                 .eq('id', id);
             if (error) throw error;
-            
+
             await logAction('UPDATE_USER', { userId: id, fullName: userData.full_name, role: userData.role });
             showToast('Usuário atualizado com sucesso!');
 
@@ -134,9 +142,9 @@ async function saveUser(event) {
                 p_full_name: userData.full_name,
                 p_role: userData.role
             });
-                
+
             if (error) throw error;
-            
+
             showToast('Usuário criado com sucesso!');
         }
 

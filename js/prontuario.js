@@ -10,13 +10,13 @@ let currentViewOnlyProfessionalId = null; // Guarda o ID do profissional (da tab
 // Evita o erro de tentar fazer JSON.parse em algo que já é objeto (comum em campos JSONB do Supabase)
 function safeFormatExams(data) {
     if (!data) return 'N/A';
-    
+
     let list = [];
-    
+
     // Se já for um objeto/array (comportamento padrão do Supabase para colunas JSONB)
     if (typeof data === 'object') {
         list = data;
-    } 
+    }
     // Se for uma string (comportamento para colunas TEXT ou legado)
     else if (typeof data === 'string') {
         if (data === '[]') return 'N/A';
@@ -29,7 +29,7 @@ function safeFormatExams(data) {
     }
 
     if (!Array.isArray(list) || list.length === 0) return 'N/A';
-    
+
     // Mapeia e junta os nomes
     return list.map(e => e.name).join(', ');
 }
@@ -39,20 +39,20 @@ async function fetchCurrentProfessionalId() {
     try {
         const user = getCurrentUserProfile();
         if (!user) {
-             console.log("[PRONTUÁRIO] Usuário não logado.");
-             return;
+            console.log("[PRONTUÁRIO] Usuário não logado.");
+            return;
         }
 
-        // Apenas 'medicos' podem ter um ID de profissional
-        if (user.role === 'medicos') {
+        // Apenas 'medicos' ou 'dentista' podem ter um ID de profissional
+        if (user.role === 'medicos' || user.role === 'dentista') {
             const { data: professional, error } = await _supabase
                 .from('professionals')
                 .select('id')
                 .eq('user_id', user.id)
                 .single();
-            
+
             if (error) throw error;
-            
+
             if (professional) {
                 currentViewOnlyProfessionalId = professional.id;
                 console.log(`[PRONTUÁRIO] Visualizador identificado. ID Profissional: ${currentViewOnlyProfessionalId}`);
@@ -77,10 +77,16 @@ async function loadHistoryForPatient(patientData) {
         document.getElementById('prontuarioPatientPlan').textContent = patientData.plano || 'N/A';
         patientInfoContainer.style.display = 'block';
 
+        const sectionsContainer = document.getElementById('prontuarioSections');
+        if (sectionsContainer) sectionsContainer.style.display = 'block';
+
+        const startMessage = document.getElementById('prontuarioStartMessage');
+        if (startMessage) startMessage.style.display = 'none';
+
         historyContainer.innerHTML = '<p>Carregando histórico...</p>';
-        
+
         console.log(`[PRONTUÁRIO] Buscando agendamentos para o NOME: ${patientData.nome}`);
-        
+
         // Busca agendamentos pelo nome exato do paciente
         const { data: patientAppointments, error: apptError } = await _supabase.from('appointments')
             .select('id, appointment_date, start_time, professional_id, professionals(name)')
@@ -100,8 +106,10 @@ async function loadHistoryForPatient(patientData) {
             .select('*').in('appointment_id', appointmentIds).order('created_at', { ascending: false });
 
         if (consultError) throw consultError;
-        
-        historyContainer.innerHTML = '';
+
+        // Carrega exames em paralelo para a outra aba
+        await loadExamesForProntuario(patientData.nome, patientData.cpf);
+
         if (history.length === 0) {
             historyContainer.innerHTML = '<p>Este paciente possui agendamentos, mas nenhuma consulta foi finalizada e salva.</p>';
             return;
@@ -130,8 +138,10 @@ async function loadHistoryForPatient(patientData) {
                 // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
                 const creatorProfId = consultation.professional_id;
                 const viewerProfId = currentViewOnlyProfessionalId; // ID do profissional logado
-                const isOwner = (creatorProfId === viewerProfId);
-                
+                const currentUser = getCurrentUserProfile();
+                const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
+                const isOwner = isSuperAdmin || (creatorProfId === viewerProfId);
+
                 const item = document.createElement('div');
                 item.className = 'historico-item card';
 
@@ -172,7 +182,7 @@ async function loadHistoryForPatient(patientData) {
                     <p><strong>Profissional:</strong> ${professionalName}</p>
                     ${sensitiveDetailsHtml}
                 `;
-                
+
                 // Adiciona o listener de clique SOMENTE se o link "Ver Detalhes" existir
                 const detailsLink = item.querySelector('.details-link');
                 if (detailsLink) {
@@ -184,7 +194,7 @@ async function loadHistoryForPatient(patientData) {
                         }
                     });
                 }
-                
+
                 historyContainer.appendChild(item);
 
             } catch (innerError) {
@@ -204,6 +214,66 @@ async function loadHistoryForPatient(patientData) {
     }
 }
 
+async function loadExamesForProntuario(nome, cpf) {
+    const examesContainer = document.getElementById('prontuarioExamesContainer');
+    if (!examesContainer) return;
+
+    examesContainer.innerHTML = '<p>Carregando exames e resultados...</p>';
+
+    try {
+        let query = _supabase.from('pedidos_exames').select('*').order('created_at', { ascending: false });
+        if (cpf && cpf !== 'N/A') {
+            const cleanCpf = cpf.replace(/\D/g, ''); // só os numeros
+            // Busca simplificada pelo nome pra ser mais permissivo no ILIKE
+            query = query.or(`paciente_cpf.ilike.%${cleanCpf}%,paciente_nome.ilike.%${nome.split(' ')[0]}%`);
+        } else {
+            query = query.ilike('paciente_nome', `%${nome.split(' ')[0]}%`);
+        }
+
+        const { data: exames, error } = await query;
+        if (error) throw error;
+
+        if (!exames || exames.length === 0) {
+            examesContainer.innerHTML = '<p>Nenhum pedido de exame registrado para este paciente.</p>';
+            return;
+        }
+
+        examesContainer.innerHTML = '';
+        exames.forEach(exame => {
+            const date = new Date(exame.created_at).toLocaleDateString('pt-BR');
+            let resultHtml = 'Nenhum resultado anexado';
+
+            let anexos = [];
+            try { anexos = typeof exame.anexos_resultados === 'string' ? JSON.parse(exame.anexos_resultados) : exame.anexos_resultados; } catch (e) { }
+
+            if (anexos && anexos.length > 0) {
+                resultHtml = '<ul style="list-style: none; padding-left: 0;">';
+                anexos.forEach(anexo => {
+                    const { data } = _supabase.storage.from('resultados-exames').getPublicUrl(anexo.path);
+                    resultHtml += `<li><a href="${data.publicUrl}" target="_blank" style="font-size: 13px;"><i class="fas fa-file-download"></i> ${anexo.name}</a></li>`;
+                });
+                resultHtml += '</ul>';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'historico-item card';
+            item.innerHTML = `
+                <p><strong>Data do Pedido:</strong> ${date}</p>
+                <p><strong>Médico Solicitante:</strong> ${exame.medico_nome}</p>
+                <p><strong>Status:</strong> <span style="color: ${exame.status === 'Concluído' ? 'green' : 'orange'}">${exame.status}</span></p>
+                <hr>
+                <p><strong>Resultados:</strong></p>
+                ${resultHtml}
+            `;
+            examesContainer.appendChild(item);
+        });
+
+    } catch (err) {
+        console.error("[PRONTUÁRIO] Erro ao carregar exames", err);
+        examesContainer.innerHTML = '<p style="color:red">Erro ao carregar os exames.</p>';
+    }
+}
+
 async function searchAndLoadPatientHistory(patientNameQuery) {
     console.log(`[PRONTUÁRIO] Buscando por: "${patientNameQuery}"`);
 
@@ -218,7 +288,7 @@ async function searchAndLoadPatientHistory(patientNameQuery) {
 
     const lowerSearchTerm = patientNameQuery.toLowerCase();
     const searchWords = lowerSearchTerm.split(' ').filter(w => w.length > 0);
-            
+
     try {
         // Constrói os filtros
         const nameAndFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
@@ -249,7 +319,7 @@ async function searchAndLoadPatientHistory(patientNameQuery) {
                 tipo: `Dependente de ${d.clients.nome} ${d.clients.sobrenome || ''}`.trim()
             }))
         ];
-        
+
         // Remove duplicados (caso um titular e dependente tenham nomes parecidos)
         const uniquePatients = Array.from(new Map(matchingPatients.map(p => [`${p.nome}-${p.cpf}`, p])).values());
 
@@ -277,22 +347,38 @@ async function searchAndLoadPatientHistory(patientNameQuery) {
         });
 
     } catch (error) {
-         console.error('[PRONTUÁRIO] Erro ao buscar pacientes:', error);
-         historyContainer.innerHTML = `<p style="color:red;">Erro ao buscar pacientes: ${error.message}</p>`;
+        console.error('[PRONTUÁRIO] Erro ao buscar pacientes:', error);
+        historyContainer.innerHTML = `<p style="color:red;">Erro ao buscar pacientes: ${error.message}</p>`;
     }
 }
 
 async function setupProntuarioPage() {
     // Busca o ID do profissional logado ANTES de configurar os listeners
     await fetchCurrentProfessionalId();
-    
+
     const searchInput = document.getElementById('prontuarioSearchInput');
-    
+
     // Limpa o campo e o histórico ao carregar a página
     searchInput.value = '';
-    historyContainer.innerHTML = '<p>Busque por um paciente para ver seu histórico de consultas.</p>';
+
+    document.getElementById('prontuarioSections').style.display = 'none';
+    document.getElementById('prontuarioStartMessage').style.display = 'block';
+
     patientInfoContainer.style.display = 'none';
-    
+
+    // Configura as abas do Prontuário
+    const tabBtns = document.querySelectorAll('#prontuarioSections .btn-tab');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#prontuarioSections .tab-pane').forEach(p => p.classList.remove('active'));
+
+            btn.classList.add('active');
+            const targetTab = document.getElementById(`tab${btn.dataset.tab}`);
+            if (targetTab) targetTab.classList.add('active');
+        });
+    });
+
     let debounceTimer;
     searchInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimer);

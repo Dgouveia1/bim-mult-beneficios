@@ -32,6 +32,7 @@ async function handleLogin(event) {
 async function handleLogout() {
     await logAction('LOGOUT', {});
     await _supabase.auth.signOut();
+    localStorage.removeItem('impersonatedUserId');
     currentUserProfile = null;
     showLoginScreen();
 }
@@ -43,15 +44,16 @@ function getCurrentUserProfile() {
 function setupPermissions(role) {
     // Mapeia roles para as classes CSS que elas podem ver
     const rolePermissions = {
-        superadmin: ['admin-only', 'medicos-only'], 
-        admin: ['admin-only', 'medicos-only'], 
+        superadmin: ['admin-only', 'medicos-only'],
+        admin: ['admin-only', 'medicos-only'],
         // CORREÇÃO: Recepção agora vê elementos 'admin-only' limitados (necessário para ver o menu 'Marketing & Admin' onde 'Profissionais' está)
         // Isso é necessário porque o menu pai está envolto em <div class="admin-only"> no HTML.
         // Se quisermos ser mais restritos, deveríamos mudar o HTML, mas via JS, permitimos que vejam o container pai
         // e filtramos os filhos abaixo.
-        recepcao: ['admin-only'], 
-        medicos: ['medicos-only'], 
-        financeiro: ['admin-only'] 
+        recepcao: ['admin-only'],
+        medicos: ['medicos-only'],
+        dentista: ['medicos-only'],
+        financeiro: ['admin-only']
     };
 
     // 1. Esconde todos os elementos com classes de permissão
@@ -66,7 +68,7 @@ function setupPermissions(role) {
             if (el.tagName === 'BUTTON' || el.style.display === 'flex') {
                 el.style.display = 'flex';
             } else {
-                el.style.display = 'block'; 
+                el.style.display = 'block';
             }
         });
     });
@@ -76,12 +78,13 @@ function setupPermissions(role) {
         'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true,
         'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true,
     };
-    
+
     const rolesPermissions = {
         superadmin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
         admin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
         recepcao: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true }, // Vê o menu pai
         medicos: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
+        dentista: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
         financeiro: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': false, 'submenu-clinica': false, 'menu-admin': true, 'submenu-admin': true }
     };
 
@@ -95,7 +98,7 @@ function setupPermissions(role) {
     }
 
     // 4. Lógica Fina para Itens DENTRO dos Submenus
-    
+
     // a) Menu Cartão: Controle WhatsApp (Todos Admin/Recepção veem)
     const whatsappLink = document.querySelector('[data-page="whatsapp_admin"]');
     if (whatsappLink) {
@@ -121,20 +124,40 @@ function setupPermissions(role) {
         if (role === 'recepcao') {
             // Recepção vê APENAS Profissionais (para agenda) e talvez Laboratório?
             // Vamos esconder as funções sensíveis de admin
-            if(cronogramaLink) cronogramaLink.style.display = 'none';
-            if(logsLink) logsLink.style.display = 'none';
-            if(dashboardLink) dashboardLink.style.display = 'none';
-            if(usersLink) usersLink.style.display = 'none';
-            if(financeiroLink) financeiroLink.style.display = 'none';
-            
+            if (cronogramaLink) cronogramaLink.style.display = 'none';
+            if (logsLink) logsLink.style.display = 'none';
+            if (dashboardLink) dashboardLink.style.display = 'none';
+            if (usersLink) usersLink.style.display = 'none';
+            if (financeiroLink) financeiroLink.style.display = 'none';
+
             // Garante que Profissionais esteja visível para Recepção
-            if(profLink) profLink.style.display = 'block';
-            
+            if (profLink) profLink.style.display = 'block';
+
         } else if (role === 'admin' || role === 'superadmin') {
             // Admins veem tudo
-            if(cronogramaLink) cronogramaLink.style.display = 'block';
-            if(logsLink) logsLink.style.display = 'block';
-            if(profLink) profLink.style.display = 'block';
+            if (cronogramaLink) cronogramaLink.style.display = 'block';
+            if (logsLink) logsLink.style.display = 'block';
+            if (profLink) profLink.style.display = 'block';
+        }
+    }
+
+    // c) Menu Clínica: Atendimento (Médico vs Odonto)
+    const clinicaSubmenu = document.getElementById('submenu-clinica');
+    if (clinicaSubmenu) {
+        const atendimentoMedicoLink = clinicaSubmenu.querySelector('[data-page="pacientes_medico"]');
+        const atendimentoOdontoLink = clinicaSubmenu.querySelector('[data-page="pacientes_odonto"]');
+
+        if (atendimentoMedicoLink && atendimentoOdontoLink) {
+            if (role === 'medicos') {
+                atendimentoMedicoLink.style.display = 'block';
+                atendimentoOdontoLink.style.display = 'none';
+            } else if (role === 'dentista') {
+                atendimentoMedicoLink.style.display = 'none';
+                atendimentoOdontoLink.style.display = 'block';
+            } else {
+                atendimentoMedicoLink.style.display = 'block';
+                atendimentoOdontoLink.style.display = 'block';
+            }
         }
     }
 }

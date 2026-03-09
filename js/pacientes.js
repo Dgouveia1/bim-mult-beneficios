@@ -12,6 +12,7 @@ let currentUploadedFiles = [];
 let currentSelectedPatientData = null;
 let currentProfessionalData = null; // Esta variável guardará os dados do profissional logado
 let currentAppointmentData = null; // Armazena dados completos do agendamento atual
+let currentViewMode = null; // 'medico' or 'odonto'
 
 // --- ELEMENTOS DO DOM (CACHE) ---
 const consultationWorkspaceDiv = document.getElementById('consultationWorkspace');
@@ -70,32 +71,53 @@ function unsubscribePatients() {
 }
 
 // --- LÓGICA DA FILA DE PACIENTES ---
-async function loadPatientsData() {
+async function loadPatientsData(viewMode = null) {
+    if (viewMode) {
+        currentViewMode = viewMode;
+    } else if (!currentViewMode) {
+        const currentUserProfile = getCurrentUserProfile();
+        if (currentUserProfile?.role === 'dentista') {
+            currentViewMode = 'odonto';
+        } else {
+            currentViewMode = 'medico';
+        }
+    }
+
     if (!patientQueueListContainer) return;
     patientQueueListContainer.innerHTML = '<p>Carregando...</p>';
     const currentUser = getCurrentUserProfile();
-    if (!currentUser || currentUser.role !== 'medicos') {
+    if (!currentUser || (currentUser.role !== 'medicos' && currentUser.role !== 'dentista' && currentUser.role !== 'superadmin' && currentUser.role !== 'admin')) {
         patientQueueListContainer.innerHTML = '<p>Acesso restrito.</p>';
         return;
     }
     const today = new Date().toISOString().split('T')[0];
     try {
         unsubscribePatients();
-        const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
-        if (!professional) throw new Error('Perfil profissional não encontrado.');
-        
-        // Inclui 'pausado' na lista de status visíveis na fila
-        const { data, error } = await _supabase
+        let query = _supabase
             .from('appointments')
             .select('*')
             .eq('appointment_date', today)
-            .eq('professional_id', professional.id)
             .in('status', ['chegou', 'em_atendimento', 'pausado'])
             .order('start_time');
-            
+
+        let filterString = '';
+
+        if (currentUser.role !== 'superadmin') {
+            const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
+            if (!professional) throw new Error('Perfil profissional não encontrado.');
+            query = query.eq('professional_id', professional.id);
+            filterString = `professional_id=eq.${professional.id}`;
+        }
+
+        const { data, error } = await query;
+
         if (error) throw error;
         renderPatientsList(data);
-        patientsSubscription = _supabase.channel('public:appointments_medico').on('postgres_changes', { event: '*', schema: 'public', table: 'appointments', filter: `professional_id=eq.${professional.id}` }, () => loadPatientsData()).subscribe();
+
+        const channelOpts = { event: '*', schema: 'public', table: 'appointments' };
+        if (filterString) channelOpts.filter = filterString;
+
+        patientsSubscription = _supabase.channel('public:appointments_medico').on('postgres_changes', channelOpts, () => loadPatientsData()).subscribe();
     } catch (error) {
         patientQueueListContainer.innerHTML = `<p style="color:red">${error.message}</p>`;
     }
@@ -106,16 +128,16 @@ function renderPatientsList(data) {
     data.forEach(appt => {
         const item = document.createElement('div');
         item.className = 'paciente-espera-item';
-        
+
         // Marca visualmente se está ativo ou pausado
         if (appt.status === 'em_atendimento') item.classList.add('active');
         if (appt.status === 'pausado') item.style.borderLeft = '4px solid #ff9800'; // Indicador laranja para pausado
 
         item.dataset.appointmentId = appt.id;
-        
+
         let statusIcon = '';
         if (appt.status === 'pausado') statusIcon = ' <i class="fas fa-pause" style="font-size: 0.8em; color: #ff9800;"></i>';
-        
+
         item.innerHTML = `<span class="nome">${appt.patient_name}${statusIcon}</span><span class="horario">${appt.start_time.substring(0, 5)}</span>`;
         patientQueueListContainer.appendChild(item);
     });
@@ -132,7 +154,7 @@ function updateLabExamPreview() {
     } else {
         contentHTML = '<p style="text-align:center; color: #888;">Nenhum exame selecionado.</p>';
     }
-    
+
     container.innerHTML = `
         <div class="printable-title">PEDIDO DE EXAMES LABORATORIAIS</div>
         <div class="printable-patient-data" id="labPreviewPatientData"></div>
@@ -149,7 +171,7 @@ function updateLabExamPreview() {
         const patientAddress = currentSelectedPatientData?.endereco || 'Não informado';
         const profName = currentProfessionalData?.name || 'Profissional não identificado';
         const profCRM = currentProfessionalData?.CRM || '';
-        
+
         patientDataEl.innerHTML = `<b>Paciente:</b> ${patientName}<br><b>CPF:</b> ${patientCPF}<br><b>Endereço:</b> ${patientAddress}`;
         profDataEl.innerHTML = `<p>_________________________________________</p><b>${profName}</b><br><span>${profCRM}</span>`;
     }
@@ -182,7 +204,7 @@ function updateImageExamPreview() {
         const patientAddress = currentSelectedPatientData?.endereco || 'Não informado';
         const profName = currentProfessionalData?.name || 'Profissional não identificado';
         const profCRM = currentProfessionalData?.CRM || '';
-        
+
         patientDataEl.innerHTML = `<b>Paciente:</b> ${patientName}<br><b>CPF:</b> ${patientCPF}<br><b>Endereço:</b> ${patientAddress}`;
         profDataEl.innerHTML = `<p>_________________________________________</p><b>${profName}</b><br><span>${profCRM}</span>`;
     }
@@ -200,31 +222,56 @@ async function selectPatient(appointmentId) {
     renderSelectedExams();
     renderSelectedImageExams();
     renderAttachments();
-    
+
     // Atualiza a UI para mostrar a área de trabalho da consulta
     document.querySelectorAll('.paciente-espera-item').forEach(item => item.classList.remove('active'));
     document.querySelector(`.paciente-espera-item[data-appointment-id="${appointmentId}"]`)?.classList.add('active');
     consultationWorkspaceDiv.style.display = 'flex';
     noPatientSelectedDiv.style.display = 'none';
 
+    // Setup tabs by mode
+    const tabAtendimentoMedicoBtn = document.querySelector('.btn-tab[data-tab="AtendimentoMedico"]');
+    const tabAtendimentoOdontoBtn = document.querySelector('.btn-tab[data-tab="AtendimentoOdonto"]');
+
+    if (tabAtendimentoMedicoBtn && tabAtendimentoOdontoBtn) {
+        tabAtendimentoMedicoBtn.style.display = 'inline-block';
+        tabAtendimentoOdontoBtn.style.display = 'inline-block';
+
+        // Remove active from all tabs
+        document.querySelectorAll('.btn-tab, .tab-pane').forEach(el => el.classList.remove('active'));
+
+        if (currentViewMode === 'odonto') {
+            tabAtendimentoMedicoBtn.style.display = 'none';
+            tabAtendimentoOdontoBtn.classList.add('active');
+            document.getElementById('tabAtendimentoOdonto').classList.add('active');
+        } else if (currentViewMode === 'medico') {
+            tabAtendimentoOdontoBtn.style.display = 'none';
+            tabAtendimentoMedicoBtn.classList.add('active');
+            document.getElementById('tabAtendimentoMedico').classList.add('active');
+        } else {
+            tabAtendimentoMedicoBtn.classList.add('active');
+            document.getElementById('tabAtendimentoMedico').classList.add('active');
+        }
+    }
+
     try {
         // Busca os detalhes do agendamento primeiro para verificar status
         const { data: appt, error: apptError } = await _supabase.from('appointments').select('*, client_id').eq('id', appointmentId).single();
         if (apptError) throw apptError;
-        
+
         currentAppointmentData = appt; // Armazena para uso global (pausa/resume)
 
         // Se não estiver pausado e nem finalizado, marca como em atendimento (início)
         // Se estiver 'chegou', muda para 'em_atendimento' e grava start_time se não houver
         if (appt.status === 'chegou') {
             const startTime = new Date().toISOString();
-            const { error: updateError } = await _supabase.from('appointments').update({ 
+            const { error: updateError } = await _supabase.from('appointments').update({
                 status: 'em_atendimento',
                 consultation_start_time: startTime
             }).eq('id', appointmentId);
-            
+
             if (updateError) throw updateError;
-            
+
             await logAction('START_CONSULTATION', {
                 appointmentId: appointmentId,
                 startTime: startTime
@@ -244,7 +291,7 @@ async function selectPatient(appointmentId) {
         }
 
         let patientDetails = null;
-        
+
         // Se o agendamento tem um ID de cliente, busca os dados completos
         if (appt.client_id) {
             const { data: titular, error: clientError } = await _supabase.from('clients').select('*, dependents(*)').eq('id', appt.client_id).single();
@@ -269,7 +316,7 @@ async function selectPatient(appointmentId) {
         // Preenche os cabeçalhos e a aba de dados do paciente
         document.getElementById('currentPatientName').textContent = appt.patient_name || 'N/A';
         document.getElementById('currentAppointmentId').value = appointmentId;
-        
+
         if (currentSelectedPatientData) {
             document.getElementById('dadosNome').textContent = `${currentSelectedPatientData.nome} ${currentSelectedPatientData.sobrenome || ''}`;
             document.getElementById('dadosCPF').textContent = currentSelectedPatientData.cpf || 'N/A';
@@ -277,7 +324,7 @@ async function selectPatient(appointmentId) {
             document.getElementById('dadosPlano').textContent = currentSelectedPatientData.plano || 'N/A';
             document.getElementById('dadosEndereco').textContent = currentSelectedPatientData.endereco || 'N/A';
             document.getElementById('currentPatientPlan').textContent = currentSelectedPatientData.plano || 'N/A';
-            
+
             // --- CÁLCULO E EXIBIÇÃO DA IDADE ---
             const age = calculateAge(currentSelectedPatientData.data_nascimento);
             document.getElementById('currentPatientAge').textContent = age;
@@ -292,9 +339,11 @@ async function selectPatient(appointmentId) {
 
         // Carrega o histórico de consultas e anexos
         await loadPatientHistory(appt.patient_name);
+        await loadPatientExams(appt.patient_name, currentSelectedPatientData?.cpf);
         await loadAttachments(appointmentId);
         await loadProtocols();
         await loadImageProtocols();
+        await loadOdontogramaData(appt.patient_name);
 
     } catch (error) {
         showToast('Erro ao selecionar o paciente: ' + error.message);
@@ -305,25 +354,25 @@ async function selectPatient(appointmentId) {
 // --- FUNÇÃO PARA PAUSAR/RETOMAR ---
 async function togglePause() {
     if (!currentAppointmentData) return;
-    
+
     pauseBtn.disabled = true;
     const isPausing = currentAppointmentData.status === 'em_atendimento';
-    
+
     try {
         const now = new Date().toISOString();
         let pauseHistory = currentAppointmentData.pause_history || [];
-        
+
         // Garante que é um array (caso venha null do banco)
         if (!Array.isArray(pauseHistory)) pauseHistory = [];
 
         let newStatus;
-        
+
         if (isPausing) {
             // INICIAR PAUSA
             newStatus = 'pausado';
             // Adiciona novo registro de pausa aberta
             pauseHistory.push({ start: now, end: null });
-            
+
             pauseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pausando...';
         } else {
             // RETOMAR ATENDIMENTO
@@ -335,16 +384,16 @@ async function togglePause() {
             } else {
                 console.warn('Tentativa de retomar sem pausa aberta encontrada. Criando registro de consistência.');
             }
-            
+
             pauseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Retomando...';
         }
 
         // Atualiza no Supabase
         const { data, error } = await _supabase
             .from('appointments')
-            .update({ 
+            .update({
                 status: newStatus,
-                pause_history: pauseHistory 
+                pause_history: pauseHistory
             })
             .eq('id', currentAppointmentData.id)
             .select()
@@ -354,7 +403,7 @@ async function togglePause() {
 
         // Atualiza estado local
         currentAppointmentData = data;
-        
+
         // Atualiza UI
         if (newStatus === 'pausado') {
             pauseBtn.innerHTML = '<i class="fas fa-play"></i> Retomar Atendimento';
@@ -365,7 +414,7 @@ async function togglePause() {
             pauseBtn.className = 'btn btn-warning';
             showToast('Atendimento retomado.');
         }
-        
+
         // Atualiza a fila lateral para refletir a mudança de status/cor
         loadPatientsData();
 
@@ -389,7 +438,7 @@ function populatePrintableFields() {
     const patientAddress = currentSelectedPatientData?.endereco || 'Não informado';
     const profName = currentProfessionalData?.name || 'Profissional não identificado';
     const profCRM = currentProfessionalData?.CRM || '';
-    
+
     const patientDataHTML = `<b>Paciente:</b> ${patientName}<br><b>CPF:</b> ${patientCPF}<br><b>Endereço:</b> ${patientAddress}`;
     const profDataHTML = `<p>_________________________________________</p><b>${profName}</b><br><span>${profCRM}</span>`;
 
@@ -397,14 +446,72 @@ function populatePrintableFields() {
     areas.forEach(area => {
         const patientDataEl = document.getElementById(`${area}PatientData`);
         const profDataEl = document.getElementById(`${area}ProfData`);
-        if(patientDataEl) patientDataEl.innerHTML = patientDataHTML;
-        if(profDataEl) profDataEl.innerHTML = profDataHTML;
+        if (patientDataEl) patientDataEl.innerHTML = patientDataHTML;
+        if (profDataEl) profDataEl.innerHTML = profDataHTML;
     });
 }
 function showInitialScreen() {
     consultationWorkspaceDiv.style.display = 'none';
     noPatientSelectedDiv.style.display = 'block';
     document.querySelectorAll('.paciente-espera-item').forEach(item => item.classList.remove('active'));
+}
+
+async function loadPatientExams(nome, cpf) {
+    const examesContainer = document.getElementById('pacienteHistoricoExamesContainer');
+    if (!examesContainer) return;
+
+    examesContainer.innerHTML = '<p>Carregando exames...</p>';
+    try {
+        let query = _supabase.from('pedidos_exames').select('*').order('created_at', { ascending: false });
+        // Simular a busca parecida com o loadPatientHistory ou busca direta
+        if (cpf && cpf !== 'N/A') {
+            const cleanCpf = cpf.replace(/\D/g, ''); // só numeros
+            query = query.or(`paciente_cpf.ilike.%${cleanCpf}%,paciente_nome.ilike.%${nome.split(' ')[0]}%`);
+        } else {
+            query = query.ilike('paciente_nome', `%${nome.split(' ')[0]}%`);
+        }
+
+        const { data: exames, error } = await query;
+        if (error) throw error;
+
+        examesContainer.innerHTML = '';
+        if (!exames || exames.length === 0) {
+            examesContainer.innerHTML = '<p>Nenhum pedido de exame registrado anterior.</p>';
+            return;
+        }
+
+        exames.forEach(exame => {
+            const date = new Date(exame.created_at).toLocaleDateString('pt-BR');
+            let resultHtml = 'Nenhum resultado anexado';
+
+            let anexos = [];
+            try { anexos = typeof exame.anexos_resultados === 'string' ? JSON.parse(exame.anexos_resultados) : exame.anexos_resultados; } catch (e) { }
+
+            if (anexos && anexos.length > 0) {
+                resultHtml = '<ul style="list-style: none; padding-left: 0;">';
+                anexos.forEach(anexo => {
+                    const { data } = _supabase.storage.from('resultados-exames').getPublicUrl(anexo.path);
+                    resultHtml += `<li><a href="${data.publicUrl}" target="_blank" style="font-size: 13px;"><i class="fas fa-file-download"></i> ${anexo.name}</a></li>`;
+                });
+                resultHtml += '</ul>';
+            }
+
+            const item = document.createElement('div');
+            item.className = 'historico-item card';
+            item.innerHTML = `
+                <p><strong>Data do Pedido:</strong> ${date}</p>
+                <p><strong>Médico Solicitante:</strong> ${exame.medico_nome}</p>
+                <p><strong>Status:</strong> <span style="color: ${exame.status === 'Concluído' ? 'green' : 'orange'}">${exame.status}</span></p>
+                <hr>
+                <p><strong>Resultados:</strong></p>
+                ${resultHtml}
+            `;
+            examesContainer.appendChild(item);
+        });
+    } catch (error) {
+        console.error('Erro ao buscar historico de exames:', error);
+        examesContainer.innerHTML = '<p style="color:red;">Erro ao carregar histórico de exames.</p>';
+    }
 }
 
 async function loadPatientHistory(patientName) {
@@ -423,7 +530,7 @@ async function loadPatientHistory(patientName) {
             historyContainer.innerHTML = '<p>Nenhuma consulta finalizada encontrada.</p>';
             return;
         }
-        
+
         consultations.forEach(consult => {
             const appointment = appointments.find(a => a.id === consult.appointment_id);
             const professionalName = appointment?.professionals?.name || 'N/A';
@@ -446,7 +553,7 @@ async function loadPatientHistory(patientName) {
 
             const item = document.createElement('div');
             item.className = 'historico-item card';
-            
+
             let sensitiveDetailsHtml = '';
 
             if (isOwner) {
@@ -490,7 +597,7 @@ async function loadPatientHistory(patientName) {
                 });
             }
             // --- FIM DA LÓGICA DE SEGURANÇA ---
-            
+
             historyContainer.appendChild(item);
         });
     } catch (error) {
@@ -521,7 +628,7 @@ function setupManualExamEntry() {
 function setupExamSearch() {
     const searchInput = document.getElementById('examSearchInput');
     const resultsContainer = document.getElementById('examSearchResults');
-    
+
     searchInput?.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase();
         resultsContainer.innerHTML = '';
@@ -619,10 +726,10 @@ async function saveImageProtocol() {
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
     if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
     try {
-        const { error } = await _supabase.from('image_exam_protocols').insert({ 
+        const { error } = await _supabase.from('image_exam_protocols').insert({
             created_at: new Date().toISOString(),
-            protocol_name: protocolName, 
-            professional_id: professional.id, 
+            protocol_name: protocolName,
+            professional_id: professional.id,
             exams: JSON.stringify(selectedImageExams)
         });
         if (error) throw error;
@@ -713,7 +820,7 @@ async function loadAttachments(appointmentId) {
 }
 function renderAttachments() {
     const list = document.getElementById('attachmentsList');
-    if(!list) return;
+    if (!list) return;
     list.innerHTML = '';
     currentUploadedFiles.forEach(file => {
         const { data } = _supabase.storage.from('resultados-exames').getPublicUrl(file.path);
@@ -728,9 +835,9 @@ async function finalizeConsultation() {
     const appointmentId = document.getElementById('currentAppointmentId').value;
     const submitButton = document.getElementById('finalizeConsultationBtn');
     const currentUser = getCurrentUserProfile();
-    const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
+    const { data: professional } = await _supabase.from('professionals').select('id, name').eq('user_id', currentUser.id).single();
     if (!professional) return showToast('Erro: Perfil profissional não encontrado.');
-    
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
     try {
@@ -763,11 +870,51 @@ async function finalizeConsultation() {
 
         // Salva os dados da consulta
         await _supabase.from('consultations').upsert(consultationData, { onConflict: 'appointment_id' });
-        
-        // Registra o término da consulta
-        await _supabase.from('appointments').update({ 
+
+        // Registra os pedidos de exames na nova tabela
+        if (selectedExams.length > 0 || selectedImageExams.length > 0) {
+            const pacienteNome = document.getElementById('currentPatientName').textContent;
+            const pacienteCpf = document.getElementById('dadosCPF')?.textContent || 'Não informado';
+
+            const { data: novoPedido, error: errorPedido } = await _supabase.from('pedidos_exames').insert({
+                paciente_nome: pacienteNome,
+                paciente_cpf: pacienteCpf,
+                medico_nome: professional.name || currentUser.full_name || 'Médico',
+                profissional_id: professional.id,
+                atendimento_id: appointmentId,
+                exames_lab_solicitados: JSON.stringify(selectedExams),
+                exames_img_solicitados: JSON.stringify(selectedImageExams),
+                status: 'Pendente'
+            }).select().single();
+
+            if (errorPedido) throw errorPedido;
+
+            const valorTotalExames = selectedExams.reduce((total, exam) => total + parseFloat(exam.value || 0), 0);
+
+            if (valorTotalExames > 0) {
+                const patientId = currentAppointmentData && currentAppointmentData.client_id ? currentAppointmentData.client_id : null;
+
+                const transacaoExame = {
+                    paciente_id: patientId,
+                    paciente_nome: pacienteNome,
+                    atendimento_id: appointmentId,
+                    pedido_exame_id: novoPedido.id,
+                    tipo_cobranca: 'EXAME',
+                    valor_original: valorTotalExames,
+                    desconto_aplicado: 0,
+                    valor_final: valorTotalExames,
+                    status_pagamento: 'PENDENTE',
+                    created_by: currentUser.id
+                };
+
+                const { error: txError } = await _supabase.from('transacoes_financeiras').insert(transacaoExame);
+                if (txError) console.error("Erro ao gerar transação pro exame:", txError);
+            }
+        }
+
+        await _supabase.from('appointments').update({
             status: 'finalizado',
-            consultation_end_time: now 
+            consultation_end_time: now
         }).eq('id', appointmentId);
 
         await logAction('FINISH_CONSULTATION', {
@@ -811,7 +958,7 @@ async function triggerPrintFromElement(button) {
             contentText = selectedOptions.map(opt => `- ${opt.textContent.split(' (R$')[0]}`).join('\n');
             isContentEmpty = false;
         }
-    } else { 
+    } else {
         if (contentElement.value && contentElement.value.trim() !== '') {
             contentText = contentElement.value;
             isContentEmpty = false;
@@ -847,7 +994,7 @@ async function triggerPrintFromElement(button) {
 
         const profName = currentProfessionalData?.name || 'Profissional não identificado';
         const profCRM = currentProfessionalData?.CRM || '';
-        
+
         const createPageLayout = (title) => {
             pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
             pdf.setFont('helvetica', 'bold');
@@ -873,13 +1020,13 @@ async function triggerPrintFromElement(button) {
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(11);
 
-            const itemsPerColumn = 28; 
+            const itemsPerColumn = 28;
             if (examList.length > itemsPerColumn) {
                 // Duas colunas
                 const midPoint = Math.ceil(examList.length / 2);
                 const firstColumn = examList.slice(0, midPoint).map(exam => `- ${exam.name}`).join('\n');
                 const secondColumn = examList.slice(midPoint).map(exam => `- ${exam.name}`).join('\n');
-                
+
                 pdf.text(pdf.splitTextToSize(firstColumn, 85), 20, 95);
                 pdf.text(pdf.splitTextToSize(secondColumn, 85), 110, 95);
 
@@ -893,15 +1040,15 @@ async function triggerPrintFromElement(button) {
             // --- PÁGINA 2+: ORÇAMENTO ---
             pdf.addPage();
             createPageLayout('ORÇAMENTO');
-            
+
             let totalValue = 0;
             let yPosition = 95;
             const pageHeight = pdf.internal.pageSize.height;
             const bottomMargin = 60; // Espaço para o rodapé
-            
+
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(11);
-            
+
             examList.forEach((exam, index) => {
                 // Adiciona nova página se o conteúdo for longo
                 if (yPosition > pageHeight - bottomMargin) {
@@ -913,18 +1060,18 @@ async function triggerPrintFromElement(button) {
                 const examValue = parseFloat(exam.value || 0);
                 totalValue += examValue;
                 const examText = `- ${exam.name}`; // ALTERADO: Não exibe mais o valor individual
-                
+
                 pdf.text(examText, 20, yPosition);
                 yPosition += 7; // Incrementa a posição vertical para a próxima linha
             });
 
             // Adiciona o valor total no final
             if (yPosition > pageHeight - bottomMargin) {
-                 pdf.addPage();
-                 createPageLayout('ORÇAMENTO (continuação)');
-                 yPosition = 95;
+                pdf.addPage();
+                createPageLayout('ORÇAMENTO (continuação)');
+                yPosition = 95;
             }
-            pdf.line(20, yPosition, 190, yPosition); 
+            pdf.line(20, yPosition, 190, yPosition);
             yPosition += 10;
 
             pdf.setFont('helvetica', 'bold');
@@ -937,7 +1084,7 @@ async function triggerPrintFromElement(button) {
             createPageLayout('PEDIDO DE EXAMES DE IMAGEM');
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(11);
-            const itemsPerColumn = 28; 
+            const itemsPerColumn = 28;
             if (examList.length > itemsPerColumn) {
                 const midPoint = Math.ceil(examList.length / 2);
                 const firstColumn = examList.slice(0, midPoint).map(exam => `- ${exam.name}`).join('\n');
@@ -988,15 +1135,15 @@ function setupPacientesEventListeners() {
             document.getElementById(`tab${tabId}`).classList.add('active');
         }
     });
-    
-    document.getElementById('finalizeConsultationBtn')?.addEventListener('click', finalizeConsultation);
+
+    // Listener removido daqui pois está sendo tratado globalmente no main.js
     document.getElementById('pauseConsultationBtn')?.addEventListener('click', togglePause); // Listener do botão de pausa
     document.getElementById('saveProtocolBtn')?.addEventListener('click', saveProtocol);
     document.getElementById('saveProtocolBtnImg')?.addEventListener('click', saveImageProtocol);
-    if(document.getElementById('fileUploadInput')) {
+    if (document.getElementById('fileUploadInput')) {
         document.getElementById('fileUploadInput').onchange = handleFileUpload;
     }
-    
+
     document.getElementById('removeSelectedExamBtn')?.addEventListener('click', () => {
         const selectedId = document.getElementById('selectedExamsList').value;
         if (selectedId) removeExam(selectedId);
@@ -1005,7 +1152,7 @@ function setupPacientesEventListeners() {
         const selectedId = document.getElementById('selectedExamsListImg').value;
         if (selectedId) removeImageExam(selectedId);
     });
-    
+
     // Adiciona ouvintes para os botões de impressão
     document.querySelectorAll('.print-btn').forEach(button => {
         button.addEventListener('click', () => triggerPrintFromElement(button));
@@ -1013,17 +1160,268 @@ function setupPacientesEventListeners() {
 
     setupExamSearch();
     setupManualExamEntry();
+    initOdontograma();
 }
 
 // --- INICIALIZAÇÃO ---
 initializeExamsCache();
 setupPacientesEventListeners();
 
+// --- LÓGICA DO ODONTOGRAMA ---
+function createToothSvg(num, x, y, size = 30) {
+    const centerSize = size / 3;
+    const m = (size - centerSize) / 2;
+
+    let g = `<g class="dente-group" transform="translate(${x}, ${y})" data-dente="${num}">`;
+    g += `<text class="dente-text" x="${size / 2}" y="${size + 15}" text-anchor="middle">${num}</text>`;
+    g += `<polygon class="dente-face estado-higido" data-dente="${num}" data-face="Topo" points="0,0 ${size},0 ${size - m},${m} ${m},${m}"></polygon>`;
+    g += `<polygon class="dente-face estado-higido" data-dente="${num}" data-face="Base" points="0,${size} ${m},${size - m} ${size - m},${size - m} ${size},${size}"></polygon>`;
+    g += `<polygon class="dente-face estado-higido" data-dente="${num}" data-face="Esquerda" points="0,0 ${m},${m} ${m},${size - m} 0,${size}"></polygon>`;
+    g += `<polygon class="dente-face estado-higido" data-dente="${num}" data-face="Direita" points="${size},0 ${size},${size} ${size - m},${size - m} ${size - m},${m}"></polygon>`;
+    g += `<polygon class="dente-face estado-higido" data-dente="${num}" data-face="Centro" points="${m},${m} ${size - m},${m} ${size - m},${size - m} ${m},${size - m}"></polygon>`;
+    g += `</g>`;
+    return g;
+}
+
+function initOdontograma() {
+    const container = document.getElementById('odontogramaContainer');
+    if (!container) return;
+
+    let svgHTML = '<svg viewBox="0 0 800 300" style="width:100%; height:100%; min-width:600px;">';
+
+    let startX = 20;
+    let yTop = 20;
+    const teethR = [18, 17, 16, 15, 14, 13, 12, 11];
+    const teethL = [21, 22, 23, 24, 25, 26, 27, 28];
+
+    teethR.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startX + (index * 45), yTop);
+    });
+
+    let startXRight = startX + (8 * 45) + 30;
+    teethL.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startXRight + (index * 45), yTop);
+    });
+
+    let yBottom = yTop + 130;
+    const teethR_inf = [48, 47, 46, 45, 44, 43, 42, 41];
+    const teethL_inf = [31, 32, 33, 34, 35, 36, 37, 38];
+
+    teethR_inf.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startX + (index * 45), yBottom);
+    });
+
+    teethL_inf.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startXRight + (index * 45), yBottom);
+    });
+
+    let yDecTop = yTop + 65;
+    let startXDec = startX + (3 * 45) + 20;
+    const teethR_dec = [55, 54, 53, 52, 51];
+    const teethL_dec = [61, 62, 63, 64, 65];
+
+    teethR_dec.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startXDec + (index * 35), yDecTop, 25);
+    });
+
+    let startXRightDec = startXRight;
+    teethL_dec.forEach((num, index) => {
+        svgHTML += createToothSvg(num, startXRightDec + (index * 35), yDecTop, 25);
+    });
+
+    svgHTML += '</svg>';
+    container.innerHTML = svgHTML;
+
+    document.querySelectorAll('.dente-face').forEach(face => {
+        face.addEventListener('click', handleFaceClick);
+    });
+
+    document.getElementById('btnSalvarOdonto')?.addEventListener('click', saveOdontogramaData);
+    document.getElementById('btnExcluirOdonto')?.addEventListener('click', deleteOdontogramaData);
+}
+
+function handleFaceClick(event) {
+    document.querySelectorAll('.dente-face').forEach(f => f.classList.remove('selected'));
+    const faceElement = event.target;
+    faceElement.classList.add('selected');
+
+    const denteNum = faceElement.getAttribute('data-dente');
+    const faceNome = faceElement.getAttribute('data-face');
+
+    const promptEl = document.getElementById('odontogramaPrompt');
+    if (promptEl) promptEl.style.display = 'none';
+
+    const formEl = document.getElementById('odontogramaForm');
+    if (formEl) formEl.style.display = 'block';
+
+    document.getElementById('odontoFaceSelecionada').value = `Dente: ${denteNum} - Face: ${faceNome}`;
+    document.getElementById('odontoDenteNum').value = denteNum;
+    document.getElementById('odontoFaceNome').value = faceNome;
+
+    const currentStateClass = Array.from(faceElement.classList).find(c => c.startsWith('estado-'));
+    let estado = '';
+
+    const btnExcluir = document.getElementById('btnExcluirOdonto');
+    if (currentStateClass && currentStateClass !== 'estado-higido') {
+        estado = currentStateClass.replace('estado-', '');
+        if (btnExcluir) btnExcluir.style.display = 'inline-block';
+    } else {
+        if (btnExcluir) btnExcluir.style.display = 'none';
+    }
+
+    const select = document.getElementById('odontoEstadoClinico');
+    if (select) {
+        let found = false;
+        for (let i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === estado) {
+                select.selectedIndex = i;
+                found = true;
+                break;
+            }
+        }
+        if (!found) select.selectedIndex = 0;
+    }
+    document.getElementById('odontoObservacoes').value = faceElement.getAttribute('data-obs') || '';
+}
+
+async function saveOdontogramaData() {
+    const denteNum = document.getElementById('odontoDenteNum').value;
+    const faceNome = document.getElementById('odontoFaceNome').value;
+    const estado = document.getElementById('odontoEstadoClinico').value;
+    const observacoes = document.getElementById('odontoObservacoes').value;
+
+    if (!estado) return showToast('Selecione um estado clínico.');
+    if (!currentAppointmentData) return showToast('Nenhum atendimento ativo.');
+
+    const patientName = document.getElementById('currentPatientName').textContent;
+    const btn = document.getElementById('btnSalvarOdonto');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        const { data: existing, error: searchErr } = await _supabase
+            .from('odontograma_registros')
+            .select('id')
+            .eq('paciente_nome', patientName)
+            .eq('dente_numero', denteNum)
+            .eq('face', faceNome)
+            .maybeSingle();
+
+        if (searchErr) throw searchErr;
+
+        if (existing) {
+            await _supabase.from('odontograma_registros').update({
+                estado_clinico: estado,
+                observacoes: observacoes,
+                profissional_id: currentProfessionalData?.id,
+                atendimento_id: currentAppointmentData.id,
+                created_at: new Date().toISOString()
+            }).eq('id', existing.id);
+        } else {
+            await _supabase.from('odontograma_registros').insert({
+                paciente_nome: patientName,
+                dente_numero: denteNum,
+                face: faceNome,
+                estado_clinico: estado,
+                observacoes: observacoes,
+                profissional_id: currentProfessionalData?.id,
+                atendimento_id: currentAppointmentData.id
+            });
+        }
+
+        const faceElement = document.querySelector(`.dente-face[data-dente="${denteNum}"][data-face="${faceNome}"]`);
+        if (faceElement) {
+            // Remove previous classes
+            faceElement.className.baseVal = faceElement.className.baseVal.replace(/estado-[a-zA-Z]+/g, '').trim() + ` dente-face estado-${estado}`;
+            faceElement.setAttribute('data-obs', observacoes);
+        }
+
+        showToast('Registro do odontograma salvo!');
+        document.getElementById('btnExcluirOdonto').style.display = 'inline-block';
+
+    } catch (error) {
+        showToast('Erro ao salvar no odontograma: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Salvar Registro';
+    }
+}
+
+async function deleteOdontogramaData() {
+    const denteNum = document.getElementById('odontoDenteNum').value;
+    const faceNome = document.getElementById('odontoFaceNome').value;
+    const patientName = document.getElementById('currentPatientName').textContent;
+    const btn = document.getElementById('btnExcluirOdonto');
+    btn.disabled = true;
+
+    try {
+        await _supabase.from('odontograma_registros')
+            .delete()
+            .eq('paciente_nome', patientName)
+            .eq('dente_numero', denteNum)
+            .eq('face', faceNome);
+
+        const faceElement = document.querySelector(`.dente-face[data-dente="${denteNum}"][data-face="${faceNome}"]`);
+        if (faceElement) {
+            faceElement.className.baseVal = faceElement.className.baseVal.replace(/estado-[a-zA-Z]+/g, '').trim() + ' dente-face estado-higido';
+            faceElement.removeAttribute('data-obs');
+        }
+
+        document.getElementById('odontoEstadoClinico').value = '';
+        document.getElementById('odontoObservacoes').value = '';
+        btn.style.display = 'none';
+
+        showToast('Registro removido do odontograma.');
+    } catch (error) {
+        showToast('Erro ao remover: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function loadOdontogramaData(patientName) {
+    if (!patientName) return;
+
+    document.querySelectorAll('.dente-face').forEach(f => {
+        if (f.className.baseVal) {
+            f.className.baseVal = f.className.baseVal.replace(/estado-[a-zA-Z]+/g, '').trim() + ' dente-face estado-higido';
+        }
+        f.removeAttribute('data-obs');
+    });
+
+    const promptEl = document.getElementById('odontogramaPrompt');
+    if (promptEl) promptEl.style.display = 'block';
+
+    const formEl = document.getElementById('odontogramaForm');
+    if (formEl) formEl.style.display = 'none';
+
+    try {
+        const { data, error } = await _supabase
+            .from('odontograma_registros')
+            .select('*')
+            .eq('paciente_nome', patientName);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            data.forEach(reg => {
+                const face = document.querySelector(`.dente-face[data-dente="${reg.dente_numero}"][data-face="${reg.face}"]`);
+                if (face) {
+                    face.className.baseVal = face.className.baseVal.replace(/estado-[a-zA-Z]+/g, '').trim() + ` dente-face estado-${reg.estado_clinico}`;
+                    face.setAttribute('data-obs', reg.observacoes || '');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar odontograma:', error);
+    }
+}
+
 // --- EXPORTAÇÕES ---
-export { 
-    loadPatientsData, 
-    selectPatient, 
-    finalizeConsultation, 
+export {
+    loadPatientsData,
+    selectPatient,
+    finalizeConsultation,
     unsubscribePatients,
     removeExam,
     triggerPrintFromElement

@@ -1,0 +1,96 @@
+/* Odontograma Layout */
+.odontograma-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.odontograma-svg-container {
+    flex: 2;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    text-align: center;
+}
+
+.odontograma-svg-container svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.odontograma-side-panel {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    min-width: 300px;
+}
+
+.odontograma-side-panel h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 10px;
+}
+
+/* SVG Elements Interaction */
+.dente-group {
+    cursor: pointer;
+}
+
+.dente-face {
+    fill: #ffffff;
+    stroke: #333333;
+    stroke-width: 1;
+    transition: fill 0.2s, stroke-width 0.2s;
+}
+
+.dente-face:hover {
+    fill: #e3f2fd;
+    stroke: var(--primary-color);
+    stroke-width: 2;
+}
+
+.dente-face.selected {
+    stroke: #ff9800;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 3px rgba(255, 152, 0, 0.5));
+}
+
+/* Clinical States */
+.estado-higido { fill: #ffffff; }
+.estado-carie { fill: #f44336; } /* Red */
+.estado-restaurado { fill: #2196f3; } /* Blue */
+.estado-ausente { fill: #212121; opacity: 0.8; } /* Black */
+.estado-extraido { fill: #9e9e9e; stroke-dasharray: 4; } /* Gray dashed */
+.estado-canal { fill: #9c27b0; } /* Purple */
+.estado-coroa { fill: #ff9800; } /* Orange */
+.estado-implante { fill: #4caf50; } /* Green */
+
+/* Dente name text */
+.dente-text {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #555;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .odontograma-layout {
+        flex-direction: column;
+    }
+    
+    .odontograma-svg-container,
+    .odontograma-side-panel {
+        width: 100%;
+        flex: none;
+    }
+}
