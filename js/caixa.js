@@ -43,6 +43,7 @@ function setupEventListeners() {
     });
 
     document.getElementById('receberCaixaValorDesconto')?.addEventListener('input', recalcularTotalCaixa);
+    document.getElementById('receberCaixaValorConsulta')?.addEventListener('input', recalcularTotalCaixa);
 }
 
 // Recalcula o total do Caixa no modal
@@ -50,7 +51,10 @@ function recalcularTotalCaixa() {
     const inputHidden = document.getElementById('receberCaixaTransacaoId');
     if (!inputHidden || !inputHidden.value) return;
 
-    const valorOriginal = parseFloat(inputHidden.dataset.valorOriginal) || 0;
+    const inputValorConsulta = document.getElementById('receberCaixaValorConsulta');
+    const valorOriginal = inputValorConsulta && inputValorConsulta.value !== ''
+        ? parseFloat(inputValorConsulta.value) || 0
+        : parseFloat(inputHidden.dataset.valorOriginal) || 0;
     const tipoDesconto = document.getElementById('receberCaixaTipoDesconto').value;
     let valorInpDesc = parseFloat(document.getElementById('receberCaixaValorDesconto').value) || 0;
 
@@ -174,6 +178,7 @@ function abrirModalRecebimento(id) {
 
     document.getElementById('receberCaixaTransacaoId').dataset.valorOriginal = valorOriginal;
     document.getElementById('receberCaixaValorOriginal').textContent = valorOriginal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('receberCaixaValorConsulta').value = valorOriginal.toFixed(2);
 
     // Reseta inputs por padrão
     document.getElementById('receberCaixaTipoDesconto').value = 'nenhum';
