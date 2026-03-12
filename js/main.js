@@ -428,7 +428,7 @@ async function initializeDashboard(user) {
 
     let finalProfile = profile;
     const impersonatedUserId = localStorage.getItem('impersonatedUserId');
-    if ((profile.role === 'superadmin' || profile.role === 'admin') && impersonatedUserId) {
+    if (profile.role === 'superadmin' && impersonatedUserId) {
         const { data: impersonatedProfile, error: impError } = await _supabase.from('profiles').select('*').eq('id', impersonatedUserId).single();
         if (impersonatedProfile && !impError) {
             finalProfile = {
