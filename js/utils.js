@@ -197,6 +197,71 @@ export function showConfirm(message) {
     });
 }
 
+/**
+ * Exibe um prompt de entrada personalizado no topo da tela.
+ * Retorna uma promessa que resolve com o valor inserido ou null se cancelado.
+ * @param {string} message - A mensagem/pergunta do prompt.
+ * @param {string} [defaultValue=''] - O valor padrão do input.
+ * @returns {Promise<string|null>}
+ */
+export function showPrompt(message, defaultValue = '') {
+    return new Promise((resolve) => {
+        const container = document.getElementById('notificationContainer');
+        if (!container) {
+            resolve(null);
+            return;
+        }
+
+        const promptDialog = document.createElement('div');
+        promptDialog.className = 'confirm-notification';
+        
+        promptDialog.innerHTML = `
+            <div class="confirm-message" style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; width: 100%;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <i class="fas fa-edit"></i>
+                    <span>${message}</span>
+                </div>
+                <input type="text" id="promptInputVal" class="form-control" value="${defaultValue}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" autocomplete="off" />
+            </div>
+            <div class="confirm-buttons" style="margin-top: 15px;">
+                <button class="btn btn-secondary btn-small" id="promptBtnCancelar">Cancelar</button>
+                <button class="btn btn-success btn-small" id="promptBtnOk">OK</button>
+            </div>
+        `;
+        
+        container.appendChild(promptDialog);
+
+        const inputEl = document.getElementById('promptInputVal');
+        const btnOk = document.getElementById('promptBtnOk');
+        const btnCancelar = document.getElementById('promptBtnCancelar');
+
+        // Focus and select text
+        inputEl.focus();
+        if (defaultValue) {
+            inputEl.setSelectionRange(0, inputEl.value.length);
+        }
+
+        const closeDialog = (result) => {
+            promptDialog.style.opacity = '0';
+            promptDialog.style.transform = 'translateY(-100px)';
+            setTimeout(() => {
+                if (promptDialog.parentElement) {
+                    promptDialog.parentElement.removeChild(promptDialog);
+                }
+                resolve(result);
+            }, 300);
+        };
+
+        btnOk.addEventListener('click', () => closeDialog(inputEl.value));
+        btnCancelar.addEventListener('click', () => closeDialog(null));
+        inputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                closeDialog(inputEl.value);
+            }
+        });
+    });
+}
+
 // Formatação de Moeda (BRL)
 export function formatCurrency(value) {
     // Garante que o valor é um número; se for nulo/undefined, assume 0

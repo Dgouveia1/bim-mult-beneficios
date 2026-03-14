@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -491,14 +491,18 @@
                                     <div class="tab-pane" id="tabExamesLab">
                                         <div class="editor-preview-layout">
                                             <div class="editor-column">
-                                                <div class="protocol-controls">
-                                                    <div class="form-group"><label for="protocolSelect">Carregar
+                                                <div class="protocol-controls" style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
+                                                    <div class="form-group" style="margin-bottom: 0;"><label for="protocolSelect">Carregar
                                                             Protocolo</label><select id="protocolSelect">
                                                             <option value="">Selecione</option>
                                                         </select></div>
                                                     <button type="button" class="btn btn-secondary btn-small"
                                                         id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar
                                                         Protocolo</button>
+                                                    <button type="button" class="btn btn-warning btn-small"
+                                                        id="renameProtocolBtn" style="background-color: #ffc107; color: #333;"><i class="fas fa-edit"></i> Renomear</button>
+                                                    <button type="button" class="btn btn-danger btn-small"
+                                                        id="deleteProtocolBtn"><i class="fas fa-trash"></i> Excluir</button>
                                                 </div>
                                                 <hr>
                                                 <div class="form-group"><label for="examSearchInput">Buscar
@@ -536,14 +540,18 @@
                                     <div class="tab-pane" id="tabExamesImg">
                                         <div class="editor-preview-layout">
                                             <div class="editor-column">
-                                                <div class="protocol-controls">
-                                                    <div class="form-group"><label for="protocolSelectImg">Carregar
+                                                <div class="protocol-controls" style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
+                                                    <div class="form-group" style="margin-bottom: 0;"><label for="protocolSelectImg">Carregar
                                                             Protocolo</label><select id="protocolSelectImg">
                                                             <option value="">Selecione</option>
                                                         </select></div>
                                                     <button type="button" class="btn btn-secondary btn-small"
                                                         id="saveProtocolBtnImg"><i class="fas fa-save"></i> Salvar
                                                         Protocolo</button>
+                                                    <button type="button" class="btn btn-warning btn-small"
+                                                        id="renameProtocolBtnImg" style="background-color: #ffc107; color: #333;"><i class="fas fa-edit"></i> Renomear</button>
+                                                    <button type="button" class="btn btn-danger btn-small"
+                                                        id="deleteProtocolBtnImg"><i class="fas fa-trash"></i> Excluir</button>
                                                 </div>
                                                 <hr>
                                                 <div class="form-group"><label for="manualExamInputImg">Adicionar Exame

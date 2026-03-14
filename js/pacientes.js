@@ -1,7 +1,7 @@
 import { _supabase } from './supabase.js';
 import { getCurrentUserProfile } from './auth.js';
 import { logAction } from './logger.js';
-import { showToast, calculateAge } from './utils.js';
+import { showToast, calculateAge, showPrompt, showConfirm } from './utils.js';
 
 // --- ESTADO DA CONSULTA ---
 let allExams = [];
@@ -705,7 +705,7 @@ function removeImageExam(examId) {
 }
 async function saveProtocol() {
     if (selectedExams.length === 0) return showToast('Selecione exames para salvar.');
-    const protocolName = prompt('Digite um nome para o protocolo:');
+    const protocolName = await showPrompt('Digite um nome para o protocolo:');
     if (!protocolName) return;
     const currentUser = getCurrentUserProfile();
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
@@ -720,7 +720,7 @@ async function saveProtocol() {
 }
 async function saveImageProtocol() {
     if (selectedImageExams.length === 0) return showToast('Selecione exames de imagem para salvar no protocolo.');
-    const protocolName = prompt('Digite um nome para o protocolo de imagem:');
+    const protocolName = await showPrompt('Digite um nome para o protocolo de imagem:');
     if (!protocolName) return;
     const currentUser = getCurrentUserProfile();
     const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
@@ -740,6 +740,81 @@ async function saveImageProtocol() {
         console.error(e);
     }
 }
+
+async function renameProtocol() {
+    const protocolId = document.getElementById('protocolSelect').value;
+    if (!protocolId) return showToast('Selecione um protocolo para renomear.');
+    const select = document.getElementById('protocolSelect');
+    const selectedText = select.options[select.selectedIndex].text;
+    const newName = await showPrompt('Digite o novo nome para o protocolo:', selectedText);
+    if (!newName || newName.trim() === '' || newName === selectedText) return;
+    try {
+        const { error } = await _supabase.from('exam_protocols').update({ protocol_name: newName }).eq('id', protocolId);
+        if (error) throw error;
+        showToast('Protocolo renomeado com sucesso!');
+        await loadProtocols();
+        setTimeout(() => { document.getElementById('protocolSelect').value = protocolId; }, 100);
+    } catch (e) {
+        showToast('Erro ao renomear protocolo: ' + e.message);
+        console.error(e);
+    }
+}
+
+async function deleteProtocol() {
+    const protocolId = document.getElementById('protocolSelect').value;
+    if (!protocolId) return showToast('Selecione um protocolo para excluir.');
+    if (!await showConfirm('Tem certeza que deseja excluir este protocolo?')) return;
+    try {
+        const { error } = await _supabase.from('exam_protocols').delete().eq('id', protocolId);
+        if (error) throw error;
+        showToast('Protocolo excluído com sucesso!');
+        document.getElementById('protocolSelect').value = '';
+        selectedExams = [];
+        renderSelectedExams();
+        await loadProtocols();
+    } catch (e) {
+        showToast('Erro ao excluir protocolo: ' + e.message);
+        console.error(e);
+    }
+}
+
+async function renameImageProtocol() {
+    const protocolId = document.getElementById('protocolSelectImg').value;
+    if (!protocolId) return showToast('Selecione um protocolo de imagem para renomear.');
+    const select = document.getElementById('protocolSelectImg');
+    const selectedText = select.options[select.selectedIndex].text;
+    const newName = await showPrompt('Digite o novo nome para o protocolo:', selectedText);
+    if (!newName || newName.trim() === '' || newName === selectedText) return;
+    try {
+        const { error } = await _supabase.from('image_exam_protocols').update({ protocol_name: newName }).eq('id', protocolId);
+        if (error) throw error;
+        showToast('Protocolo renomeado com sucesso!');
+        await loadImageProtocols();
+        setTimeout(() => { document.getElementById('protocolSelectImg').value = protocolId; }, 100);
+    } catch (e) {
+        showToast('Erro ao renomear protocolo: ' + e.message);
+        console.error(e);
+    }
+}
+
+async function deleteImageProtocol() {
+    const protocolId = document.getElementById('protocolSelectImg').value;
+    if (!protocolId) return showToast('Selecione um protocolo de imagem para excluir.');
+    if (!await showConfirm('Tem certeza que deseja excluir este protocolo?')) return;
+    try {
+        const { error } = await _supabase.from('image_exam_protocols').delete().eq('id', protocolId);
+        if (error) throw error;
+        showToast('Protocolo de imagem excluído com sucesso!');
+        document.getElementById('protocolSelectImg').value = '';
+        selectedImageExams = [];
+        renderSelectedImageExams();
+        await loadImageProtocols();
+    } catch (e) {
+        showToast('Erro ao excluir protocolo: ' + e.message);
+        console.error(e);
+    }
+}
+
 async function loadProtocols() {
     const select = document.getElementById('protocolSelect');
     if (!select) return;
@@ -749,6 +824,10 @@ async function loadProtocols() {
     if (!professional) return;
     const { data: protocols } = await _supabase.from('exam_protocols').select('*').eq('professional_id', professional.id);
     if (protocols) {
+        // Clear all options EXCEPT the first one (Selecione um protocolo)
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
         protocols.forEach(p => {
             const option = document.createElement('option');
             option.value = p.id;
@@ -773,6 +852,10 @@ async function loadImageProtocols() {
     if (!professional) return;
     const { data: protocols } = await _supabase.from('image_exam_protocols').select('*').eq('professional_id', professional.id);
     if (protocols) {
+        // Clear all options EXCEPT the first one (Selecione um protocolo)
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
         protocols.forEach(p => {
             const option = document.createElement('option');
             option.value = p.id;
@@ -1139,7 +1222,11 @@ function setupPacientesEventListeners() {
     // Listener removido daqui pois está sendo tratado globalmente no main.js
     document.getElementById('pauseConsultationBtn')?.addEventListener('click', togglePause); // Listener do botão de pausa
     document.getElementById('saveProtocolBtn')?.addEventListener('click', saveProtocol);
+    document.getElementById('renameProtocolBtn')?.addEventListener('click', renameProtocol);
+    document.getElementById('deleteProtocolBtn')?.addEventListener('click', deleteProtocol);
     document.getElementById('saveProtocolBtnImg')?.addEventListener('click', saveImageProtocol);
+    document.getElementById('renameProtocolBtnImg')?.addEventListener('click', renameImageProtocol);
+    document.getElementById('deleteProtocolBtnImg')?.addEventListener('click', deleteImageProtocol);
     if (document.getElementById('fileUploadInput')) {
         document.getElementById('fileUploadInput').onchange = handleFileUpload;
     }
