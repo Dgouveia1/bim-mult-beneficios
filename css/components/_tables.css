@@ -1,123 +1,146 @@
 /* =================================================================
-   COMPONENTE: TABELAS (COM RESPONSIVIDADE)
+   COMPONENTE: TABELAS
    ================================================================= */
 
-   .table-container { 
-    overflow-x: auto; 
+.table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
 }
 
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    font-size: 14px; /* Tamanho da fonte ajustado */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
 }
 
-th, td { 
-    padding: 12px 15px; /* Padding ajustado */
-    border-bottom: 1px solid #eee; 
+thead th {
+    background: var(--gray-light);
+    color: var(--gray-medium);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
     text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
-th { 
-    background-color: var(--secondary-color); 
-    color: var(--white); 
+tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--secondary-dark);
+    vertical-align: middle;
 }
 
-tr:nth-child(even) { 
-    background-color: var(--gray-light); 
+tbody tr:last-child td {
+    border-bottom: none;
 }
 
-tr:hover {
-    background-color: rgba(70, 130, 180, 0.05);
+tbody tr:hover td {
+    background: var(--primary-light);
 }
 
-/* -- RESPONSIVIDADE PARA TABELAS EM CELULARES -- */
+/* Responsividade mobile */
 @media (max-width: 767px) {
-    table, thead, tbody, th, td, tr { 
-        display: block; 
-    }
-    
-    thead tr { 
+    table, thead, tbody, th, td, tr { display: block; }
+
+    thead tr {
         position: absolute;
         top: -9999px;
         left: -9999px;
     }
-    
-    tr { 
-        border: 1px solid #ddd; 
-        border-radius: 8px;
+
+    tr {
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
         margin-bottom: 10px;
-        background-color: #fff; /* Fundo branco para cada "card" */
+        background: var(--white);
+        box-shadow: var(--card-shadow);
     }
-    
-    td { 
+
+    td {
         border: none;
-        border-bottom: 1px solid #eee; 
+        border-bottom: 1px solid var(--border-color);
         position: relative;
-        padding-left: 50%; 
-        text-align: right; /* Alinha o conteúdo à direita */
-        display: flex; /* Para melhor alinhamento */
+        padding-left: 50%;
+        text-align: right;
+        display: flex;
         align-items: center;
         justify-content: flex-end;
     }
-    
-    td:last-child {
-        border-bottom: none;
-    }
 
-    td:before { 
+    td:last-child { border-bottom: none; }
+
+    td:before {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         left: 15px;
-        width: 45%; 
-        padding-right: 10px; 
+        width: 45%;
+        padding-right: 10px;
         white-space: nowrap;
-        text-align: left; /* Alinha o rótulo à esquerda */
-        font-weight: bold;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.75rem;
         color: var(--secondary-dark);
-        content: attr(data-label); /* Pega o rótulo do atributo data-label */
+        content: attr(data-label);
     }
 
-    .actions { 
-        display: flex; 
-        gap: 10px; 
-        justify-content: flex-end; /* Alinha os botões à direita */
+    .actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
         padding-left: 15px !important;
     }
 
-    td.actions:before {
-        content: "" !important; /* Remove o label "Ações" */
-    }
+    td.actions:before { content: "" !important; }
 }
 
-
-/* Status Tags */
-.status { 
-    padding: 6px 12px; 
-    border-radius: 20px; 
-    font-size: 12px; 
-    font-weight: 500;
+/* Status badges */
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
     display: inline-block;
+    white-space: nowrap;
 }
 
-.status-active { 
-    background: #e8f5e9; 
-    color: var(--confirmed-color); 
+.status-active   { background: #DCFCE7; color: #15803D; }
+.status-inactive { background: #FEE2E2; color: #B91C1C; }
+.status-pending  { background: #FEF3C7; color: #B45309; }
+.status-info     { background: #E0F2FE; color: #0369A1; }
+
+/* Paginacao */
+.pagination {
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
-.status-inactive { 
-    background: #ffebee; 
-    color: var(--cancelled-color); 
+.table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.8rem;
+    color: var(--gray-medium);
+    background: var(--gray-light);
+    border-radius: 0 0 10px 10px;
 }
 
-.status-pending { 
-    background: #fffde7; 
-    color: var(--pending-color); 
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-
-.status-info { 
-    background: #e3f2fd; 
-    color: var(--info-color); 
+.results-info {
+    font-size: 0.8rem;
+    color: var(--gray-medium);
 }
