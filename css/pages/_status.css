@@ -67,12 +67,12 @@
     padding: 20px; 
     border: 1px dashed var(--primary-color); 
     border-radius: 12px; 
-    background: rgba(255, 140, 0, 0.05);
+    background: rgba(79,70,229, 0.05);
     transition: all 0.3s ease;
 }
 
 .qrcode-container:hover {
-    background: rgba(255, 140, 0, 0.1);
+    background: rgba(79,70,229, 0.1);
     border-color: var(--primary-dark);
 }
 

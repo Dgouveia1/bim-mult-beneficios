@@ -2,96 +2,135 @@
    COMPONENTE: BOTÕES
    ================================================================= */
 
-.btn { 
-    padding: 12px 24px; 
-    background: var(--primary-color); 
-    color: var(--white); 
-    border: none; 
-    border-radius: 8px; 
-    font-size: 14px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    transition: all 0.3s ease;
+.btn {
+    padding: 9px 18px;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(79,70,229,0.25);
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.btn:hover { 
-    background: var(--primary-dark); 
+.btn:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.35);
     transform: translateY(-1px);
-    box-shadow: var(--hover-shadow);
 }
 
-.btn-secondary { 
-    background: var(--secondary-color); 
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
-.btn-secondary:hover { 
-    background: var(--secondary-dark); 
+/* Variantes */
+.btn-secondary {
+    background: var(--gray-light);
+    color: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    box-shadow: none;
 }
 
-.btn-success { 
-    background: var(--confirmed-color); 
+.btn-secondary:hover {
+    background: var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.btn-success {
+    background: var(--confirmed-color);
+    box-shadow: 0 1px 3px rgba(22,163,74,0.3);
 }
 
 .btn-success:hover {
-    background: #45a049;
+    background: #15803d;
+    box-shadow: 0 4px 12px rgba(22,163,74,0.35);
 }
 
-.btn-logout { 
-    background: #f44336; 
-    width: 100%; 
+.btn-danger {
+    background: var(--cancelled-color);
+    box-shadow: 0 1px 3px rgba(220,38,38,0.3);
 }
 
-.btn-logout:hover { 
-    background: #d32f2f; 
+.btn-danger:hover {
+    background: #b91c1c;
+    box-shadow: 0 4px 12px rgba(220,38,38,0.35);
 }
 
-/* Botões de Ação */
-.action-btn { 
-    width: 36px; 
-    height: 36px; 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    cursor: pointer; 
-    border: none; 
-    transition: all 0.3s ease;
+.btn-logout {
+    background: var(--cancelled-color);
+    width: 100%;
+    justify-content: center;
 }
 
-.action-edit { 
-    background: rgba(70, 130, 180, 0.1); 
-    color: var(--secondary-color); 
+.btn-logout:hover {
+    background: #b91c1c;
 }
 
-.action-edit:hover { 
-    background: var(--secondary-color); 
-    color: white; 
-    transform: scale(1.1);
+/* Tamanhos */
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.8rem;
 }
 
-.action-delete { 
-    background: rgba(244, 67, 54, 0.1); 
-    color: var(--cancelled-color); 
+.btn-large {
+    padding: 12px 24px;
+    font-size: 1rem;
 }
 
-.action-delete:hover { 
-    background: var(--cancelled-color); 
-    color: white; 
-    transform: scale(1.1);
+/* Botões de Ação (ícone circular) */
+.action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.action-edit {
+    background: rgba(79,70,229,0.08);
+    color: var(--primary-color);
+}
+
+.action-edit:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-delete {
+    background: rgba(220,38,38,0.08);
+    color: var(--cancelled-color);
+}
+
+.action-delete:hover {
+    background: var(--cancelled-color);
+    color: white;
 }
 
 /* Botões de Atendimento */
-.atendimento-botoes .btn { 
-    flex: 1; 
-    background: transparent; 
-    color: var(--secondary-color); 
-    border: 1px solid var(--secondary-color); 
+.atendimento-botoes .btn {
+    flex: 1;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    box-shadow: none;
 }
 
-.atendimento-botoes .btn.active, 
-.atendimento-botoes .btn:hover { 
-    background: var(--secondary-color); 
-    color: var(--white); 
-} 
+.atendimento-botoes .btn.active,
+.atendimento-botoes .btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}

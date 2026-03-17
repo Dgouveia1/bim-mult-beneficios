@@ -2,7 +2,7 @@
    COMPONENTE: BARRA DE PESQUISA
    ================================================================= */
 
-   .search-container {
+.search-container {
     position: relative;
     display: flex;
     align-items: center;
@@ -13,21 +13,26 @@
 
 .search-container i {
     position: absolute;
-    left: 15px;
+    left: 14px;
     color: var(--gray-medium);
+    pointer-events: none;
 }
 
-.search-container input[type="search"] {
+.search-container input[type="search"],
+.search-container input[type="text"] {
     width: 100%;
-    padding: 12px 15px 12px 40px; /* Espaço para o ícone */
-    border: 1px solid #ddd;
-    border-radius: 25px; /* Bordas arredondadas */
-    font-size: 22px;
-    transition: all 0.2s ease-in-out;
+    padding: 10px 14px 10px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: var(--secondary-dark);
+    background: var(--white);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.search-container input[type="search"]:focus {
+.search-container input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.2);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
 }
