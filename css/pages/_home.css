@@ -1,45 +1,45 @@
 /* =================================================================
-   PAGINA: HOME
+   PÁGINA: HOME
    ================================================================= */
 
 .home-header {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, #1E1B4B 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
     color: white;
     padding: 28px 32px;
-    border-radius: 14px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 20px rgba(15,23,42,0.2);
+    border-radius: var(--radius-lg);
+    margin-bottom: 22px;
+    box-shadow: 0 8px 28px rgba(30, 77, 107, 0.2);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    border: 1px solid rgba(255,255,255,0.08);
     position: relative;
     overflow: hidden;
 }
 
-.home-header::before {
-    content: "";
+.home-header::after {
+    content: '';
     position: absolute;
-    inset: 0;
-    background-image: radial-gradient(rgba(99,102,241,0.2) 1px, transparent 1px);
-    background-size: 28px 28px;
+    right: -40px;
+    top: -40px;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
     pointer-events: none;
 }
 
 .home-greeting {
-    font-size: 1.625rem;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 4px;
-    letter-spacing: -0.02em;
-    position: relative;
+    letter-spacing: -0.3px;
 }
 
 .home-date {
-    font-size: 0.875rem;
-    opacity: 0.65;
-    position: relative;
+    font-size: 14px;
+    opacity: 0.85;
 }
 
 .home-widgets-grid {
@@ -50,41 +50,42 @@
 
 .widget-card {
     background: var(--white);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     padding: 24px;
     box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(0,0,0,0.04);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    transition: var(--transition);
 }
 
 .widget-card:hover {
     box-shadow: var(--hover-shadow);
+    transform: translateY(-2px);
 }
 
 .widget-icon {
-    font-size: 2rem;
+    font-size: 36px;
     margin-bottom: 14px;
-    color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .widget-title {
-    font-size: 0.95rem;
+    font-size: 15px;
     font-weight: 700;
     color: var(--secondary-dark);
     margin-bottom: 8px;
 }
 
 .widget-content {
-    font-size: 0.875rem;
+    font-size: 13.5px;
     color: var(--gray-medium);
-    line-height: 1.6;
+    line-height: 1.65;
 }
 
-/* Cores especificas dos widgets */
+/* Cores específicas para os widgets */
 #weatherWidget .widget-icon {
     color: #F59E0B;
 }
@@ -93,18 +94,13 @@
     color: #8B5CF6;
 }
 
-/* Card de acao clicavel */
+/* Card de Ação Clicável */
 .widget-card-action {
     cursor: pointer;
 }
 
 .widget-card-action:hover {
-    background: var(--primary-light);
-    border-color: var(--primary-color);
-    transform: translateY(-3px);
+    background: var(--gray-light);
+    transform: translateY(-4px);
     box-shadow: var(--hover-shadow);
-}
-
-.widget-card-action .widget-icon {
-    color: var(--cancelled-color);
 }

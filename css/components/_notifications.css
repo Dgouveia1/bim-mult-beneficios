@@ -1,132 +1,122 @@
 /* =================================================================
-   COMPONENTE: NOTIFICACOES (TOAST)
+   COMPONENTE: NOTIFICAÇÕES (TOAST)
    ================================================================= */
 
-#notificationContainer {
+   #notificationContainer {
     position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 20px; /* MUDADO */
+    left: 50%; /* MUDADO */
+    transform: translateX(-50%); /* MUDADO para centralizar */
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    align-items: center; /* MUDADO */
+    gap: 10px;
     width: 90%;
-    max-width: 420px;
-}
-
-@media (min-width: 768px) {
-    #notificationContainer {
-        top: auto;
-        bottom: 24px;
-        right: 24px;
-        left: auto;
-        transform: none;
-        align-items: flex-end;
-    }
+    max-width: 450px;
 }
 
 .toast-notification {
     background-color: var(--white);
     color: var(--secondary-dark);
-    padding: 14px 18px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    border-left: 5px solid var(--secondary-color); /* Padrão info */
     opacity: 0;
+    transition: all 0.4s ease-in-out;
+    animation: slideInFromTop 0.5s ease forwards; /* MUDADO */
     width: 100%;
-    font-size: 0.875rem;
+    font-size: 15px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-left: 4px solid var(--info-color);
-    animation: slideInFromRight 0.35s ease forwards;
+    gap: 15px;
 }
 
 .toast-notification i {
-    font-size: 18px;
-    flex-shrink: 0;
+    font-size: 20px;
 }
 
-/* Tipos */
+/* Modificadores de Tipo */
 .toast-notification.success {
     border-left-color: var(--confirmed-color);
-    background: #F0FDF4;
-    color: #15803D;
+    color: var(--confirmed-color);
 }
 
 .toast-notification.error {
     border-left-color: var(--cancelled-color);
-    background: #FEF2F2;
-    color: #B91C1C;
+    color: var(--cancelled-color);
 }
 
 .toast-notification.info {
     border-left-color: var(--info-color);
-    background: #F0F9FF;
-    color: #0369A1;
+    color: var(--info-color);
 }
 
-.toast-notification.warning {
-    border-left-color: var(--pending-color);
-    background: #FFFBEB;
-    color: #92400E;
-}
+/* =================================================================
+   NOVO: COMPONENTE: CONFIRMAÇÃO (ESTILO TOAST)
+   ================================================================= */
 
-/* Confirmacao */
 .confirm-notification {
     background-color: var(--white);
     color: var(--secondary-dark);
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-    border-top: 4px solid var(--info-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    border-top: 5px solid var(--info-color); /* Borda azul (info) */
     opacity: 0;
     transition: all 0.3s ease-in-out;
     animation: slideInFromTop 0.4s ease forwards;
     width: 100%;
-    font-size: 0.875rem;
+    font-size: 16px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 15px;
 }
 
 .confirm-message {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
     font-weight: 500;
 }
 
 .confirm-message i {
-    font-size: 20px;
+    font-size: 22px;
     color: var(--info-color);
-    flex-shrink: 0;
 }
 
 .confirm-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 10px;
 }
 
 .confirm-buttons .btn-small {
-    padding: 7px 14px;
-    font-size: 0.8rem;
+    padding: 8px 16px;
+    font-size: 14px;
 }
 
-/* Animacoes */
-@keyframes slideInFromRight {
-    from { opacity: 0; transform: translateX(100%); }
-    to   { opacity: 1; transform: translateX(0); }
-}
 
-@keyframes slideInFromTop {
-    from { opacity: 0; transform: translateY(-100%); }
-    to   { opacity: 1; transform: translateY(0); }
+/* Animações */
+@keyframes slideInFromTop { /* MUDADO */
+    from {
+        opacity: 0;
+        transform: translateY(-100%); /* MUDADO */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; transform: translateX(0); }
-    to   { opacity: 0; transform: translateX(100%); }
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%); /* MUDADO */
+    }
 }

@@ -7,32 +7,74 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 400px;
-    margin: 0 20px;
+    max-width: 380px;
 }
 
 .search-container i {
     position: absolute;
-    left: 14px;
+    left: 13px;
     color: var(--gray-medium);
+    font-size: 14px;
     pointer-events: none;
 }
 
 .search-container input[type="search"],
 .search-container input[type="text"] {
     width: 100%;
-    padding: 10px 14px 10px 40px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-family: inherit;
-    color: var(--secondary-dark);
-    background: var(--white);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    padding: 9px 14px 9px 36px;
+    border: 1.5px solid var(--gray-border);
+    border-radius: 24px;
+    font-size: 13.5px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--black);
+    background: #fff;
+    transition: var(--transition);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-.search-container input:focus {
-    outline: none;
+.search-container input[type="search"]:focus,
+.search-container input[type="text"]:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.12);
+}
+
+/* Search results autocomplete */
+.search-results-list,
+.autocomplete-results {
+    list-style: none;
+    background: #fff;
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--hover-shadow);
+    max-height: 280px;
+    overflow-y: auto;
+    margin-top: 6px;
+    position: absolute;
+    width: 100%;
+    z-index: 500;
+    top: 100%;
+    left: 0;
+}
+
+.search-results-list li,
+.autocomplete-results .autocomplete-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--gray-border);
+    transition: var(--transition);
+    color: var(--black);
+}
+
+.search-results-list li:last-child,
+.autocomplete-results .autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.search-results-list li:hover,
+.autocomplete-results .autocomplete-item:hover {
+    background: var(--gray-light);
+    color: var(--secondary-dark);
 }

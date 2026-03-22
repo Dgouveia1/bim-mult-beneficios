@@ -4,52 +4,69 @@
 
 .card {
     background: var(--white);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: box-shadow 0.2s ease;
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
 .card:hover {
     box-shadow: var(--hover-shadow);
 }
 
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid var(--gray-border);
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--secondary-dark);
+}
+
 /* Cards de Pacientes */
 .patient-card {
     background: var(--white);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
     padding: 18px;
-    transition: box-shadow 0.2s ease;
+    transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .patient-card:hover {
     box-shadow: var(--hover-shadow);
+    transform: translateY(-1px);
 }
 
 .patient-card-header {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--gray-border);
     padding-bottom: 12px;
     margin-bottom: 12px;
 }
 
 .patient-card-header h4 {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 16px;
     color: var(--secondary-dark);
+    font-weight: 600;
 }
 
 .patient-card-header span {
-    font-size: 0.8rem;
+    font-size: 13px;
     color: var(--primary-color);
     font-weight: 500;
 }
 
 .patient-card-body p {
-    font-size: 0.875rem;
+    font-size: 13px;
     color: var(--gray-medium);
     margin-bottom: 6px;
 }
@@ -58,30 +75,38 @@
     display: flex;
     gap: 8px;
     margin-top: 16px;
+    flex-wrap: wrap;
 }
 
 /* Cards de Informação do Paciente */
 .paciente-info-header {
-    padding: 16px;
+    padding: 18px;
 }
 
 .paciente-info-header h4 {
     margin-bottom: 12px;
-    font-size: 1rem;
+    font-size: 15px;
     font-weight: 700;
     color: var(--secondary-dark);
 }
 
 .paciente-info-header p {
-    font-size: 0.875rem;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: var(--gray-medium);
 }
 
 .historico-item {
     padding: 14px;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+.historico-item:last-child {
+    border-bottom: none;
 }
 
 .historico-item p {
-    font-size: 0.875rem;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: var(--gray-medium);
 }

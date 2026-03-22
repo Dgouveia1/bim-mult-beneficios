@@ -8,31 +8,32 @@
 
 .atendimento-layout {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     width: 100%;
 }
 
 /* Coluna da Fila (Esquerda) */
 .atendimento-fila-coluna {
-    flex: 0 0 300px;
+    flex: 0 0 285px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     background: var(--white);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: var(--card-shadow);
-    padding: 15px;
-    /* Define uma altura máxima e permite que apenas a fila role */
-    max-height: calc(100vh - 120px); 
+    padding: 16px;
+    max-height: calc(100vh - 120px);
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
 .coluna-header {
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid var(--gray-border);
 }
 
 .coluna-header h3 {
-    font-size: 18px;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--secondary-dark);
 }
 
@@ -44,22 +45,26 @@
 .paciente-espera-item {
     display: flex;
     justify-content: space-between;
-    padding: 15px 10px;
-    border-radius: 8px;
+    align-items: center;
+    padding: 12px 10px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    border-bottom: 1px solid #f5f5f5;
-    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--gray-border);
+    transition: var(--transition);
+    font-size: 13.5px;
 }
 
 .paciente-espera-item:hover {
-    background-color: var(--blue-light);
-    transform: translateX(5px);
+    background-color: var(--gray-light);
+    transform: translateX(4px);
 }
 
 .paciente-espera-item.active {
-    background-color: var(--primary-light);
+    background-color: var(--primary-color);
     color: white;
-    box-shadow: 0 2px 10px rgba(79,70,229, 0.3);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 2px 10px rgba(255, 140, 0, 0.3);
+    border-bottom-color: transparent;
 }
 
 /* Painel Principal (Direita) */
@@ -72,14 +77,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid var(--gray-border);
+    margin-bottom: 16px;
 }
 
 .atendimento-paciente-header h3 {
     color: var(--secondary-dark);
-    font-size: 1.5rem;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .atendimento-paciente-header .header-actions {
@@ -88,10 +96,11 @@
 }
 
 /* Navegação das Abas */
-.atendimento-tab-nav {
+.atendimento-tab-nav,
+.tab-nav {
     display: flex;
-    gap: 10px;
-    border-bottom: 1px solid #eee;
+    gap: 4px;
+    border-bottom: 2px solid var(--gray-border);
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -99,25 +108,32 @@
 .btn-tab {
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
-    padding: 10px 15px;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -2px;
+    padding: 9px 14px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
     color: var(--gray-medium);
-    transition: all 0.2s ease-in-out;
-    display: flex;
+    transition: var(--transition);
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    white-space: nowrap;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .btn-tab:hover {
     color: var(--primary-color);
+    background: rgba(255, 140, 0, 0.04);
 }
 
 .btn-tab.active {
     border-bottom-color: var(--primary-color);
     color: var(--primary-dark);
-    font-weight: 600;
+    font-weight: 700;
+    background: rgba(255, 140, 0, 0.05);
 }
 
 /* Conteúdo das Abas (SEM SCROLL INTERNO) */
@@ -137,10 +153,13 @@
 /* Rodapé com Ações */
 .atendimento-actions {
     margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--gray-border);
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 /* =================================================================
