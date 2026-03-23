@@ -5,6 +5,7 @@ const historyContainer = document.getElementById('prontuarioHistoryContainer');
 const patientInfoContainer = document.getElementById('prontuarioPatientInfo');
 
 let currentViewOnlyProfessionalId = null; // Guarda o ID do profissional (da tabela 'professionals') que está logado
+let currentAuxiliarProfIds = []; // Guarda os IDs dos profissionais aos quais o auxiliar está vinculado
 
 // Função auxiliar para processar listas de exames com segurança
 // Evita o erro de tentar fazer JSON.parse em algo que já é objeto (comum em campos JSONB do Supabase)
@@ -57,6 +58,19 @@ async function fetchCurrentProfessionalId() {
                 currentViewOnlyProfessionalId = professional.id;
                 console.log(`[PRONTUÁRIO] Visualizador identificado. ID Profissional: ${currentViewOnlyProfessionalId}`);
             }
+        } else if (user.role === 'auxiliar') {
+            currentAuxiliarProfIds = [];
+            if (user.assisted_professionals && Array.isArray(user.assisted_professionals) && user.assisted_professionals.length > 0) {
+                 const { data: professionals, error } = await _supabase
+                    .from('professionals')
+                    .select('id')
+                    .in('user_id', user.assisted_professionals);
+
+                 if (!error && professionals) {
+                     currentAuxiliarProfIds = professionals.map(p => p.id);
+                 }
+            }
+            console.log(`[PRONTUÁRIO] Auxiliar logado. Profissionais vinculados:`, currentAuxiliarProfIds);
         } else {
             console.log(`[PRONTUÁRIO] Usuário logado é ${user.role}, não é um profissional de saúde. Acesso será restrito.`);
         }
@@ -140,7 +154,10 @@ async function loadHistoryForPatient(patientData) {
                 const viewerProfId = currentViewOnlyProfessionalId; // ID do profissional logado
                 const currentUser = getCurrentUserProfile();
                 const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
-                const isOwner = isSuperAdmin || (creatorProfId === viewerProfId);
+                const isAuxiliar = currentUser && currentUser.role === 'auxiliar';
+                const isOwner = isSuperAdmin || 
+                                (creatorProfId === viewerProfId) || 
+                                (isAuxiliar && currentAuxiliarProfIds.includes(creatorProfId));
 
                 const item = document.createElement('div');
                 item.className = 'historico-item card';

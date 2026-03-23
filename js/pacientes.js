@@ -86,7 +86,7 @@ async function loadPatientsData(viewMode = null) {
     if (!patientQueueListContainer) return;
     patientQueueListContainer.innerHTML = '<p>Carregando...</p>';
     const currentUser = getCurrentUserProfile();
-    if (!currentUser || (currentUser.role !== 'medicos' && currentUser.role !== 'dentista' && currentUser.role !== 'superadmin' && currentUser.role !== 'admin')) {
+    if (!currentUser || (currentUser.role !== 'medicos' && currentUser.role !== 'dentista' && currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && currentUser.role !== 'auxiliar')) {
         patientQueueListContainer.innerHTML = '<p>Acesso restrito.</p>';
         return;
     }
@@ -102,11 +102,25 @@ async function loadPatientsData(viewMode = null) {
 
         let filterString = '';
 
-        if (currentUser.role !== 'superadmin') {
+        if (currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && currentUser.role !== 'auxiliar') {
             const { data: professional } = await _supabase.from('professionals').select('id').eq('user_id', currentUser.id).single();
             if (!professional) throw new Error('Perfil profissional não encontrado.');
             query = query.eq('professional_id', professional.id);
             filterString = `professional_id=eq.${professional.id}`;
+        } else if (currentUser.role === 'auxiliar') {
+            // Auxiliar vê apenas a fila dos profissionais vinculados a ele
+            if (currentUser.assisted_professionals && currentUser.assisted_professionals.length > 0) {
+                 const { data: professionals } = await _supabase.from('professionals').select('id').in('user_id', currentUser.assisted_professionals);
+                 if (professionals && professionals.length > 0) {
+                     const profIds = professionals.map(p => p.id);
+                     query = query.in('professional_id', profIds);
+                     filterString = `professional_id=in.(${profIds.join(',')})`;
+                 } else {
+                     query = query.eq('professional_id', '00000000-0000-0000-0000-000000000000'); // ID inválido para não retornar nada
+                 }
+            } else {
+                query = query.eq('professional_id', '00000000-0000-0000-0000-000000000000');
+            }
         }
 
         const { data, error } = await query;
@@ -531,6 +545,13 @@ async function loadPatientHistory(patientName) {
             return;
         }
 
+        let allowedProfIds = [];
+        const currentUser = getCurrentUserProfile();
+        if (currentUser && currentUser.role === 'auxiliar' && currentUser.assisted_professionals && currentUser.assisted_professionals.length > 0) {
+             const { data: profs } = await _supabase.from('professionals').select('id').in('user_id', currentUser.assisted_professionals);
+             if (profs) allowedProfIds = profs.map(p => p.id);
+        }
+
         consultations.forEach(consult => {
             const appointment = appointments.find(a => a.id === consult.appointment_id);
             const professionalName = appointment?.professionals?.name || 'N/A';
@@ -549,7 +570,9 @@ async function loadPatientHistory(patientName) {
             // --- INÍCIO DA LÓGICA DE SEGURANÇA ---
             const creatorProfId = consult.professional_id;
             const viewerProfId = currentProfessionalData?.id; // ID do profissional logado
-            const isOwner = (creatorProfId === viewerProfId);
+            const isSuperAdmin = currentUser && currentUser.role === 'superadmin';
+            const isAuxiliar = currentUser && currentUser.role === 'auxiliar';
+            const isOwner = isSuperAdmin || (creatorProfId === viewerProfId) || (isAuxiliar && allowedProfIds.includes(creatorProfId));
 
             const item = document.createElement('div');
             item.className = 'historico-item card';

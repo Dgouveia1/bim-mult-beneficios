@@ -187,7 +187,7 @@ function setupEventListeners() {
         if (user.role === 'medicos' || user.role === 'dentista') {
             openAvailabilityModal();
         }
-        else if (['admin', 'superadmin', 'recepcao'].includes(user.role)) {
+        else if (['admin', 'superadmin', 'recepcao', 'auxiliar'].includes(user.role)) {
             showToast('Para gerenciar a agenda, selecione um profissional na lista.', 'info');
             navigateToPage('profissionais');
         } else {

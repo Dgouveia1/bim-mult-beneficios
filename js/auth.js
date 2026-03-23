@@ -51,6 +51,7 @@ function setupPermissions(role) {
         // Se quisermos ser mais restritos, deveríamos mudar o HTML, mas via JS, permitimos que vejam o container pai
         // e filtramos os filhos abaixo.
         recepcao: ['admin-only'],
+        auxiliar: ['admin-only'], // Auxiliar tem as mesmas permissões de elemento que recepção
         medicos: ['medicos-only'],
         dentista: ['medicos-only'],
         financeiro: ['admin-only']
@@ -83,6 +84,7 @@ function setupPermissions(role) {
         superadmin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
         admin: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true },
         recepcao: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true }, // Vê o menu pai
+        auxiliar: { 'menu-cartao': true, 'submenu-cartao': true, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': true, 'submenu-admin': true }, // Auxiliar: mesmo menu que recepção
         medicos: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
         dentista: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': true, 'submenu-clinica': true, 'menu-admin': false, 'submenu-admin': false },
         financeiro: { 'menu-cartao': false, 'submenu-cartao': false, 'menu-clinica': false, 'submenu-clinica': false, 'menu-admin': true, 'submenu-admin': true }
@@ -102,7 +104,7 @@ function setupPermissions(role) {
     // a) Menu Cartão: Controle WhatsApp (Todos Admin/Recepção veem)
     const whatsappLink = document.querySelector('[data-page="whatsapp_admin"]');
     if (whatsappLink) {
-        if (role === 'admin' || role === 'superadmin' || role === 'recepcao') {
+        if (role === 'admin' || role === 'superadmin' || role === 'recepcao' || role === 'auxiliar') {
             whatsappLink.style.display = 'block';
         } else {
             whatsappLink.style.display = 'none';
@@ -121,16 +123,16 @@ function setupPermissions(role) {
         const labLink = adminSubmenu.querySelector('[data-page="laboratorio"]');
         const profLink = adminSubmenu.querySelector('[data-page="profissionais"]');
 
-        if (role === 'recepcao') {
-            // Recepção vê APENAS Profissionais (para agenda) e talvez Laboratório?
-            // Vamos esconder as funções sensíveis de admin
+        if (role === 'recepcao' || role === 'auxiliar') {
+            // Recepção e Auxiliar veem APENAS Profissionais (para agenda)
+            // Esconde funções sensíveis de admin
             if (cronogramaLink) cronogramaLink.style.display = 'none';
             if (logsLink) logsLink.style.display = 'none';
             if (dashboardLink) dashboardLink.style.display = 'none';
             if (usersLink) usersLink.style.display = 'none';
             if (financeiroLink) financeiroLink.style.display = 'none';
 
-            // Garante que Profissionais esteja visível para Recepção
+            // Garante que Profissionais esteja visível para Recepção e Auxiliar
             if (profLink) profLink.style.display = 'block';
 
         } else if (role === 'admin' || role === 'superadmin') {

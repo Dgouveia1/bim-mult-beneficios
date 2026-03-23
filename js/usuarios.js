@@ -66,6 +66,20 @@ async function openUserModal(id = null) {
         document.getElementById('userEmail').readOnly = true;
         document.getElementById('userRole').value = profile.role;
 
+        // Dispara manualmente o evento de mudança para o role carregado
+        const roleSelectEl = document.getElementById('userRole');
+        await handleRoleChange.call(roleSelectEl);
+
+        // Restaura a seleção de profissionais auxiliados (se for auxiliar)
+        if (profile.role === 'auxiliar' && profile.assisted_professionals && Array.isArray(profile.assisted_professionals)) {
+            const auxSelect = document.getElementById('auxiliarProfissionaisSelect');
+            if (auxSelect) {
+                Array.from(auxSelect.options).forEach(opt => {
+                    opt.selected = profile.assisted_professionals.includes(opt.value);
+                });
+            }
+        }
+
     } else {
         // Modo Criação
         userModalTitle.textContent = 'Adicionar Novo Usuário';
@@ -76,6 +90,34 @@ async function openUserModal(id = null) {
     userModal.style.display = 'flex';
 }
 
+// Handler para mostrar/esconder e popular o campo de profissionais auxiliados
+async function handleRoleChange() {
+    const auxiliarFieldContainer = document.getElementById('auxiliarProfissionaisContainer');
+    if (!auxiliarFieldContainer) return;
+
+    if (this.value === 'auxiliar') {
+        auxiliarFieldContainer.style.display = 'block';
+        // Popula a lista de profissionais se ainda não foi feito
+        const select = document.getElementById('auxiliarProfissionaisSelect');
+        if (select && select.options.length === 0) {
+            const { data: professionals, error } = await _supabase
+                .from('professionals')
+                .select('id, name, user_id')
+                .order('name');
+            if (!error && professionals) {
+                professionals.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.user_id; // Usamos user_id (UUID do auth/profile) que está em profiles.id
+                    opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+    } else {
+        auxiliarFieldContainer.style.display = 'none';
+    }
+}
+
 // Preenche o <select> de roles com base na permissão do usuário logado
 function populateRoleOptions() {
     const roleSelect = document.getElementById('userRole');
@@ -84,6 +126,7 @@ function populateRoleOptions() {
     const allRoles = {
         admin: 'Administrador',
         recepcao: 'Usuário Recepção',
+        auxiliar: 'Auxiliar',
         medicos: 'Usuário Clínica',
         dentista: 'Dentista',
         financeiro: 'Usuário Financeiro'
@@ -97,6 +140,11 @@ function populateRoleOptions() {
         option.textContent = allRoles[roleKey];
         roleSelect.appendChild(option);
     }
+
+    // Listener para mostrar/esconder o campo de profissionais auxiliados
+    roleSelect.removeEventListener('change', handleRoleChange);
+    roleSelect.addEventListener('change', handleRoleChange);
+    handleRoleChange.call(roleSelect); // Chama imediatamente para o estado atual
 }
 
 // Salva o usuário (cria um novo ou atualiza um existente)
@@ -119,9 +167,22 @@ async function saveUser(event) {
     try {
         if (id) {
             // Lógica de atualização
+            const updateData = { full_name: userData.full_name, role: userData.role };
+
+            // Se for auxiliar, salva os profissionais selecionados
+            if (userData.role === 'auxiliar') {
+                const auxSelect = document.getElementById('auxiliarProfissionaisSelect');
+                if (auxSelect) {
+                    updateData.assisted_professionals = Array.from(auxSelect.selectedOptions).map(o => o.value);
+                }
+            } else {
+                // Limpa a lista se mudou de auxiliar para outro role
+                updateData.assisted_professionals = [];
+            }
+
             const { error } = await _supabase
                 .from('profiles')
-                .update({ full_name: userData.full_name, role: userData.role })
+                .update(updateData)
                 .eq('id', id);
             if (error) throw error;
 
@@ -144,6 +205,23 @@ async function saveUser(event) {
             });
 
             if (error) throw error;
+
+            // Se for auxiliar, salva os profissionais imediatamente após criar
+            if (userData.role === 'auxiliar') {
+                const auxSelect = document.getElementById('auxiliarProfissionaisSelect');
+                if (auxSelect && auxSelect.selectedOptions.length > 0) {
+                    const assistedIds = Array.from(auxSelect.selectedOptions).map(o => o.value);
+                    // Busca o novo usuário pelo email para pegar o ID
+                    const { data: newProfile } = await _supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('email', userData.email)
+                        .single();
+                    if (newProfile) {
+                        await _supabase.from('profiles').update({ assisted_professionals: assistedIds }).eq('id', newProfile.id);
+                    }
+                }
+            }
 
             showToast('Usuário criado com sucesso!');
         }
