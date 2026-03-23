@@ -192,9 +192,9 @@
                             <div class="search-container">
                                 <input type="text" id="carteirinhaSearchInput"
                                     placeholder="Digite o nome ou CPF do titular ou dependente...">
+                                <ul id="searchResults" class="search-results-list">
+                                </ul>
                             </div>
-                            <ul id="searchResults" class="search-results-list">
-                            </ul>
                         </div>
 
                         <div class="card">
@@ -802,11 +802,10 @@
                         <div class="search-container" style="max-width: 100%; margin: 0;">
                             <input type="search" id="financialSearchInput"
                                 placeholder="Digite o Nome ou CPF do titular...">
-                        </div>
-
-                        <div id="financialSearchResults" class="search-results-list"
-                            style="margin-top: 15px; border: 1px solid #eee; display: none;">
-                            <!-- Resultados da busca renderizados aqui -->
+                            <div id="financialSearchResults" class="search-results-list"
+                                style="margin-top: 0px; border: 1px solid #eee; display: none;">
+                                <!-- Resultados da busca renderizados aqui -->
+                            </div>
                         </div>
                     </div>
 

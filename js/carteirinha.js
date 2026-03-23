@@ -66,23 +66,30 @@ async function searchMembers(searchTerm) {
     resultsList.innerHTML = '<li class="search-result-item">Buscando...</li>';
 
     try {
-        const { data: titulares, error: titularError } = await _supabase
-            .from('clients')
-            .select('id, nome, sobrenome, cpf, created_at')
-            .or(`nome.ilike.%${searchTerm}%,sobrenome.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const searchWords = lowerSearchTerm.split(' ').filter(w => w.length > 0);
 
-        if (titularError) throw titularError;
+        let clientQuery = _supabase.from('clients').select('id, nome, sobrenome, cpf, created_at');
+        const clientNameFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+        const clientOrFilters = `and(${clientNameFilter}),cpf.ilike.%${lowerSearchTerm}%`;
+        clientQuery = clientQuery.or(clientOrFilters);
 
-        const { data: dependentes, error: dependenteError } = await _supabase
-            .from('dependents')
-            .select('id, nome, sobrenome, cpf, created_at, titular_id')
-            .or(`nome.ilike.%${searchTerm}%,sobrenome.ilike.%${searchTerm}%,cpf.ilike.%${searchTerm}%`);
+        let dependentQuery = _supabase.from('dependents').select('id, nome, sobrenome, cpf, created_at, titular_id');
+        const dependentNameFilter = searchWords.map(word => `or(nome.ilike.%${word}%,sobrenome.ilike.%${word}%)`).join(',');
+        const dependentOrFilters = `and(${dependentNameFilter}),cpf.ilike.%${lowerSearchTerm}%`;
+        dependentQuery = dependentQuery.or(dependentOrFilters);
 
-        if (dependenteError) throw dependenteError;
+        const [titularResults, dependenteResults] = await Promise.all([
+            clientQuery,
+            dependentQuery
+        ]);
+
+        if (titularResults.error) throw titularResults.error;
+        if (dependenteResults.error) throw dependenteResults.error;
 
         const combinedResults = [
-            ...titulares.map(t => ({ ...t, type: 'titular' })),
-            ...dependentes.map(d => ({ ...d, type: 'dependente' }))
+            ...titularResults.data.map(t => ({ ...t, type: 'titular' })),
+            ...dependenteResults.data.map(d => ({ ...d, type: 'dependente' }))
         ];
 
         renderSearchResults(combinedResults);
@@ -160,7 +167,7 @@ async function generateCards(selectedMember) {
             .eq('titular_id', selectedMember.titular_id);
 
         if (depsError) {
-             console.error('Erro ao buscar todos os dependentes:', error);
+             console.error('Erro ao buscar todos os dependentes:', depsError);
              container.innerHTML = '<p>Erro ao carregar grupo familiar.</p>';
              return;
         }
