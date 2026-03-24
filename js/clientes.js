@@ -3,7 +3,7 @@ import { validateCPF, validateEmail, validatePhone } from './utils.js';
 import { logAction } from './logger.js';
 import { showToast, showConfirm } from './utils.js';
 import { getCurrentUserProfile } from './auth.js';
-import { generateContractPDF } from './vendas.js';
+import { generateContractPDF, calcularProximoVencimento } from './vendas.js';
 
 // --- ELEMENTOS DO DOM ---
 const clientsTableBody = document.getElementById('clientsTableBody');
@@ -568,6 +568,7 @@ function populateDetailsForm(client, dependents) {
 
     document.getElementById('details_plano').value = client.plano || '';
     document.getElementById('details_status').value = client.status || 'ATIVO';
+    document.getElementById('details_dia_vencimento').value = client.dia_vencimento || '5';
     document.getElementById('details_cep').value = client.cep || '';
     document.getElementById('details_endereco').value = client.endereco || '';
     document.getElementById('details_municipio').value = client.municipio || '';
@@ -649,7 +650,8 @@ async function handleUpdateClient(event) {
         cep: formProps.details_cep,
         endereco: formProps.details_endereco,
         municipio: formProps.details_municipio,
-        observacao: formProps.details_observacao
+        observacao: formProps.details_observacao,
+        dia_vencimento: formProps.details_dia_vencimento ? parseInt(formProps.details_dia_vencimento, 10) : null
     };
 
     submitButton.disabled = true;
@@ -899,4 +901,50 @@ async function handleReactivatePlan() {
     }
 }
 
-export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople, handleGenerateContract, handleMigratePlanToFamiliar, handleCancelPlan, handleReactivatePlan };
+// =================================================================
+// NOVA FUNÇÃO: ALTERAR DIA DE VENCIMENTO NO ASAAS
+// =================================================================
+async function handleAlterarVencimentoAsaas() {
+    const titularId = document.getElementById('detailsClientId').value;
+    const diaVencimento = parseInt(document.getElementById('details_dia_vencimento').value, 10);
+
+    const confirmacao = await showConfirm(`Deseja alterar o dia de vencimento para o dia ${String(diaVencimento).padStart(2, '0')} de cada mês no Asaas?`);
+    if (!confirmacao) return;
+
+    const btn = document.getElementById('btnAlterarVencimentoAsaas');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Alterando...';
+
+    try {
+        const nextDueDate = calcularProximoVencimento(diaVencimento);
+
+        const { data, error } = await _supabase.functions.invoke('update-asaas-due-date', {
+            body: { clientId: titularId, nextDueDate: nextDueDate, diaVencimento: diaVencimento }
+        });
+
+        if (error) {
+            console.error('Supabase edge function error:', error);
+            throw error;
+        }
+
+        if (data && data.success) {
+            // Atualiza o dia_vencimento localmente na tabela clients
+            await _supabase.from('clients').update({ dia_vencimento: diaVencimento }).eq('id', titularId);
+            showToast(`Vencimento alterado para o dia ${String(diaVencimento).padStart(2, '0')} com sucesso!`, 'success');
+        } else {
+            const errorMsg = data?.error || 'Erro desconhecido retornado pela API.';
+            showToast(`Erro ao alterar vencimento: ${errorMsg}`, 'error');
+        }
+    } catch (error) {
+        console.error('Catch handleAlterarVencimentoAsaas:', error);
+        showToast(`Erro ao conectar com servidor: ${error.message || 'Erro de conexão.'}`, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+}
+
+export { loadClientsData, handleNewClientSubmit, openModal, closeModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, allPeople, handleGenerateContract, handleMigratePlanToFamiliar, handleCancelPlan, handleReactivatePlan, handleAlterarVencimentoAsaas };

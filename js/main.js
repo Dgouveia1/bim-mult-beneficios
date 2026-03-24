@@ -1,7 +1,7 @@
 import { _supabase } from './supabase.js';
 import { handleLogin, handleLogout, setupPermissions, setCurrentUserProfile, getCurrentUserProfile } from './auth.js';
 import { showDashboard, showLoginScreen } from './ui.js';
-import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, handleGenerateContract, handleMigratePlanToFamiliar, handleCancelPlan, handleReactivatePlan } from './clientes.js';
+import { loadClientsData, handleNewClientSubmit, openModal, addDependenteField, openDetailsModal, handleUpdateClient, filterAndRenderClients, exportToExcel, handleGenerateContract, handleMigratePlanToFamiliar, handleCancelPlan, handleReactivatePlan, handleAlterarVencimentoAsaas } from './clientes.js';
 import { fetchAddressByCEP, showToast, showConfirm } from './utils.js';
 import { loadScheduleView, openNewAppointmentModal, closeAppointmentModal, saveAppointment, openAppointmentDetails, updateAppointment, deleteAppointment, changeDay, unsubscribeSchedule } from './agenda.js';
 import { loadReceptionQueue, markArrival, openPaymentModal, savePayment, unsubscribeReception } from './recepcao.js';
@@ -330,6 +330,9 @@ function setupEventListeners() {
 
         const btnReativarPlanoModal = target.closest('#btnReativarPlano');
         if (btnReativarPlanoModal) handleReactivatePlan();
+
+        const btnAlterarVenc = target.closest('#btnAlterarVencimentoAsaas');
+        if (btnAlterarVenc) handleAlterarVencimentoAsaas();
 
         const contractButton = target.closest('.generate-contract-btn');
         if (contractButton) handleGenerateContract(contractButton.dataset.titularId);

@@ -287,6 +287,19 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Dia de Vencimento</label>
+                                    <select name="dia_vencimento" required>
+                                        <option value="1">Dia 01</option>
+                                        <option value="5" selected>Dia 05</option>
+                                        <option value="10">Dia 10</option>
+                                        <option value="15">Dia 15</option>
+                                        <option value="20">Dia 20</option>
+                                        <option value="25">Dia 25</option>
+                                    </select>
+                                </div>
+                            </div>
                             <h4>Endereço</h4>
                             <div class="form-row">
                                 <div class="form-group"><label>CEP</label><input type="text" name="cep"></div>
@@ -1491,6 +1504,24 @@
                                             <option value="INATIVO">Inativo</option>
                                             <option value="DOACAO">Doação</option>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Dia de Vencimento</label>
+                                        <select id="details_dia_vencimento" name="details_dia_vencimento">
+                                            <option value="1">Dia 01</option>
+                                            <option value="5">Dia 05</option>
+                                            <option value="10">Dia 10</option>
+                                            <option value="15">Dia 15</option>
+                                            <option value="20">Dia 20</option>
+                                            <option value="25">Dia 25</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="align-self: flex-end;">
+                                        <button type="button" class="btn btn-secondary" id="btnAlterarVencimentoAsaas">
+                                            <i class="fas fa-calendar-alt"></i> Alterar Vencimento no Asaas
+                                        </button>
                                     </div>
                                 </div>
                                 <h4>Endereço</h4>

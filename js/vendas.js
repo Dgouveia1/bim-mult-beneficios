@@ -153,6 +153,8 @@ async function handleSaleSubmit(event) {
         return;
     }
 
+    const diaVencimento = parseInt(formData.get('dia_vencimento') || '5', 10);
+
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
 
@@ -186,6 +188,7 @@ async function handleSaleSubmit(event) {
             plano: selectedPlanName,
             status: formData.get('status') || 'ATIVO',
             vendedor: sellerName, // REGISTRA O VENDEDOR AQUI
+            dia_vencimento: diaVencimento,
             created_at: new Date()
         };
 
@@ -225,11 +228,15 @@ async function handleSaleSubmit(event) {
         // 3. INTEGRAÇÃO ASAAS VIA EDGE FUNCTION
         showToast('Gerando cobrança no Asaas...', 'info');
 
+        const nextDueDate = calcularProximoVencimento(diaVencimento);
+
         const { data: asaasResult, error: asaasError } = await _supabase.functions.invoke('create-asaas-subscription', {
             body: {
                 record: { id: client.id },
                 titularData: clientData,
-                seller: sellerName // Envia nome do vendedor para metadados se a função suportar
+                seller: sellerName, // Envia nome do vendedor para metadados se a função suportar
+                diaVencimento: diaVencimento,
+                nextDueDate: nextDueDate
             }
         });
 
@@ -245,16 +252,14 @@ async function handleSaleSubmit(event) {
 
         const paymentLink = asaasResult?.payment_link;
 
-        // 4. Registro do Histórico Financeiro com Vendedor (Local, para comissões)
+        // 4. Registro do Histórico Financeiro
         try {
             await _supabase.from('financial_history').insert([{
-                client_id: client.id,
-                type: 'Receita',
-                category: 'Venda de Plano', // Categoria específica
+                client_cpf: client.cpf,
+                client_name: `${client.nome} ${client.sobrenome}`,
                 amount: selectedPlan.price,
                 status: 'Pendente',
-                description: `Venda Plano ${selectedPlan.name} - Vendedor: ${sellerName}`,
-                due_date: new Date().toISOString().split('T')[0]
+                due_date: nextDueDate
             }]);
         } catch (finErr) {
             console.warn('Erro ao salvar histórico financeiro local:', finErr);
@@ -298,6 +303,25 @@ async function handleSaleSubmit(event) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Salvar e Gerar Contrato';
     }
+}
+
+/**
+ * Calcula a próxima data de vencimento baseada no dia escolhido.
+ * Se o dia do mês atual ainda não passou, usa o mês corrente. Caso contrário, usa o próximo mês.
+ */
+export function calcularProximoVencimento(diaVencimento) {
+    const hoje = new Date();
+    const diaHoje = hoje.getDate();
+    let ano = hoje.getFullYear();
+    let mes = hoje.getMonth(); // 0-indexed
+
+    if (diaHoje >= diaVencimento) {
+        mes += 1;
+        if (mes > 11) { mes = 0; ano += 1; }
+    }
+
+    const nextDate = new Date(ano, mes, diaVencimento);
+    return nextDate.toISOString().split('T')[0]; // YYYY-MM-DD
 }
 
 /**
