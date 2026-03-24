@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bim Benefícios - Sistema Interno</title>
+    <link rel="icon" type="image/png" href="imagens/fivecon.png.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -504,8 +505,10 @@
                                     <div class="tab-pane" id="tabExamesLab">
                                         <div class="editor-preview-layout">
                                             <div class="editor-column">
-                                                <div class="protocol-controls" style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
-                                                    <div class="form-group" style="margin-bottom: 0;"><label for="protocolSelect">Carregar
+                                                <div class="protocol-controls"
+                                                    style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
+                                                    <div class="form-group" style="margin-bottom: 0;"><label
+                                                            for="protocolSelect">Carregar
                                                             Protocolo</label><select id="protocolSelect">
                                                             <option value="">Selecione</option>
                                                         </select></div>
@@ -513,9 +516,12 @@
                                                         id="saveProtocolBtn"><i class="fas fa-save"></i> Salvar
                                                         Protocolo</button>
                                                     <button type="button" class="btn btn-warning btn-small"
-                                                        id="renameProtocolBtn" style="background-color: #ffc107; color: #333;"><i class="fas fa-edit"></i> Renomear</button>
+                                                        id="renameProtocolBtn"
+                                                        style="background-color: #ffc107; color: #333;"><i
+                                                            class="fas fa-edit"></i> Renomear</button>
                                                     <button type="button" class="btn btn-danger btn-small"
-                                                        id="deleteProtocolBtn"><i class="fas fa-trash"></i> Excluir</button>
+                                                        id="deleteProtocolBtn"><i class="fas fa-trash"></i>
+                                                        Excluir</button>
                                                 </div>
                                                 <hr>
                                                 <div class="form-group"><label for="examSearchInput">Buscar
@@ -553,8 +559,10 @@
                                     <div class="tab-pane" id="tabExamesImg">
                                         <div class="editor-preview-layout">
                                             <div class="editor-column">
-                                                <div class="protocol-controls" style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
-                                                    <div class="form-group" style="margin-bottom: 0;"><label for="protocolSelectImg">Carregar
+                                                <div class="protocol-controls"
+                                                    style="display: flex; gap: 5px; align-items: flex-end; flex-wrap: wrap;">
+                                                    <div class="form-group" style="margin-bottom: 0;"><label
+                                                            for="protocolSelectImg">Carregar
                                                             Protocolo</label><select id="protocolSelectImg">
                                                             <option value="">Selecione</option>
                                                         </select></div>
@@ -562,9 +570,12 @@
                                                         id="saveProtocolBtnImg"><i class="fas fa-save"></i> Salvar
                                                         Protocolo</button>
                                                     <button type="button" class="btn btn-warning btn-small"
-                                                        id="renameProtocolBtnImg" style="background-color: #ffc107; color: #333;"><i class="fas fa-edit"></i> Renomear</button>
+                                                        id="renameProtocolBtnImg"
+                                                        style="background-color: #ffc107; color: #333;"><i
+                                                            class="fas fa-edit"></i> Renomear</button>
                                                     <button type="button" class="btn btn-danger btn-small"
-                                                        id="deleteProtocolBtnImg"><i class="fas fa-trash"></i> Excluir</button>
+                                                        id="deleteProtocolBtnImg"><i class="fas fa-trash"></i>
+                                                        Excluir</button>
                                                 </div>
                                                 <hr>
                                                 <div class="form-group"><label for="manualExamInputImg">Adicionar Exame
@@ -832,7 +843,8 @@
                     <div class="content-header">
                         <h2 class="page-title">Caixa</h2>
                         <div>
-                            <button class="btn btn-success btn-small" id="btnCriarPagamento"><i class="fas fa-plus-circle"></i> Criar Pagamento</button>
+                            <button class="btn btn-success btn-small" id="btnCriarPagamento"><i
+                                    class="fas fa-plus-circle"></i> Criar Pagamento</button>
                             <button class="btn btn-primary btn-small" id="fecharCaixaBtn"><i class="fas fa-lock"></i>
                                 Fechamento</button>
                             <button class="btn btn-secondary btn-small" id="refreshCaixaBtn"><i
@@ -1417,7 +1429,6 @@
                                     <div class="form-group"><label>Plano</label>
                                         <select name="plano" required>
                                             <option value="">Selecione...</option>
-                                            <option value="Bim Familiar">Bim Familiar</option>
                                             <option value="Mult">Mult</option>
                                             <option value="Convenio">Convênio</option>
                                             <option value="Particular">Particular</option>
@@ -1683,9 +1694,11 @@
                                 </div>
                                 <div class="form-group" id="auxiliarProfissionaisContainer" style="display: none;">
                                     <label for="auxiliarProfissionaisSelect">Profissionais Auxiliados</label>
-                                    <select id="auxiliarProfissionaisSelect" name="assisted_professionals" multiple style="height: 100px;">
+                                    <select id="auxiliarProfissionaisSelect" name="assisted_professionals" multiple
+                                        style="height: 100px;">
                                     </select>
-                                    <small style="color: var(--gray-medium);">Segure Ctrl (ou Cmd) para selecionar múltiplos profissionais.</small>
+                                    <small style="color: var(--gray-medium);">Segure Ctrl (ou Cmd) para selecionar
+                                        múltiplos profissionais.</small>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
@@ -1753,19 +1766,25 @@
                                     0,00</strong>
                             </div>
 
-                            <div id="convenioFaturamentoMsg" style="display:none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 15px;">
+                            <div id="convenioFaturamentoMsg"
+                                style="display:none; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 15px;">
                                 <i class="fas fa-file-invoice" style="font-size: 1.5rem; color: #856404;"></i>
-                                <p style="margin-top: 8px; font-weight: bold; color: #856404;">Paciente com Plano Convênio</p>
-                                <p style="color: #856404; margin-top: 4px;">O pagamento será registrado como <strong>faturamento ao convênio</strong>.</p>
+                                <p style="margin-top: 8px; font-weight: bold; color: #856404;">Paciente com Plano
+                                    Convênio</p>
+                                <p style="color: #856404; margin-top: 4px;">O pagamento será registrado como
+                                    <strong>faturamento ao convênio</strong>.</p>
                             </div>
 
                             <div class="form-group" id="formaPgtoContainer">
                                 <label>Forma(s) de Pagamento</label>
                                 <div id="formasPagamentoList"></div>
-                                <button type="button" class="btn btn-secondary btn-small" id="btnAdicionarFormaPgto" style="margin-top: 8px;">
+                                <button type="button" class="btn btn-secondary btn-small" id="btnAdicionarFormaPgto"
+                                    style="margin-top: 8px;">
                                     <i class="fas fa-plus"></i> Adicionar Forma de Pagamento
                                 </button>
-                                <div id="formaPgtoAviso" style="display:none; margin-top: 8px; padding: 6px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;"></div>
+                                <div id="formaPgtoAviso"
+                                    style="display:none; margin-top: 8px; padding: 6px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">
+                                </div>
                             </div>
 
                             <div class="modal-footer">
@@ -1814,8 +1833,12 @@
 
                             <div id="fechamentoConvenioSection" style="display:none;">
                                 <hr style="margin-bottom: 15px;">
-                                <p style="font-size: 1rem; font-weight: bold; color: #856404; margin-bottom: 10px;"><i class="fas fa-file-invoice"></i> Faturamento Convênio (<span id="fechamentoConvenioCount">0</span> atendimento(s)):</p>
-                                <div id="fechamentoConvenioLista" style="max-height: 150px; overflow-y: auto; font-size: 0.9rem; background: #fff3cd; border-radius: 6px; padding: 10px;"></div>
+                                <p style="font-size: 1rem; font-weight: bold; color: #856404; margin-bottom: 10px;"><i
+                                        class="fas fa-file-invoice"></i> Faturamento Convênio (<span
+                                        id="fechamentoConvenioCount">0</span> atendimento(s)):</p>
+                                <div id="fechamentoConvenioLista"
+                                    style="max-height: 150px; overflow-y: auto; font-size: 0.9rem; background: #fff3cd; border-radius: 6px; padding: 10px;">
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -1833,10 +1856,12 @@
                         <div class="modal-body">
                             <!-- Toggle de modo -->
                             <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                                <button type="button" id="modoProcedimentoBtn" class="btn btn-primary btn-small" style="flex:1;">
+                                <button type="button" id="modoProcedimentoBtn" class="btn btn-primary btn-small"
+                                    style="flex:1;">
                                     <i class="fas fa-file-medical"></i> Procedimento Avulso
                                 </button>
-                                <button type="button" id="modoPedidoExameBtn" class="btn btn-secondary btn-small" style="flex:1;">
+                                <button type="button" id="modoPedidoExameBtn" class="btn btn-secondary btn-small"
+                                    style="flex:1;">
                                     <i class="fas fa-flask"></i> Pedido de Exames
                                 </button>
                             </div>
@@ -1845,10 +1870,14 @@
                             <div id="secaoProcedimentoAvulso">
                                 <div class="form-group">
                                     <label>Paciente</label>
-                                    <input type="text" id="criarPgtoClienteSearch" placeholder="Buscar paciente pelo nome..." autocomplete="off">
-                                    <div id="criarPgtoClienteResultados" style="display:none; border: 1px solid #ddd; border-radius: 4px; max-height: 160px; overflow-y: auto; margin-top: 2px; background: white; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                                    <input type="text" id="criarPgtoClienteSearch"
+                                        placeholder="Buscar paciente pelo nome..." autocomplete="off">
+                                    <div id="criarPgtoClienteResultados"
+                                        style="display:none; border: 1px solid #ddd; border-radius: 4px; max-height: 160px; overflow-y: auto; margin-top: 2px; background: white; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    </div>
                                     <input type="hidden" id="criarPgtoClienteId">
-                                    <small id="criarPgtoClienteSelecionado" style="color: var(--primary-color); font-weight: bold;"></small>
+                                    <small id="criarPgtoClienteSelecionado"
+                                        style="color: var(--primary-color); font-weight: bold;"></small>
                                 </div>
                                 <div class="form-group">
                                     <label>Profissional / Laboratório</label>
@@ -1858,11 +1887,13 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Procedimento / Descrição</label>
-                                    <input type="text" id="criarPgtoProcedimento" placeholder="Ex: Consulta, Exame de sangue, Raio-X...">
+                                    <input type="text" id="criarPgtoProcedimento"
+                                        placeholder="Ex: Consulta, Exame de sangue, Raio-X...">
                                 </div>
                                 <div class="form-group">
                                     <label>Valor (R$)</label>
-                                    <input type="number" id="criarPgtoValor" step="0.01" min="0" placeholder="0.00" style="font-size: 1.1rem; font-weight: bold;">
+                                    <input type="number" id="criarPgtoValor" step="0.01" min="0" placeholder="0.00"
+                                        style="font-size: 1.1rem; font-weight: bold;">
                                 </div>
                             </div>
 
@@ -1870,25 +1901,35 @@
                             <div id="secaoPedidoExame" style="display:none;">
                                 <div class="form-group">
                                     <label>Buscar Pedido por Paciente</label>
-                                    <input type="text" id="criarPgtoPedidoSearch" placeholder="Nome do paciente..." autocomplete="off">
-                                    <div id="criarPgtoPedidoResultados" style="display:none; border: 1px solid #ddd; border-radius: 4px; max-height: 160px; overflow-y: auto; margin-top: 2px; background: white; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+                                    <input type="text" id="criarPgtoPedidoSearch" placeholder="Nome do paciente..."
+                                        autocomplete="off">
+                                    <div id="criarPgtoPedidoResultados"
+                                        style="display:none; border: 1px solid #ddd; border-radius: 4px; max-height: 160px; overflow-y: auto; margin-top: 2px; background: white; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    </div>
                                     <input type="hidden" id="criarPgtoPedidoId">
                                     <input type="hidden" id="criarPgtoPedidoClienteId">
                                     <input type="hidden" id="criarPgtoPedidoClienteNome">
                                 </div>
 
                                 <div id="criarPgtoExamesContainer" style="display:none;">
-                                    <p style="font-weight: bold; margin-bottom: 8px; color: var(--gray-dark);">Exames do pedido <small style="color:var(--gray-medium);">(desmarque para remover do pedido)</small>:</p>
-                                    <div id="criarPgtoExamesLista" style="max-height: 220px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; padding: 8px;"></div>
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 10px; background: #f0f7f4; border-radius: 6px;">
+                                    <p style="font-weight: bold; margin-bottom: 8px; color: var(--gray-dark);">Exames do
+                                        pedido <small style="color:var(--gray-medium);">(desmarque para remover do
+                                            pedido)</small>:</p>
+                                    <div id="criarPgtoExamesLista"
+                                        style="max-height: 220px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; padding: 8px;">
+                                    </div>
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 10px; background: #f0f7f4; border-radius: 6px;">
                                         <span style="font-weight: bold;">Total a cobrar:</span>
-                                        <strong id="criarPgtoExamesTotal" style="font-size: 1.3rem; color: #2ecc71;">R$ 0,00</strong>
+                                        <strong id="criarPgtoExamesTotal" style="font-size: 1.3rem; color: #2ecc71;">R$
+                                            0,00</strong>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-close-modal="criarPagamentoModal">Cancelar</button>
+                                <button type="button" class="btn btn-secondary"
+                                    data-close-modal="criarPagamentoModal">Cancelar</button>
                                 <button type="button" class="btn btn-success" id="btnSalvarCriarPagamento">
                                     <i class="fas fa-plus-circle"></i> Criar Pagamento
                                 </button>

@@ -222,7 +222,7 @@ async function handleSaleSubmit(event) {
             const { error: depError } = await _supabase
                 .from('dependents')
                 .insert(dependentsToInsert);
-            if (depError) console.error('Erro não fatal dependentes:', depError);
+            if (depError) throw depError;
         }
 
         // 3. INTEGRAÇÃO ASAAS VIA EDGE FUNCTION
