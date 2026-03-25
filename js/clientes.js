@@ -775,7 +775,13 @@ async function handleMigratePlanToFamiliar() {
 
         if (error) {
             console.error("Supabase edge function error:", error);
-            throw error;
+            let errorMsg = error.message;
+            try {
+                const body = await error.context?.json();
+                errorMsg = body?.error || errorMsg;
+            } catch {}
+            showToast(`Erro na migração: ${errorMsg}`, 'error');
+            return;
         }
 
         if (data && data.success) {
