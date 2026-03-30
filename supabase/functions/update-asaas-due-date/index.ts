@@ -38,7 +38,7 @@ serve(async (req) => {
     if (subError || !subscription?.asaas_subscription_id) {
       return new Response(
         JSON.stringify({ success: false, error: 'Assinatura Asaas não encontrada para este cliente.' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
