@@ -163,15 +163,16 @@ async function handleSaleSubmit(event) {
         const currentUser = getCurrentUserProfile();
         const sellerName = currentUser ? currentUser.full_name : 'Sistema';
 
-        // 0. Verifica se cliente já existe
+        // 0. Verifica se já existe contrato deste CPF para o mesmo plano
         const { data: existingClient } = await _supabase
             .from('clients')
             .select('id')
             .eq('cpf', cpfClean)
+            .eq('plano', selectedPlanName)
             .maybeSingle();
 
         if (existingClient) {
-            throw new Error('CPF já cadastrado no sistema!');
+            throw new Error('Este CPF já possui um contrato ativo para este mesmo plano!');
         }
 
         // 1. Criação do Cliente

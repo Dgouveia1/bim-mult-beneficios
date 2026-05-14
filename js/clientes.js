@@ -404,7 +404,7 @@ async function handleNewClientSubmit(event) {
         return;
     }
 
-    if (titularFormProps.cpf) {
+    if (titularFormProps.cpf && titularFormProps.plano) {
         const originalBtnText = submitButton.innerHTML;
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando CPF...';
@@ -414,19 +414,20 @@ async function handleNewClientSubmit(event) {
                 .from('clients')
                 .select('id')
                 .eq('cpf', titularFormProps.cpf)
+                .eq('plano', titularFormProps.plano)
                 .maybeSingle();
 
             if (checkError) throw checkError;
 
             if (existingClient) {
-                showToast('ERRO: Este CPF já está cadastrado para outro cliente!');
+                showToast('ERRO: Este CPF já possui um contrato ativo para este mesmo plano!');
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalBtnText;
                 return;
             }
         } catch (error) {
-            console.error('Erro na verificação de CPF duplicado:', error);
-            showToast('Erro ao verificar disponibilidade do CPF.');
+            console.error('Erro na verificação de CPF + plano duplicado:', error);
+            showToast('Erro ao verificar disponibilidade do CPF para este plano.');
             submitButton.disabled = false;
             submitButton.innerHTML = originalBtnText;
             return;
