@@ -223,6 +223,28 @@ async function saveUser(event) {
                 }
             }
 
+            // Se for Usuário Clínica (medicos) ou Dentista, cria o perfil profissional vinculado
+            if (userData.role === 'medicos' || userData.role === 'dentista') {
+                const { data: newProfile } = await _supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', userData.email)
+                    .single();
+                if (newProfile) {
+                    const { data: existingProf } = await _supabase
+                        .from('professionals')
+                        .select('id')
+                        .eq('user_id', newProfile.id)
+                        .maybeSingle();
+                    if (!existingProf) {
+                        const { error: profError } = await _supabase
+                            .from('professionals')
+                            .insert({ name: userData.full_name, user_id: newProfile.id });
+                        if (profError) throw profError;
+                    }
+                }
+            }
+
             showToast('Usuário criado com sucesso!');
         }
 

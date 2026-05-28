@@ -71,10 +71,48 @@ async function openProfessionalModal(id) {
         document.getElementById('professionalSpecialty').value = prof.specialty;
         document.getElementById('professionalCRM').value = prof.CRM;
 
+        await populateUserLinkSelect(prof.user_id);
+
         professionalModal.style.display = 'flex';
 
     } catch (error) {
         showToast('Não foi possível carregar os dados do profissional.');
+    }
+}
+
+// Popula o <select> de vínculo de usuário com médicos/dentistas disponíveis
+async function populateUserLinkSelect(currentUserId) {
+    const select = document.getElementById('professionalUserId');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">-- Sem vínculo --</option>';
+
+    try {
+        const { data: profiles, error } = await _supabase
+            .from('profiles')
+            .select('id, full_name, email, role')
+            .in('role', ['medicos', 'dentista'])
+            .order('full_name');
+        if (error) throw error;
+
+        (profiles || []).forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.full_name || p.email || p.id} (${p.role})`;
+            if (currentUserId && p.id === currentUserId) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        // Se o user_id atual não bate com nenhum profile listado, mostra opção informativa
+        if (currentUserId && !Array.from(select.options).some(o => o.value === currentUserId)) {
+            const opt = document.createElement('option');
+            opt.value = currentUserId;
+            opt.textContent = `(usuário atual desconhecido: ${currentUserId})`;
+            opt.selected = true;
+            select.appendChild(opt);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar usuários para vínculo:', error);
     }
 }
 
@@ -84,10 +122,12 @@ async function saveProfessional(event) {
     const submitButton = professionalForm.querySelector('button[type="submit"]');
     submitButton.disabled = true;
 
+    const userIdValue = document.getElementById('professionalUserId').value;
     const professionalData = {
         name: document.getElementById('professionalName').value,
         specialty: document.getElementById('professionalSpecialty').value,
         CRM: document.getElementById('professionalCRM').value,
+        user_id: userIdValue ? userIdValue : null,
     };
 
     const id = professionalIdInput.value;
@@ -96,7 +136,7 @@ async function saveProfessional(event) {
         const { error } = await _supabase.from('professionals').update(professionalData).eq('id', id);
         if (error) throw error;
 
-        await logAction('UPDATE_PROFESSIONAL', { professionalId: id, name: professionalData.name });
+        await logAction('UPDATE_PROFESSIONAL', { professionalId: id, name: professionalData.name, user_id: professionalData.user_id });
 
         professionalModal.style.display = 'none';
         await loadProfessionalsData(); // Recarrega a tabela
